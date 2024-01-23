@@ -1,0 +1,443 @@
+.containerDesktop {
+    padding: 90px 85px;
+    height: 100vh;
+    animation: opacityUp 0.8s;
+    background-color: #F7F7F7;
+}
+
+.boxContainerDesktop {
+    border-radius: 20px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    min-height: 610px;
+    height: 610px;
+}
+
+.headContainerDesktop {
+    padding: 25px 30px;
+    border-bottom: 1px solid #E9EAED;
+    display: flex;
+    flex-direction: column;
+}
+
+.bodyContainerDesktop {
+    display: flex;
+    flex-direction: column;
+}
+
+.tableRequests {
+    border-radius: 10px;
+    height: 500px;
+    min-height: 70px;
+    overflow-y: scroll;
+    margin-bottom: 20px;
+}
+
+.tableRequests table {
+    width: 100%;
+}
+
+.tableRequests table tbody tr td {
+    border-bottom: 1px solid #E9EAED;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-direction: row;
+}
+
+.popUpView,
+.popUpSearch {
+    background-color: #00000088;
+    height: 100%;
+    width: 100vw;
+    position: absolute;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 99;
+    animation: opacityUp 0.3s;
+}
+
+.popUpViewCard {
+    height: 60%;
+    width: 80%;
+    padding: 10px;
+    border-radius: 20px;
+    background-color: white;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.popUpViewHead,
+.popUpSearchHead {
+    padding: 20px 30px;
+    border-bottom: 1px solid #E9EAED;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+}
+
+.popUpViewBody {
+    padding: 25px 30px;
+    border-bottom: 1px solid #E9EAED;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+}
+
+.popUpSearchBody {
+    padding: 20px 25px 10px 25px;
+    border-bottom: 1px solid #E9EAED;
+    width: 100%;
+    height: 60%;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+}
+
+.viewCardLeft {
+    width: 30%;
+    height: 100%;
+}
+
+
+.viewCardLeftBox {
+    padding: 20px;
+    border-radius: 20px;
+    width: 100%;
+    height: 80%;
+    background-color: #EAEAEA;
+}
+
+.viewCardLeftBox ul {
+    list-style: none;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+}
+
+.viewCardLeftBox ul li {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+}
+
+.viewCardLeftBox ul li p {
+    font-size: 15px;
+}
+
+.viewCardRight {
+    width: 60%;
+    height: 100%;
+}
+
+.viewCardRightBox {
+    padding: 20px;
+    border-radius: 20px;
+    width: 100%;
+    height: 80%;
+    background-color: #EAEAEA;
+}
+
+.tableRequestInfo {
+    border-radius: 10px;
+    height: 100%;
+    min-height: 70px;
+    overflow-y: scroll;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+}
+
+.tableRequestInfo table {
+    width: 100%;
+}
+
+.tableRequestInfo table tbody tr td {
+    border-bottom: 1px solid #E9EAED;
+    background-color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+}
+
+.tableRequestInfo table tbody tr td span {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+}
+
+.tableRequestInfo table tbody tr td span p {
+    font-size: 15px;
+}
+
+.popUpViewButtons,
+.popUpSearchButtons {
+    width: 100%;
+    margin-top: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-direction: row;
+}
+
+/* History Page Styles */
+
+.historyContainer,
+.familyContainer,
+.staffContainer {
+    height: 100px;
+    margin-bottom: 20px;
+}
+
+.searchBoxHistory,
+.searchBoxFamily {
+    padding: 10px 30px;
+    border-bottom: 1px solid #E9EAED;
+    height: 80px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: row;
+}
+
+.searchBoxInputs {
+    width: 72%;
+}
+
+.searchBoxSelect {
+    margin: 0 0 0 20px;
+    padding: 0px 10px;
+    height: 35px;
+    border: 1px solid #696C73;
+    border-radius: 10px;
+    font-size: 13px;
+    width: 200px;
+}
+
+.searchBoxButtons {
+    width: 320px;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+}
+
+.tableHistory {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.tableHistory thead {
+    height: 40px;
+    display: block;
+    width: 100%;
+    background-color: #F2F2F2;
+}
+
+.tableHistory thead tr th {
+    font-size: 15px;
+    padding: 5px 0px;
+    font-weight: 600;
+    margin: 0;
+    text-align: center;
+    color: #515151;
+}
+
+
+.tableHistory tbody {
+    height: 370px;
+    display: block;
+    overflow: auto;
+    width: 100%;
+}
+
+.tableHistory thead tr th {
+    text-align: center;
+    color: #515151;
+}
+
+.tableHistory thead tr {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    padding: 5px 0px;
+}
+
+
+.tableHistory tbody tr td {
+    text-align: center;
+}
+
+.tableHistory tbody tr {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+    border-bottom: 1px solid #E9EAED;
+    background-color: white;
+    padding: 10px 0px;
+}
+
+.tableHistory thead tr th:nth-child(1),
+.tableHistory thead tr th:last-child {
+    width: 15%;
+}
+
+.tableHistory thead tr th:nth-child(2),
+.tableHistory thead tr th:nth-child(3),
+.tableHistory thead tr th:nth-child(4),
+.tableHistory thead tr th:nth-child(5),
+.tableHistory thead tr th:nth-child(6),
+.tableHistory thead tr th:nth-child(7),
+.tableHistory thead tr th:nth-child(8) {
+    width: 8.75%;
+}
+
+.tableHistory tbody tr td:nth-child(1),
+.tableHistory tbody tr td:last-child {
+    width: 15%;
+}
+
+.tableHistory tbody tr td:nth-child(2),
+.tableHistory tbody tr td:nth-child(3),
+.tableHistory tbody tr td:nth-child(4),
+.tableHistory tbody tr td:nth-child(5),
+.tableHistory tbody tr td:nth-child(6),
+.tableHistory tbody tr td:nth-child(7),
+.tableHistory tbody tr td:nth-child(8) {
+    width: 8.75%;
+}
+
+.tableHistory thead tr th:nth-last-child(1) {
+    border-radius: 0 20px 0 0;
+}
+
+.tableHistory thead tr th:nth-child(1) {
+    border-radius: 20px 0 0 0;
+}
+
+.popUpSearchCard {
+    width: 80%;
+    height: 65%;
+    padding: 10px;
+    border-radius: 20px;
+    background-color: white;
+    box-shadow: rgba(0, 0, 0, 0.25) 0px 54px 55px, rgba(0, 0, 0, 0.12) 0px -12px 30px, rgba(0, 0, 0, 0.12) 0px 4px 6px, rgba(0, 0, 0, 0.17) 0px 12px 13px, rgba(0, 0, 0, 0.09) 0px -3px 5px;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+}
+
+.searchCardTop {
+    width: 100%;
+    height: 50%;
+}
+
+.searchCardTopBox {
+    border-radius: 20px;
+    width: 100%;
+    height: 80%;
+    display: flex;
+    flex-direction: row;
+    margin-bottom: 10px;
+}
+
+.searchCardTopBox div:nth-child(1) {
+    width: 200px;
+    margin-right: 20px;
+}
+
+.searchCardTopBox div:nth-child(2) {
+    width: 200px;
+    margin-right: 20px;
+}
+
+.searchCardTopBox div:nth-child(3) {
+    width: 150px;
+    margin-right: 20px;
+}
+
+.searchCardTopBox div:nth-child(4) {
+    width: 200px;
+}
+
+.searchForms {
+    display: flex;
+    flex-direction: column;
+}
+
+.searchCardBottom {
+    width: 100%;
+    height: 50%;
+}
+
+.searchCardBottomBox {
+    border-radius: 20px;
+    width: 100%;
+    height: 80%;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+}
+
+.searchCardBottomBox div:nth-child(1) {
+    width: 200px;
+    margin-right: 20px;
+}
+
+.searchCardBottomBox div:nth-child(2) {
+    width: 200px;
+    margin-right: 20px;
+}
+
+.searchCardBottomBox div:nth-child(3) {
+    width: 150px;
+    margin-right: 20px;
+}
+
+.searchCardBottomBox div:last-child {
+    width: 200px;
+    margin-left: 10px;
+}
+
+/* Status Elements Style */
+
+.validado-class {
+    color: green;
+    background-color: #DAE7DB;
+    padding: 5px 10px;
+    border-radius: 15px;
+}
+
+.invalidado-class {
+    color: red;
+    background-color: #FFBABA;
+    padding: 5px 10px;
+    border-radius: 15px;
+}
+
+.pendente-class {
+    color: orange;
+    background-color: rgba(255, 218, 149, 0.463);
+    padding: 5px 10px;
+    border-radius: 15px;
+}
+
