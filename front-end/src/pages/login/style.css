@@ -28,6 +28,10 @@
     margin-top: 40px;
 }
 
+.margin-top-20 {
+    margin-top: 20px;
+}
+
 /* Login Page Style */
 
 .body {
@@ -183,6 +187,7 @@
     }
 
     .loadingSection {
+        display: -webkit-flex;
         width: 100%;
         height: 50vh;
         border-radius: 0;
@@ -494,7 +499,7 @@
     transition: all .5s ease;
     width: 125px;
     height: 36px;
-    background-color: #022B7D;
+    background-color: #003B50;
     border: none;
     border-radius: 10px;
     color: #fff;
@@ -504,14 +509,14 @@
 }
 
 .button-10:hover {
-    background-color: #345AA6;
+    background-color: #006c94;
 }
 
 .button-11 {
     transition: all .5s ease;
-    width: 179px;
+    width: 200px;
     height: 36px;
-    background-color: #FF6B00;
+    background-color: #276375;
     border: none;
     border-radius: 10px;
     color: #fff;
@@ -520,28 +525,8 @@
     box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 
-.button-11:hover,
-.button-14:hover,
-.button-12:hover {
-    background-color: #FFA800;
-}
-
-.button-12 {
-    transition: all .5s ease;
-    width: 220px;
-    height: 36px;
-    background-color: #FF6B00;
-    border: none;
-    border-radius: 10px;
-    color: #fff;
-    font-weight: 400;
-    font-size: 15px;
-    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 15px;
+.button-11:hover{
+    background-color: #006c94;
 }
 
 .button-13 {
@@ -561,24 +546,6 @@
     border: none;
     border-radius: 10px;
     margin: 4px;
-}
-
-.button-14 {
-    transition: all .5s ease;
-    width: 250px;
-    height: 36px;
-    background-color: #FF6B00;
-    border: none;
-    border-radius: 10px;
-    color: #fff;
-    font-weight: 400;
-    font-size: 15px;
-    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 15px;
 }
 
 .button-15 {
@@ -644,9 +611,8 @@
     padding: 0px 10px;
     height: 42px;
     min-height: 42px;
-    border: 1px solid #696C73;
-    border-radius: 10px;
-    margin-bottom: 10px;
+    border: 1px solid #c9cbcf;
+    border-radius: 5px;
     font-size: 13px;
     font-weight: 400;
 }
@@ -693,6 +659,20 @@
 
 .form-4:focus {
     border: 2px solid #3391FF;
+}
+
+.select1{
+    width: 300px;
+    min-width: 300px;
+    font-size: 13px;
+    font-weight: 400;
+    height: 42px;
+    min-height: 42px;
+    margin-right: 20px;
+}
+.select1 input{
+    height: 28px;
+    min-height: 28px;
 }
 
 /* Animation Styles */

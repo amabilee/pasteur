@@ -19,7 +19,9 @@
     "react-bootstrap": "^2.9.2",
     "react-device-detect": "^2.2.3",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.21.1"
+    "react-imask": "^7.4.0",
+    "react-router-dom": "^6.21.1",
+    "react-select": "^5.8.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

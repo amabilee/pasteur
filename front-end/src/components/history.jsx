@@ -1,30 +1,76 @@
 import React, { useState, useEffect } from 'react';
 import { Container } from 'react-bootstrap'
 import moment from 'moment';
+import Select from 'react-select';
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-
 import './headers/style.css';
 
+//Import Components
+import Title from '../components/Title';
+import PopUpSearch from '../components/popSearch';
+const HistoryTable = ({ data }) => (
+  <table className='table table-sm tableHistory' id="table-history">
+    <thead>
+      <tr>
+        <th scope="col">NOME</th>
+        <th scope="col">MATRÍCULA</th>
+        <th scope="col">PERÍODO</th>
+        <th scope="col">BOX</th>
+        <th scope="col">HORA</th>
+        <th scope="col">DATA</th>
+        <th scope="col">TIPO</th>
+        <th scope="col">STATUS</th>
+        <th scope="col">COLABORADOR</th>
+      </tr>
+    </thead>
+    <tbody>
+      {data.map((movimentacao, index) => (
+        <tr key={index}>
+          <td>{movimentacao.nome}</td>
+          <td>{movimentacao.matricula}</td>
+          <td>{movimentacao.periodo}</td>
+          <td>{movimentacao.box}</td>
+          <td>{movimentacao.hora}</td>
+          <td>{movimentacao.data}</td>
+          <td>{movimentacao.tipo}</td>
+          <td className={
+            movimentacao.status === 'Validado' ? 'validado-class' :
+              movimentacao.status === 'Invalidado' ? 'invalidado-class' :
+                movimentacao.status === 'Pendente' ? 'pendente-class' :
+                  ''
+          }>
+            {movimentacao.status}
+          </td>
+          <td>{movimentacao.colaborador}</td>
+        </tr>
+      ))}
+
+    </tbody>
+  </table>
+);
+
 function History() {
-  const [showPopView, setShowPopView] = useState(false);
+  const [showPopSearch, setShowPopSearch] = useState(false);
   const [searchCategory, setSearchCategory] = useState('Cronológico');
+  const [errorMessage, setErrorMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [resultadosPesquisa, setResultadosPesquisa] = useState([]);
-  const [alunoName, setAlunoName] = useState('');
-  const [alunoMatricula, setAlunoMatricula] = useState('');
-  const [alunoPeriodo, setAlunoPeriodo] = useState(0);
-  const [alunoBox, setAlunoBox] = useState('');
-  const [colabName, setColabName] = useState('');
-  const [tipo, setTipo] = useState('0');
-  const [date, setDate] = useState("");
-  const [status, setStatus] = useState('0');
+  const [resultadosPesquisaCronologico, setResultadosPesquisaCronologico] = useState([]);
+  const [alunoName_his, setAlunoName] = useState('');
+  const [alunoMatricula_his, setAlunoMatricula] = useState('');
+  const [alunoPeriodo_his, setAlunoPeriodo] = useState('');
+  const [alunoBox_his, setAlunoBox] = useState('');
+  const [colabName_his, setColabName] = useState(null);
+  const [tipo_his, setTipo] = useState('');
+  const [date_his, setDate] = useState('');
+  const [status_his, setStatus] = useState('');
   const [open, setOpen] = React.useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('')
   const [snackBarStyle, setSnackBarStyle] = useState({ sx: { background: "white", color: "black", borderRadius: '10px' } })
 
-  var history = [ //banco com os dados do historico function getHistorico()
+  var history = [
     {
       matricula: '3456789',
       nome: 'Isabela',
@@ -387,135 +433,40 @@ function History() {
     },
   ];
 
-  var staff = [ //banco com o GET dados dos colaboradores function getStaff()
-    {
-      nome: 'Ana Silva',
-      matricula: '14803291',
-      email: 'example@website.com',
-      senha: '123'
-    },
-    {
-      nome: 'Paulo Oliveira',
-      matricula: '21506783',
-      email: 'ana.silva@email.com',
-      senha: '456'
-    },
-    {
-      nome: 'Rodrigo Santos',
-      matricula: '18954374',
-      email: 'carlos.cost@gmail.com',
-      senha: '789'
-    },
-    {
-      nome: 'Camila Lima',
-      matricula: '30567856',
-      email: 'fernanda.lima@hotmail.com',
-      senha: 'abc'
-    },
-    {
-      nome: 'Renato Alves',
-      matricula: '12675429',
-      email: 'rafaela.santos@gmail.com',
-      senha: 'xyz'
-    },
-    {
-      nome: 'Juliana Costa',
-      matricula: '43219837',
-      email: 'gabriel.souza@yahoo.com',
-      senha: '987'
-    },
-    {
-      nome: 'Carlos Oliveira',
-      matricula: '56789045',
-      email: 'patricia.oliveira@mail.com',
-      senha: '654'
-    },
-    {
-      nome: 'Mariana Santos',
-      matricula: '30987612',
-      email: 'vinicius.pereira@gmail.com',
-      senha: '321'
-    },
-    {
-      nome: 'Pedro Almeida',
-      matricula: '16543298',
-      email: 'larissa.alves@hotmail.com',
-      senha: 'aaa'
-    },
-    {
-      nome: 'Lucas Rodrigues',
-      matricula: '54321678',
-      email: 'roberto.lima@mail.com',
-      senha: 'bbb'
-    },
-    {
-      nome: 'Fernanda Silva',
-      matricula: '87654321',
-      email: 'juliana.pereira@yahoo.com',
-      senha: 'ccc'
-    },
-    {
-      nome: 'Márcia Oliveira',
-      matricula: '98765432',
-      email: 'pedro.santos@gmail.com',
-      senha: 'ddd'
-    },
-    {
-      nome: 'Ricardo Almeida',
-      matricula: '23456789',
-      email: 'camila.costa@mail.com',
-      senha: 'eee'
-    },
-    {
-      nome: 'Fernanda Costa',
-      matricula: '67890123',
-      email: 'lucas.santos@hotmail.com',
-      senha: 'fff'
-    },
-    {
-      nome: 'Renato Santos',
-      matricula: '12345678',
-      email: 'isabela.lima@gmail.com',
-      senha: 'ggg'
-    },
-    {
-      nome: 'Camila Lima',
-      matricula: '89012345',
-      email: 'andre.pereira@mail.com',
-      senha: 'hhh'
-    },
-    {
-      nome: 'Lucas Oliveira',
-      matricula: '45678901',
-      email: 'aline.oliveira@yahoo.com',
-      senha: 'iii'
-    },
-    {
-      nome: 'Mariana Costa',
-      matricula: '23456789',
-      email: 'thiago.alves@mail.com',
-      senha: 'jjj'
-    },
-    {
-      nome: 'Pedro Almeida',
-      matricula: '90123456',
-      email: 'marina.costa@hotmail.com',
-      senha: 'kkk'
-    }
+  var staff = [
+    { nome: 'Ana Silva', matricula: '14803291', email: 'example@website.com', senha: '123' },
+    { nome: 'Paulo Oliveira', matricula: '21506783', email: 'ana.silva@email.com', senha: '456' },
+    { nome: 'Rodrigo Santos', matricula: '18954374', email: 'carlos.cost@gmail.com', senha: '789' },
+    { nome: 'Camila Lima', matricula: '30567856', email: 'fernanda.lima@hotmail.com', senha: 'abc' },
+    { nome: 'Renato Alves', matricula: '12675429', email: 'rafaela.santos@gmail.com', senha: 'xyz' },
+    { nome: 'Juliana Costa', matricula: '43219837', email: 'gabriel.souza@yahoo.com', senha: '987' },
+    { nome: 'Carlos Oliveira', matricula: '56789045', email: 'patricia.oliveira@mail.com', senha: '654' },
+    { nome: 'Mariana Santos', matricula: '30987612', email: 'vinicius.pereira@gmail.com', senha: '321' },
+    { nome: 'Pedro Almeida', matricula: '16543298', email: 'larissa.alves@hotmail.com', senha: 'aaa' },
+    { nome: 'Lucas Rodrigues', matricula: '54321678', email: 'roberto.lima@mail.com', senha: 'bbb' },
+    { nome: 'Fernanda Silva', matricula: '87654321', email: 'juliana.pereira@yahoo.com', senha: 'ccc' },
+    { nome: 'Márcia Oliveira', matricula: '98765432', email: 'pedro.santos@gmail.com', senha: 'ddd' },
+    { nome: 'Ricardo Almeida', matricula: '23456789', email: 'camila.costa@mail.com', senha: 'eee' },
+    { nome: 'Fernanda Costa', matricula: '67890123', email: 'lucas.santos@hotmail.com', senha: 'fff' },
+    { nome: 'Renato Santos', matricula: '12345678', email: 'isabela.lima@gmail.com', senha: 'ggg' },
+    { nome: 'Camila Lima', matricula: '89012345', email: 'andre.pereira@mail.com', senha: 'hhh' },
+    { nome: 'Lucas Oliveira', matricula: '45678901', email: 'aline.oliveira@yahoo.com', senha: 'iii' },
+    { nome: 'Mariana Costa', matricula: '23456789', email: 'thiago.alves@mail.com', senha: 'jjj' },
+    { nome: 'Pedro Almeida', matricula: '90123456', email: 'marina.costa@hotmail.com', senha: 'kkk' }
   ]
 
-  const openSnackBarMessage = () => { //funcão para abrir o alerta
+  const openSnackBarMessage = () => {
     setOpen(true);
   };
 
-  const closeSnackBarMessage = (event, reason) => { //funcão para fechar o alerta
+  const closeSnackBarMessage = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
     setOpen(false);
   };
 
-  const alertBox = ( //alertBox do componente de snackBar
+  const alertBox = (
     <React.Fragment>
       <IconButton
         size="small"
@@ -528,219 +479,201 @@ function History() {
     </React.Fragment>
   );
 
-  function handleSearchTermChange(e) { //função para atualizar o termo de pesquisa
+  //Pesquisa Historico
+
+  function handleSearchTermChange(e) {
     setSearchTerm(e.target.value);
   };
 
-  function handleSearchCategoryChange(e) { //função para atualizar a categoria de pesquisa selecionada
+  function handleSearchCategoryChange(e) {
     setSearchCategory(e.target.value);
   };
 
-  useEffect(() => { //exibir inicialmente os resultados ja em ordem cronologica
-    const sortedResultados = history.sort((a, b) => {
-      const dateTimeA = `${a.data} ${a.hora}`;
-      const dateTimeB = `${b.data} ${b.hora}`;
-      return -dateTimeA.localeCompare(dateTimeB);
-    });
-    setResultadosPesquisa(sortedResultados);
+  useEffect(() => {
+    handleCronologicalResult()
+    setComponentData()
   }, []);
 
-  function handleSearchSimple() { //função para retornar resultados da pesquisa simples
+  function handleSearchSimple() {
+    const normalizedSearchTerm = searchTerm.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
     const resultadosFiltrados = history.filter(aluno => {
       if (searchCategory === 'Cronológico' || searchTerm === '') {
-        history.sort((a, b) => {
-          const dateTimeA = `${a.data} ${a.hora}`;
-          const dateTimeB = `${b.data} ${b.hora}`;
-          return -dateTimeA.localeCompare(dateTimeB);
-        });
-      } else if (searchCategory === 'Nome') {
-        return aluno.nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(searchTerm.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
-      } else if (searchCategory === 'Matrícula') {
-        return aluno.matricula.includes(searchTerm);
-      } else if (searchCategory === 'Período') {
-        return aluno.periodo.includes(searchTerm);
-      } else if (searchCategory === 'Box') {
-        return aluno.box.includes(searchTerm);
-      } else if (searchCategory === 'Hora') {
-        return aluno.hora.includes(searchTerm);
-      } else if (searchCategory === 'Data') {
-        return aluno.data.includes(searchTerm);
-      } else if (searchCategory === 'Status') {
-        return aluno.status.toLowerCase().includes(searchTerm.toLowerCase());
-      } else if (searchCategory === 'Colaborador') {
-        return aluno.colaborador.toLowerCase().includes(searchTerm.toLowerCase());
-      } else if (searchCategory === 'Tipo') {
-        return aluno.tipo.toLowerCase().includes(searchTerm.toLowerCase());
+        return true;
       }
-      return true;
+      switch (searchCategory) {
+        case 'Nome':
+          return aluno.nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(normalizedSearchTerm);
+        case 'Matrícula':
+          return aluno.matricula.includes(searchTerm);
+        case 'Período':
+          return aluno.periodo.includes(searchTerm);
+        case 'Box':
+          return aluno.box.includes(searchTerm);
+        case 'Hora':
+          return aluno.hora.includes(searchTerm);
+        case 'Data':
+          return aluno.data.includes(searchTerm);
+        case 'Status':
+          return aluno.status.toLowerCase().includes(searchTerm.toLowerCase());
+        case 'Colaborador':
+          return aluno.colaborador.toLowerCase().includes(searchTerm.toLowerCase());
+        case 'Tipo':
+          return aluno.tipo.toLowerCase().includes(searchTerm.toLowerCase());
+        default:
+          return true;
+      }
     });
-    const sortedResultados = resultadosFiltrados.sort((a, b) => {
-      const dateTimeA = `${a.data} ${a.hora}`;
-      const dateTimeB = `${b.data} ${b.hora}`;
-      return -dateTimeA.localeCompare(dateTimeB);
-    });
-    setResultadosPesquisa(sortedResultados);
+
+    handleSearchResult(resultadosFiltrados);
   }
 
-  function handleSearchAdvanced() { //função para retornar resultados da pesquisa
-    const base = {
-      alunoName: '',
-      alunoMatricula: '',
-      alunoPeriodo: 0,
-      alunoBox: '',
-      date: "",
-    };
+  function handleSearchAdvanced() {
+    const base = { alunoName: '', alunoMatricula: '', alunoPeriodo: '', alunoBox: '', date: '' };
 
-    const keys = [];
-    const values = [];
+    const filterConditions = [
+      { key: 'nome', value: alunoName_his.toLowerCase(), condition: alunoName_his !== base.alunoName },
+      { key: 'matricula', value: alunoMatricula_his, condition: alunoMatricula_his !== base.alunoMatricula },
+      { key: 'periodo', value: alunoPeriodo_his, condition: alunoPeriodo_his !== base.alunoPeriodo },
+      { key: 'box', value: alunoBox_his, condition: alunoBox_his !== base.alunoBox },
+      { key: 'colaborador', value: colabName_his, condition: colabName_his?.length >= 2 },
+      { key: 'tipo', value: tipo_his, condition: tipo_his?.length >= 3 },
+      { key: 'status', value: status_his, condition: status_his?.length >= 3 },
+      { key: 'data', value: date_his, condition: date_his !== base.date && date_his?.includes('-') },
+    ];
+
+    const filteredConditions = filterConditions.filter(({ condition }) => condition);
+    const keys = filteredConditions.map(({ key }) => key);
+    const values = filteredConditions.map(({ value }) => String(value).toLowerCase());
+
     let result = [];
     let search = [];
 
-    if (alunoName !== base.alunoName) {
-      keys.push('nome');
-      values.push(alunoName.toLowerCase());
+    if (filteredConditions.some(({ key }) => key === 'data')) {
+      const [start, end] = date_his.split('-').map(d => d.trim());
+      search = history.filter(e => isDateInRange(e['data'], start, end));
+      keys.splice(keys.indexOf('data'), 1);
+      result = search.filter(e => keys.every(key => {
+        const value = String(e[key]).toLowerCase();
+        return values.some(val => value.includes(val));
+      }));
     }
-    if (alunoMatricula !== base.alunoMatricula) {
-      keys.push('matricula');
-      values.push(alunoMatricula);
+    else {
+      result = history.filter(e => keys.every(key => {
+        const value = String(e[key]).toLowerCase();
+        return values.some(val => value.includes(val));
+      }));
     }
-    if (alunoPeriodo !== base.alunoPeriodo) {
-      keys.push('periodo');
-      values.push(alunoPeriodo);
-    }
-    if (alunoBox !== base.alunoBox) {
-      keys.push('box');
-      values.push(alunoBox);
-    }
-    if (colabName.length >= 2) {
-      keys.push('colaborador');
-      values.push(colabName);
-    }
-    if (tipo.length >= 3) {
-      keys.push('tipo');
-      values.push(tipo);
-    }
-    if (status.length >= 3) {
-      keys.push('status');
-      values.push(status);
-    }
-    if (date !== base.date) {
-      if (date.includes('-')) {
-        const [start, end] = date.split('-').map(d => d.trim());
-        console.log('Intervalo de datas:', start, end);
-        search = history.filter(
-          e => isDateInRange(e['data'], start, end)
-        );
-        result = search.filter(e =>
-          keys.every(a => values.map(v => v.toLowerCase()).includes(e[a].toLowerCase()))
-        );
-      } else {
-        result = history.filter(e =>
-          keys.every(a => values.map(v => v.toLowerCase()).includes(e[a].toLowerCase()))
-        );
-      }
-    } else {
-      result = history.filter(e =>
-        keys.every(a => {
-          const value = String(e[a]).toLowerCase(); // Converte o valor para string antes de chamar toLowerCase()
-          return values.map(v => String(v).toLowerCase()).includes(value);
-        })
-      );
-    }
-    console.log(result);
-    console.log(keys);
-    console.log(values);
 
-    setShowPopView(false);
-
-    const sortedResultados = result.sort((a, b) => {
-      const dateTimeA = `${a.data} ${a.hora}`;
-      const dateTimeB = `${b.data} ${b.hora}`;
-      return -dateTimeA.localeCompare(dateTimeB);
-    });
-
-    setResultadosPesquisa(sortedResultados);
-    openSnackBarMessage()
-    if (sortedResultados.length === 0) {
-      setSnackBarMessage('Não foram encontrados resultados')
-      setSnackBarStyle({ sx: { background: "#BE5353", color: "white", borderRadius: '15px' } })
-    } else {
-      setSnackBarMessage('Pesquisa realizada com sucesso')
-      setSnackBarStyle({ sx: { background: "#79B874", color: "white", borderRadius: '15px' } })
-    }
-    returnSearch();
+    handleSearchResult(result);
   }
-
-  function isDateInRange(date, start, end) { //funcão para calcular range de datas
+  
+  function isDateInRange(date, start, end) {
+    console.log('Input Date:', date);
+    console.log('Start Date:', start);
+    console.log('End Date:', end);
     var dateObj = moment(date, ['DD/MM/YYYY'], true);
     var startDateObj = moment(start, ['DD/MM/YYYY'], true);
     var endDateObj = moment(end, ['DD/MM/YYYY'], true);
     return dateObj.isSameOrAfter(startDateObj) && dateObj.isSameOrBefore(endDateObj);
   }
 
-  function returnSearch() { //função para limpar pop up
-    setShowPopView(false)
+  function handleCronologicalResult() {
+    const sortedResultados = history.sort((a, b) => {
+      const dateTimeA = `${a.data} ${a.hora}`;
+      const dateTimeB = `${b.data} ${b.hora}`;
+      const dateObjectA = new Date(dateTimeA.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1'));
+      const dateObjectB = new Date(dateTimeB.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1'));
+      return dateObjectB - dateObjectA;
+    });
+
+    setResultadosPesquisa(sortedResultados);
+  }
+
+  function handleSearchResult(result) {
+    const sortedResultados = result.sort((a, b) => {
+      const dateTimeA = `${a.data} ${a.hora}`;
+      const dateTimeB = `${b.data} ${b.hora}`;
+      const dateObjectA = new Date(dateTimeA.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1')); // Convert to 'YYYY-MM-DD'
+      const dateObjectB = new Date(dateTimeB.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1'));
+      return dateObjectB - dateObjectA;
+    });
+    setResultadosPesquisa(sortedResultados);
+    openSnackBarMessage()
+    if (result.length === 0) {
+      setSnackBarMessage('Não foram encontrados resultados')
+      setSnackBarStyle({ sx: { background: "#BE5353", color: "white", borderRadius: '15px' } })
+    } else {
+      setSnackBarMessage('Pesquisa realizada com sucesso')
+      setSnackBarStyle({ sx: { background: "#79B874", color: "white", borderRadius: '15px' } })
+    }
+    returnSearch()
+  }
+
+  function returnSearch() {
+    setShowPopSearch(false)
     setAlunoName('');
     setAlunoMatricula('');
-    setAlunoPeriodo(0);
+    setAlunoPeriodo('');
     setAlunoBox('');
-    setColabName('');
-    setTipo(0);
-    setStatus('0');
+    setColabName();
+    setTipo('');
+    setStatus('');
     setDate('');
     setSearchCategory('Cronológico');
     setSearchTerm('');
   }
 
+  // Components
 
-  $(function () { //componente do seletor de datas
+  $(function () {
     const dateFilterInput = $('input[name="datefilter"]');
-
     dateFilterInput.daterangepicker({
       autoUpdateInput: false,
       locale: {
         cancelLabel: 'Clear'
       }
     });
-
     const updateDateValue = (newValue) => {
       dateFilterInput.val(newValue);
       handleDateChange({ target: { value: newValue } });
     };
-
     dateFilterInput.on('apply.daterangepicker', function (ev, picker) {
       const newDateValue = `${picker.startDate.format('DD/MM/YYYY')} - ${picker.endDate.format('DD/MM/YYYY')}`;
       updateDateValue(newDateValue);
     });
-
     dateFilterInput.on('cancel.daterangepicker', function () {
       updateDateValue('');
     });
   });
 
-  const handleDateChange = (e) => { //função para onChange da data
+  const handleDateChange = (e) => {
     setDate(e.target.value);
   };
+
+  const [titleComponent, setTitleComponent] = useState('')
+
+  function setComponentData() {
+    setTitleComponent(['Histórico de Fluxo de Caixas', 'Movimentações'])
+  }
+
+  const optionsColaborador = staff.map(e => ({
+    label: e.nome,
+    value: e.nome,
+  }));
 
   return (
     <>
       <Container className='containerDesktop'>
         <div className='boxContainerDesktop'>
           <div className="headContainerDesktop">
-            <h2 className='body-normal text-color-5'>Movimentações</h2>
-            <h1 className='heading-4'>Histórico de Fluxo de Caixas</h1>
+            <Title parentToChild={titleComponent} />
           </div>
           <div className="bodyContainerDesktop">
             <div className="historyContainer">
               <div className="searchBoxHistory">
                 <div className="searchBoxInputs">
-                  <input
-                    type='text'
-                    placeholder="Pesquisar por nome, matrícula ..."
-                    className='form-3'
-                    value={searchTerm}
-                    onChange={handleSearchTermChange}
-                  />
+                  <input type='text' placeholder="Pesquisar por nome, matrícula ..." className='form-3' value={searchTerm} onChange={handleSearchTermChange} />
                   <select value={searchCategory} onChange={handleSearchCategoryChange} className='searchBoxSelect'>
                     <option value='Cronológico'>Cronológico</option>
                     <option>Nome</option>
@@ -756,192 +689,90 @@ function History() {
                 </div>
                 <div className="searchBoxButtons">
                   <button className='button-10' onClick={handleSearchSimple}>Pesquisar</button>
-                  <button className='button-11' onClick={() => setShowPopView(true)}>Pesquisa avançada</button>
+                  <button className='button-11' onClick={() => setShowPopSearch(true)}>Pesquisa avançada</button>
                 </div>
               </div>
-              <table className='table table-sm tableHistory' id="table-history">
-                <thead>
-                  <tr>
-                    <th scope="col">NOME</th>
-                    <th scope="col">MATRÍCULA</th>
-                    <th scope="col">PERÍODO</th>
-                    <th scope="col">BOX</th>
-                    <th scope="col">HORA</th>
-                    <th scope="col">DATA</th>
-                    <th scope="col">TIPO</th>
-                    <th scope="col">STATUS</th>
-                    <th scope="col">COLABORADOR</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {resultadosPesquisa.map((aluno, index) => (
-                    <tr key={index}>
-                      <td>{aluno.nome}</td>
-                      <td>{aluno.matricula}</td>
-                      <td>{aluno.periodo}</td>
-                      <td>{aluno.box}</td>
-                      <td>{aluno.hora}</td>
-                      <td>{aluno.data}</td>
-                      <td>{aluno.tipo}</td>
-                      <td className={
-                        aluno.status === 'Validado' ? 'validado-class' :
-                          aluno.status === 'Invalidado' ? 'invalidado-class' :
-                            aluno.status === 'Pendente' ? 'pendente-class' :
-                              ''
-                      }>
-                        {aluno.status}
-                      </td>
-                      <td>{aluno.colaborador}</td>
-                    </tr>
-                  ))}
-
-                </tbody>
-              </table>
+              <HistoryTable data={resultadosPesquisa} />
             </div>
           </div>
         </div>
-        <Snackbar
-          open={open}
-          autoHideDuration={4000}
-          onClose={closeSnackBarMessage}
-          message={snackBarMessage}
-          action={alertBox}
-          ContentProps={snackBarStyle}
+        <Snackbar open={open} autoHideDuration={4000} onClose={closeSnackBarMessage} message={snackBarMessage} action={alertBox} ContentProps={snackBarStyle}
         />
       </Container>
-      {showPopView && (
-        <div className="popUpSearch">
-          <div className="popUpSearchCard">
-            <div className="popUpSearchHead">
-              <h1 className='heading-4'>Pesquisa avançada<br /><span className='body-normal text-color-5'>Nem todos os campos requerem preenchimento.</span></h1>
-              <button className='button-7' onClick={returnSearch}>Voltar</button>
-            </div>
-            <div className="popUpSearchBody">
-              <div className="searchCardTop">
-                <p className='body-medium margin-bottom-20'>Informações da movimentação</p>
-                <div className="searchCardTopBox">
-                  <div className='searchForms'>
-                    <span className='body-normal margin-bottom-5'>Intervalo temporal</span>
-                    <input
-                      placeholder='Intervalo de tempo'
-                      type="text"
-                      className='form-1'
-                      name="datefilter"
-                      value={date}
-                      onChange={handleDateChange}
-                    />
-                  </div>
-                  <div className='searchForms'>
-                    <span className='body-normal margin-bottom-5'>Colaborador</span>
-                    <select
-                      className='form-1'
-                      value={colabName}
-                      onChange={(e) => setColabName(e.target.value)}
-                    >
-                      <option value='0'>Selecione a família</option>
-                      {staff.map((option, index) => (
-                        <option key={index} value={option.nome}>
-                          {option.nome}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className='searchForms'>
-                    <span className='body-normal margin-bottom-5'>Tipo</span>
-                    <select
-                      className='form-1'
-                      value={tipo}
-                      onChange={(e) => setTipo(e.target.value)}
-                    >
-                      <option value="0" disabled>Selecionar</option>
-                      <option>Entrada</option>
-                      <option>Saída</option>
-                    </select>
-                  </div>
-                  <div className='searchForms'>
-                    <span className='body-normal margin-bottom-5'>Status</span>
-                    <select
-                      className='form-1'
-                      value={status}
-                      onChange={(e) => setStatus(e.target.value)}
-                    >
-                      <option value="0" disabled>Selecionar</option>
-                      <option value='Pendente'>Pendente</option>
-                      <option>Invalidado</option>
-                      <option>Validado</option>
-                    </select>
-                  </div>
+      <PopUpSearch
+        showPopSearch={showPopSearch}
+        onClose={returnSearch}
+        headerText="Pesquisa avançada"
+        sectionOneContent={
+          <>
+            <div className="searchCardTop">
+              <p className='body-medium margin-bottom-20'>Informações da movimentação</p>
+              <div className="searchCardTopBox">
+                <div className='searchForms'>
+                  <span className='body-normal margin-bottom-5'>Intervalo temporal</span>
+                  <input placeholder='Intervalo de tempo' type="text" className='form-1' name="datefilter" value={date_his} onChange={handleDateChange} style={{ width: '220px', marginRight: '20px' }} />
+                </div>
+                <div className='searchForms'>
+                  <span className='body-normal margin-bottom-5'>Colaborador</span>
+                  <Select value={colabName_his} onChange={setColabName} options={optionsColaborador} placeholder='Selecione uma opção' className='select1' />
+                </div>
+                <div className='searchForms'>
+                  <span className='body-normal margin-bottom-5'>Tipo</span>
+                  <select className='form-1' value={tipo_his} onChange={(e) => setTipo(e.target.value)} style={{ width: '220px', marginRight: '20px' }}>
+                    <option value='' disabled>Selecionar</option>
+                    <option>Entrada</option>
+                    <option>Saída</option>
+                  </select>
+                </div>
+                <div className='searchForms'>
+                  <span className='body-normal margin-bottom-5'>Status</span>
+                  <select className='form-1' value={status_his} onChange={(e) => setStatus(e.target.value)} style={{ width: '220px', marginRight: '20px' }}>
+                    <option value='' disabled>Selecionar</option>
+                    <option>Pendente</option>
+                    <option>Invalidado</option>
+                    <option>Validado</option>
+                  </select>
                 </div>
               </div>
-              <div className="searchCardBottom">
-                <p className='body-medium margin-bottom-10'>Informações do aluno</p>
-                <div className="searchCardBottomBox">
-                  <div className='searchForms'>
-                    <span className='body-normal margin-bottom-5'>Nome</span>
-                    <input
-                      placeholder='Nome do aluno...'
-                      className='form-1'
-                      value={alunoName}
-                      onChange={(e) => setAlunoName(e.target.value)}
-                      type='text'
-                    />
-                  </div>
-                  <div className='searchForms'>
-                    <span className='body-normal margin-bottom-5'>Matrícula</span>
-                    <input
-                      placeholder='Matrícula do aluno...'
-                      className='form-1'
-                      value={alunoMatricula}
-                      onChange={(e) => setAlunoMatricula(e.target.value)}
-                      type='number'
-                    />
-                  </div>
-                  <div className='searchForms'>
-                    <span className='body-normal margin-bottom-5'>Período</span>
-                    <select
-                      className='form-1'
-                      value={alunoPeriodo}
-                      onChange={(e) => setAlunoPeriodo(e.target.value)}
-                    >
-                      <option value='0' disabled>Selecionar</option>
-                      <option>1</option>
-                      <option>2</option>
-                      <option>3</option>
-                      <option>4</option>
-                      <option>5</option>
-                      <option>6</option>
-                      <option>7</option>
-                      <option>8</option>
-                      <option>9</option>
-                      <option>10</option>
-                    </select>
-                  </div>
-                  <div className='searchForms'>
-                    <span className='body-normal margin-bottom-5'>Box de armazenamento</span>
-                    <input
-                      placeholder='Box do aluno...'
-                      className='form-1'
-                      value={alunoBox}
-                      onChange={(e) => setAlunoBox(e.target.value)}
-                      type='number'
-                    />
-                  </div>
-                </div>
-              </div >
-            </div >
-            <div className='popUpViewButtons'>
-              <button
-                className='button-10 margin-right-30'
-                disabled={false}
-                onClick={handleSearchAdvanced}
-                variant="outlined"
-              > Pesquisar
-              </button>
             </div>
-          </div >
-        </div >
-      )
-      }
+            <div className="searchCardBottom">
+              <p className='body-medium margin-bottom-10'>Informações do aluno</p>
+              <div className="searchCardBottomBox">
+                <div className='searchForms'>
+                  <span className='body-normal margin-bottom-5'>Nome</span>
+                  <input placeholder='Nome do aluno...' className='form-1' value={alunoName_his} onChange={(e) => setAlunoName(e.target.value)} type='text' style={{ width: '220px', marginRight: '20px' }} />
+                </div>
+                <div className='searchForms'>
+                  <span className='body-normal margin-bottom-5'>Matrícula</span>
+                  <input placeholder='Matrícula do aluno...' className='form-1' value={alunoMatricula_his} onChange={(e) => setAlunoMatricula(e.target.value)} type='number' style={{ width: '220px', marginRight: '20px' }} />
+                </div>
+                <div className='searchForms'>
+                  <span className='body-normal margin-bottom-5'>Período</span>
+                  <select className='form-1' value={alunoPeriodo_his} onChange={(e) => setAlunoPeriodo(e.target.value)} style={{ width: '160px', marginRight: '20px' }}>
+                    <option value='' disabled>Selecionar</option>
+                    <option>1</option>
+                    <option>2</option>
+                    <option>3</option>
+                    <option>4</option>
+                    <option>5</option>
+                    <option>6</option>
+                    <option>7</option>
+                    <option>8</option>
+                    <option>9</option>
+                    <option>10</option>
+                  </select>
+                </div>
+                <div className='searchForms'>
+                  <span className='body-normal margin-bottom-5'>Box de armazenamento</span>
+                  <input placeholder='Box do aluno...' className='form-1' value={alunoBox_his} onChange={(e) => setAlunoBox(e.target.value)} type='number' />
+                </div>
+              </div>
+            </div>
+          </>
+        }
+        onSubmit={handleSearchAdvanced}
+        errorMessage={errorMessage}
+      />
     </>
   )
 }

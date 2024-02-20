@@ -59,20 +59,9 @@ export default function LoginAluno() {
                             <div className="cardLogin">
                                 <h1 className='heading-3 text-color-1 text-align-center margin-bottom-10'>Login</h1>
                                 <span className='body-normal text-color-5 margin-bottom-10'>Usuário</span>
-                                <input
-                                    placeholder='Matrícula'
-                                    className='form-1'
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                />
-
-                                <span className='body-normal text-color-5 margin-bottom-10'>Senha</span>
-                                <input
-                                    placeholder='Senha'
-                                    className='form-1'
-                                    value={pwd}
-                                    onChange={(e) => setPwd(e.target.value)}
-                                />
+                                <input placeholder='Matrícula' className='form-1' value={username} onChange={(e) => setUsername(e.target.value)} />
+                                <span className='body-normal text-color-5 margin-bottom-10 margin-top-20'>Senha</span>
+                                <input placeholder='Senha' className='form-1' value={pwd} onChange={(e) => setPwd(e.target.value)} />
                                 <div className='errorContainer' style={{ position: 'relative', zIndex: 1 }}>
                                     {error && (
                                         <p className="error-message-login" style={{ position: 'absolute', top: 0, left: 0 }}>

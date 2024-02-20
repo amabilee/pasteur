@@ -11,199 +11,36 @@ function HomeAluno() {
   const navigate = useNavigate();
   const [showPopAssinatura, setShowPop] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
-
-  var infoUserLocal = { //valor que vem do login (localStorage)
-    matricula: '2345678'
-  };
-
-  var infoUsers = //valor do GET aluno
-    {
-      matricula: '2345678',
-      nome: 'Vinícius Freitas',
-      periodo: '10',
-    }
-
-  var pedidos = [ //valor do GET pedidos filtrados pela matricula(de preferencia) function getPedidos()
-    {
-      matricula: '2345678',
-      nome: 'Vinícius',
-      periodo: '10',
-      box: '181',
-      tipo: 'Saída',
-      status: 'Pendente',
-      colaborador: 'Lucas Rodrigues',
-      assinatura: false,
-      hora: '06:19',
-      data: '14/02/2023',
-      movimentacao: [
-        {
-          nome: 'Cirúrgica',
-          quant: '20',
-        }
-      ]
-    },
-    {
-      matricula: '2345678',
-      nome: 'Vinícius',
-      periodo: '10',
-      box: '181',
-      tipo: 'Saída',
-      status: 'Pendente',
-      colaborador: 'Lucas Rodrigues',
-      assinatura: false,
-      hora: '06:19',
-      data: '11/02/2023',
-      movimentacao: [
-        {
-          nome: 'Cirúrgica',
-          quant: '20',
-        }
-      ]
-    },
-    {
-      matricula: '2345678',
-      nome: 'Vinícius',
-      periodo: '10',
-      box: '181',
-      tipo: 'Saída',
-      status: 'Pendente',
-      colaborador: 'Lucas Rodrigues',
-      assinatura: true,
-      hora: '06:19',
-      data: '12/02/2023',
-      movimentacao: [
-        {
-          nome: 'Cirúrgica',
-          quant: '20',
-        }
-      ]
-    },
-    {
-      matricula: '2345678',
-      nome: 'Vinícius',
-      periodo: '10',
-      box: '181',
-      tipo: 'Saída',
-      status: 'Pendente',
-      colaborador: 'Lucas Rodrigues',
-      assinatura: false,
-      hora: '06:19',
-      data: '14/02/2023',
-      movimentacao: [
-        {
-          nome: 'Cirúrgica',
-          quant: '20',
-        }
-      ]
-    },
-    {
-      matricula: '2345678',
-      nome: 'Vinícius',
-      periodo: '10',
-      box: '181',
-      tipo: 'Saída',
-      status: 'Pendente',
-      colaborador: 'Lucas Rodrigues',
-      assinatura: false,
-      hora: '06:19',
-      data: '11/02/2023',
-      movimentacao: [
-        {
-          nome: 'Cirúrgica',
-          quant: '20',
-        }
-      ]
-    },
-    {
-      matricula: '2345678',
-      nome: 'Vinícius',
-      periodo: '10',
-      box: '181',
-      tipo: 'Saída',
-      status: 'Pendente',
-      colaborador: 'Lucas Rodrigues',
-      assinatura: false,
-      hora: '06:19',
-      data: '14/02/2023',
-      movimentacao: [
-        {
-          nome: 'Cirúrgica',
-          quant: '20',
-        }
-      ]
-    },
-    {
-      matricula: '2345678',
-      nome: 'Vinícius',
-      periodo: '10',
-      box: '181',
-      tipo: 'Saída',
-      status: 'Pendente',
-      colaborador: 'Lucas Rodrigues',
-      assinatura: false,
-      hora: '06:19',
-      data: '11/02/2023',
-      movimentacao: [
-        {
-          nome: 'Cirúrgica',
-          quant: '20',
-        }
-      ]
-    },
-    {
-      matricula: '2345678',
-      nome: 'Vinícius',
-      periodo: '10',
-      box: '181',
-      tipo: 'Saída',
-      status: 'Pendente',
-      colaborador: 'Lucas Rodrigues',
-      assinatura: false,
-      hora: '06:19',
-      data: '14/02/2023',
-      movimentacao: [
-        {
-          nome: 'Cirúrgica',
-          quant: '20',
-        }
-      ]
-    },
-    {
-      matricula: '2345678',
-      nome: 'Vinícius',
-      periodo: '10',
-      box: '181',
-      tipo: 'Saída',
-      status: 'Pendente',
-      colaborador: 'Lucas Rodrigues',
-      assinatura: false,
-      hora: '06:19',
-      data: '11/02/2023',
-      movimentacao: [
-        {
-          nome: 'Cirúrgica',
-          quant: '20',
-        }
-      ]
-    }
+  var infoUserLocal = { matricula: '2345678' };
+  var infoUsers =  { matricula: '2345678', nome: 'Vinícius Freitas', periodo: '10', }
+  var pedidos = [
+    { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', movimentacao: [ { nome: 'Cirúrgica', quant: '20'} ] },
+    { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', movimentacao: [ { nome: 'Cirúrgica', quant: '20'} ] },
+    { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: true, hora: '06:19', data: '12/02/2023', movimentacao: [ { nome: 'Cirúrgica', quant: '20'} ] },
+    { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', movimentacao: [ { nome: 'Cirúrgica', quant: '20'} ] },
+    { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', movimentacao: [ { nome: 'Cirúrgica', quant: '20'} ] },
+    { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', movimentacao: [ { nome: 'Cirúrgica', quant: '20'} ] },
+    { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', movimentacao: [ { nome: 'Cirúrgica', quant: '20'} ] },
+    { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', movimentacao: [ { nome: 'Cirúrgica', quant: '20'} ] },
+    { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', movimentacao: [ { nome: 'Cirúrgica', quant: '20'} ]}
   ]
 
-  function navigateToEntryAluno() { //função para navegar para a tela de pedido de entrada
+  function navigateToEntryAluno() {
     navigate('/entry-aluno')
   }
-  function navigateToExitAluno() { //função para navegar para a tela de pedido de saída
+  function navigateToExitAluno() {
     navigate('/exit-aluno')
   }
 
-  function navigateToSignatureAluno() { //função para navegar para a tela de pedido de saída
+  function navigateToSignatureAluno() {
     navigate('/signature-aluno')
   }
 
-  const matriculaDesejada = infoUsers.matricula; // filtragem do pedidos
-  var pedidosFiltrados = pedidos.filter(pedido => pedido.matricula === matriculaDesejada && !pedido.assinatura); // filtragem do pedidos
-  var quantidadeAssinaturasPendentes = pedidosFiltrados.length; // filtragem do pedidos
+  const matriculaDesejada = infoUsers.matricula;
+  var pedidosFiltrados = pedidos.filter(pedido => pedido.matricula === matriculaDesejada && !pedido.assinatura);
+  var quantidadeAssinaturasPendentes = pedidosFiltrados.length;
 
-  function handleAssinarClick() { //função para detectar quais pedidos foram selecionados para assinar
+  function handleAssinarClick() {
     const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
     const pedidosSelecionados = [];
 
@@ -220,7 +57,7 @@ function HomeAluno() {
       setErrorMessage('Selecione pelo menos uma checkbox antes de assinar.');
     } else {
       setErrorMessage('');
-      console.log('Pedidos selecionados:', pedidosSelecionados); //logica para enviar os pedidos que foram assinados
+      console.log('Pedidos selecionados:', pedidosSelecionados);
       setShowPop(false);
     }
   }
@@ -290,15 +127,11 @@ function HomeAluno() {
             </table>
             {errorMessage && <p className="error-message-mobile-assinatura">{errorMessage}</p>}
             <div className='popUpAssinaturaButtons'>
-              <button
-                className='button-2'
-                onClick={() => setShowPop(false)}
-              > Voltar
+              <button className='button-2' onClick={() => setShowPop(false)} >
+                Voltar
               </button>
-              <button
-                className='button-3'
-                onClick={handleAssinarClick}
-              > Assinar
+              <button className='button-3' onClick={handleAssinarClick}>
+                Assinar
               </button>
             </div>
           </div>
