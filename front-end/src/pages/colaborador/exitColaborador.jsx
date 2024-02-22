@@ -14,93 +14,27 @@ function HomeColaborador() {
   const [snackBarMessage, setSnackBarMessage] = useState('')
   const [snackBarStyle, setSnackBarStyle] = useState({ sx: { background: "white", color: "black", borderRadius: '10px' } })
 
-  function buttonView(aluno) { //função para abrir o pop up
+  function buttonView(aluno) {
     setShowPopView(true);
     setSelectedAluno(aluno);
   }
-  var entryRequests = [ //banco com GET pedido filtrados para somente tipo = saida function getPedidos()
-    {
-      matricula: '2345678',
-      nome: 'Vinícius',
-      periodo: '10',
-      box: '181',
-      tipo: 'Saída',
-      status: 'Pendente',
-      colaborador: 'Lucas Rodrigues',
-      assinatura: false,
-      hora: '06:19',
-      data: '11/02/2023',
-      movimentacao: [
-        {
-          family: 'Cirúrgica',
-          quantity: '20'
-        },
-        {
-          family: 'Dentística',
-          quantity: '19'
-        }
-      ]
-    },
-    {
-      matricula: '2345678',
-      nome: 'Vinícius',
-      periodo: '10',
-      box: '181',
-      tipo: 'Saída',
-      status: 'Pendente',
-      colaborador: 'Lucas Rodrigues',
-      assinatura: false,
-      hora: '06:19',
-      data: '11/02/2023',
-      movimentacao: [
-        {
-          family: 'Cirúrgica',
-          quantity: '20'
-        },
-        {
-          family: 'Dentística',
-          quantity: '19'
-        },
-        {
-          family: 'Dentística',
-          quantity: '19'
-        }
-        ,
-        {
-          family: 'Dentística',
-          quantity: '19'
-        }
-        ,
-        {
-          family: 'Dentística',
-          quantity: '19'
-        }
-        ,
-        {
-          family: 'Dentística',
-          quantity: '19'
-        }
-        ,
-        {
-          family: 'Dentística',
-          quantity: '19'
-        }
-      ]
-    }
+  var entryRequests = [
+    { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', movimentacao: [ { family: 'Cirúrgica', quantity: '20' }, { family: 'Dentística', quantity: '19' } ] },
+    { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', movimentacao: [ { family: 'Cirúrgica', quantity: '20' }, { family: 'Dentística', quantity: '19' }, { family: 'Dentística', quantity: '19' }, { family: 'Dentística', quantity: '19' }, { family: 'Dentística', quantity: '19' }, { family: 'Dentística', quantity: '19' }, { family: 'Dentística', quantity: '19' } ] }
   ]
 
-  const openSnackBarMessage = () => { //funcão para abrir o alerta
+  const openSnackBarMessage = () => {
     setOpen(true);
   };
 
-  const closeSnackBarMessage = (event, reason) => { //funcão para fechar o alerta
+  const closeSnackBarMessage = (event, reason) => {
     if (reason === 'clickaway') {
       return;
     }
     setOpen(false);
   };
 
-  const alertBox = ( //alertBox do componente de snackBar
+  const alertBox = (
     <React.Fragment>
       <IconButton
         size="small"
@@ -113,21 +47,21 @@ function HomeColaborador() {
     </React.Fragment>
   );
 
-  function invalidateBox() {  //funcão para invalidar uma caixa function updatePedidos()
+  function invalidateBox() {
     openSnackBarMessage()
     setSnackBarMessage('Pedido invalidado com sucesso')
     setSnackBarStyle({ sx: { background: "#79B874", color: "white", borderRadius: '15px' } })
     handleReturn()
   }
 
-  function validateBox() {  //funcão para validar uma caixa function updatePedidos()
+  function validateBox() {
     openSnackBarMessage()
     setSnackBarMessage('Pedido validado com sucesso')
     setSnackBarStyle({ sx: { background: "#79B874", color: "white", borderRadius: '15px' } })
     handleReturn()
   }
 
-  function handleReturn() {  //funcão para fechar o pop up
+  function handleReturn() {
     setShowPopView(false)
     setErrorMessage(' ');
   }
@@ -164,14 +98,7 @@ function HomeColaborador() {
             </div>
           </div>
         </div>
-        <Snackbar
-          open={open}
-          autoHideDuration={4000}
-          onClose={closeSnackBarMessage}
-          message={snackBarMessage}
-          action={alertBox}
-          ContentProps={snackBarStyle}
-        />
+        <Snackbar open={open} autoHideDuration={4000} onClose={closeSnackBarMessage} message={snackBarMessage} action={alertBox} ContentProps={snackBarStyle} />
       </Container>
       {showPopView && (
         <div className="popUpView">
@@ -225,20 +152,10 @@ function HomeColaborador() {
                 </p>
               )}
               <div className='popUpViewButtons'>
-                <button
-                  className='button-8'
-                  disabled={false}
-                  onClick={invalidateBox}
-                  variant="outlined"
-                >
+                <button className='button-8' disabled={false} onClick={invalidateBox} variant="outlined" >
                   Invalidar
                 </button>
-                <button
-                  className='button-9'
-                  disabled={false}
-                  onClick={validateBox}
-                  variant="outlined"
-                >
+                <button className='button-9' disabled={false} onClick={validateBox} variant="outlined" >
                   Validar
                 </button>
               </div>
