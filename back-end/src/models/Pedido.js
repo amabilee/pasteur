@@ -1,8 +1,8 @@
 import { DataTypes } from 'sequelize';
 import db from '../config/dbConnect.js';
 
-const User = db.define(
-    'User', 
+const pedido = db.define(
+    'pedido', 
     {
         matricula: {
             type: DataTypes.STRING,
@@ -15,8 +15,8 @@ const User = db.define(
         },
     }, 
     {
-        tableName: 'User',  
+        tableName: 'pedido',  
     }   
 );
 
-export default User;
+export default pedido;
