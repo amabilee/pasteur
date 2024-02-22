@@ -2,21 +2,30 @@ import { DataTypes } from 'sequelize';
 import db from '../config/dbConnect.js';
 
 const User = db.define(
-    'User', 
+    'admin', 
     {
         matricula: {
             type: DataTypes.STRING,
             allowNull: false,
-            primaryKey: true, 
+            unique: true,
+            primaryKey: true,
+        },
+        nome: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        email: {
+            type: DataTypes.STRING,
+            allowNull: false,
         },
         senha: {
             type: DataTypes.STRING,
             allowNull: false,
         },
-    }, 
+    },  
     {
-        tableName: 'User',  
-    }   
+            tableName: 'admin',  
+        }   
 );
 
 export default User;
