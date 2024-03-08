@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useDeferredValue } from 'react';
+import React, { useState, useEffect} from 'react';
 import './style.css';
 import HeaderPagesAluno from '../../components/headers/alunoPagesIndex'
 import { Container } from 'react-bootstrap'
@@ -8,7 +8,6 @@ function ExitAluno() {
 
     const [request, setRequest] = useState('');
     const [showPop, setShowPop] = useState(false);
-    const [showConfirmExit, setShowConfirmExit] = useState(false);
     const navigate = useNavigate();
     const [addButtonStyle, changeAddButtonStyle] = useState('button-6-disable');
     const [addButtonState, changeAddButtonState] = useState(true);
@@ -16,10 +15,16 @@ function ExitAluno() {
     const [errorMessage, setErrorMessage] = useState(' ');
     const [organizedPedidos, setOrganizedPedidos] = useState([])
     var pedidos = [
-        { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', movimentacao: [{ nome: 'Cirúrgica', quant: '20' }] },
-        { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', movimentacao: [{ nome: 'Cirúrgica', quant: '20' }] },
-        { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: true, hora: '06:19', data: '12/02/2023', movimentacao: [{ nome: 'Cirúrgica', quant: '20' }] }
-    ]
+        {  id: 1, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
+        {  id: 2, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
+        {  id: 3, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: true, hora: '06:19', data: '12/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
+        {  id: 4, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
+        {  id: 5, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
+        {  id: 6, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
+        {  id: 7, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
+        {  id: 8, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
+        {  id: 9, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' }
+      ]
 
     function navigateToHomeAluno() {
         if (showPop) {
@@ -37,7 +42,6 @@ function ExitAluno() {
             setErrorMessage(' ');
             setShowPop(false);
             requestConfirmed()
-            navigate('/home-aluno')
         }
     }
 
@@ -51,14 +55,13 @@ function ExitAluno() {
     function stagesReturn() {
         changeAddButtonStyle('button-6-disable');
         changeAddButtonState(true);
-        setTableData([]);
     }
 
     function requestConfirmed() {
         navigate('/home-aluno')
-        setShowConfirmExit(false)
         console.log(tableData);
         stagesReturn();
+        setTableData([]);
     }
 
     useEffect(() => {
@@ -74,23 +77,24 @@ function ExitAluno() {
 
     function addMovement() {
         const selectedPedido = pedidos.find(pedido => {
-            const pedidoInfo = `Pedido de ${pedido.tipo} : ${pedido.data} às ${pedido.hora}`;
+            const pedidoInfo = `Pedido de ${pedido.modalidade} : ${pedido.data} às ${pedido.hora}`;
             return pedidoInfo === request;
         });
 
         if (selectedPedido) {
             const existingIndex = tableData.findIndex(item =>
-                item.tipo === selectedPedido.tipo &&
+                item.modalidade === selectedPedido.modalidade &&
                 item.data === selectedPedido.data &&
                 item.hora === selectedPedido.hora
             );
 
-            if (existingIndex === -1) {
-                setTableData(prevData => [...prevData, selectedPedido]);
-                setRequest('0');
-                stagesReturn();
+            if (existingIndex !== -1) {
+                setErrorMessage('Pedido já existe na tabela.');
             } else {
-                setErrorMessage('Movimento já existe na tabela.');
+                setTableData(prevData => [...prevData, selectedPedido]);
+                setRequest('');
+                stagesReturn();
+                setErrorMessage('')
             }
         } else {
             setErrorMessage('Pedido não encontrado.');
@@ -103,24 +107,32 @@ function ExitAluno() {
             <tbody key={index}>
                 <tr>
                     <td>
-                        <p className='body-normal'>{item.tipo}</p><p className='body-normal'>{item.hora}</p><p className='body-normal'>{item.data}</p>
+                        <p className='body-normal'>{item.modalidade}</p><p className='body-normal'>{item.hora}</p><p className='body-normal'>{item.data}</p>
                     </td>
                 </tr>
             </tbody>
         ));
     }
 
+    function navigateToHome(){
+        if (tableData.length !== 0) {
+            setShowPop(true)
+        } else {
+            navigateToHomeAluno()
+        }
+    }
+
     return (
         <>
             <HeaderPagesAluno />
-            <Container className='containerMobileEntry'>
+            <Container className='containerMobileSign'>
                 <div className="inputForms">
                     <h1 className='title-1 margin-bottom-30'>Assinar pedidos</h1>
                     <select className='form-4' value={request} onChange={detectEntryRequest} >
                         <option value='0'>Selecione o pedido</option>
                         {organizedPedidos.map((option, index) => (
-                            <option key={index} value={'Pedido de ' + option.tipo + ' : ' + option.data + ' às ' + option.hora}>
-                                {'Pedido de ' + option.tipo + ' : ' + option.data + ' às ' + option.hora}
+                            <option key={index} value={'Pedido de ' + option.modalidade + ' : ' + option.data + ' às ' + option.hora}>
+                                {'Pedido de ' + option.modalidade + ' : ' + option.data + ' às ' + option.hora}
                             </option>
                         ))}
                     </select>
@@ -135,7 +147,7 @@ function ExitAluno() {
                 </div>
                 {errorMessage && <p className="error-message-mobile">{errorMessage}</p>}
                 <div className='sendButtonsEntry'>
-                    <button className='button-2' disabled={false} onClick={() => setShowPop(true)} >
+                    <button className='button-2' disabled={false} onClick={navigateToHome} >
                         Cancelar
                     </button>
                     <button className='button-3' disabled={false} onClick={navigateToConfirmExit} >
@@ -149,22 +161,13 @@ function ExitAluno() {
                         <p className='heading-3 text-align-center margin-bottom-10'>Tem certeza que<br />deseja voltar?</p>
                         <p className='body-light text-align-center margin-bottom-20'>Se continuar as alterações serão perdidas.</p>
                         <div className='popUpCancelButtons'>
-                            <button className='button-3' disabled={false} onClick={() => setShowPop(false)} >
+                            <button className='button-2' disabled={false} onClick={() => setShowPop(false)} >
                                 Voltar
                             </button>
-                            <button className='button-2' disabled={false} onClick={navigateToHomeAluno} >
+                            <button className='button-3' disabled={false} onClick={navigateToHomeAluno} >
                                 Continuar
                             </button>
                         </div>
-                    </div>
-                </div>
-            )}
-            {showConfirmExit && (
-                <div className='popUpConfirmOperation'>
-                    <div className="popUpConfirmCard">
-                        <h1 className='body-large text-align-center margin-bottom-10'>Seu pedido de <strong>saída</strong> foi enviado com sucesso !</h1>
-                        <h2 className='body-light text-align-center margin-bottom-20'>Assim que um colaborador avaliar o seu pedido, assine.</h2>
-                        <button className='button-4' onClick={requestConfirmed}>Voltar a tela inicial</button>
                     </div>
                 </div>
             )}

@@ -68,6 +68,7 @@
     border-bottom: 1px solid #E9EAED;
     background-color: white;
     padding: 0px 0px;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 .tableFamilies tbody tr td {
@@ -75,6 +76,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 .tableFamilies tbody tr td:last-child {
@@ -268,13 +270,16 @@
     border-bottom: 1px solid #E9EAED;
     background-color: white;
     padding: 0px 0px;
+    font-family: Arial, Helvetica, sans-serif;
 }
+
 
 .tableStaff tbody tr td {
     text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-family: Arial, Helvetica, sans-serif;
 }
 
 .tableStaff thead tr th:nth-child(1),

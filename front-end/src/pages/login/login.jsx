@@ -12,14 +12,11 @@ export default function LoginAluno() {
     const [showLogin, setShowLogin] = useState(false);
     const [errorMessage, setErrorMessage] = useState(' ');
 
-    const {signIn, error, loading, auth1, auth2, auth3} = UseAuth()
+    const {signIn, loginAdmin, error, loading, auth1, auth2, auth3} = UseAuth()
 
     function handleLogin(){
+        // loginAdmin(username, pwd)
         signIn(username, pwd)
-        // localStorage.setItem('user', username)
-        // localStorage.setItem('user-pwd', pwd)
-        console.log('enviou')
-
     }
 
     useEffect(() => { //função de intervalo
@@ -29,7 +26,7 @@ export default function LoginAluno() {
     }, []);
 
     useEffect(() => {
-        if(auth1){
+        if(auth1){ 
             navigate('/home-aluno')
             setErrorMessage('')
         } else if (auth2){
@@ -62,7 +59,7 @@ export default function LoginAluno() {
                                 <input placeholder='Matrícula' className='form-1' value={username} onChange={(e) => setUsername(e.target.value)} />
                                 <span className='body-normal text-color-5 margin-bottom-10 margin-top-20'>Senha</span>
                                 <input placeholder='Senha' className='form-1' value={pwd} onChange={(e) => setPwd(e.target.value)} />
-                                <div className='errorContainer' style={{ position: 'relative', zIndex: 1 }}>
+                                <div className='errorContainer' style={{ position: 'relative', zIndex: 1, marginTop: '10px' }}>
                                     {error && (
                                         <p className="error-message-login" style={{ position: 'absolute', top: 0, left: 0 }}>
                                             {error}

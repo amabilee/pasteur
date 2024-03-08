@@ -9,25 +9,33 @@ import { useNavigate } from 'react-router-dom';
 
 function HomeAluno() {
   const navigate = useNavigate();
-  const [showPopAssinatura, setShowPop] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  var infoUserLocal = { matricula: '2345678' };
-  var infoUsers =  { matricula: '2345678', nome: 'Vinícius Freitas', periodo: '10', }
+  const [nomeAluno, setNomeAluno] = useState('');
+  const [matriculaAluno, setMatriculaAluno] = useState('');
+  var infoUsers = {}
   var pedidos = [
-    { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', movimentacao: [ { nome: 'Cirúrgica', quant: '20'} ] },
-    { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', movimentacao: [ { nome: 'Cirúrgica', quant: '20'} ] },
-    { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: true, hora: '06:19', data: '12/02/2023', movimentacao: [ { nome: 'Cirúrgica', quant: '20'} ] },
-    { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', movimentacao: [ { nome: 'Cirúrgica', quant: '20'} ] },
-    { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', movimentacao: [ { nome: 'Cirúrgica', quant: '20'} ] },
-    { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', movimentacao: [ { nome: 'Cirúrgica', quant: '20'} ] },
-    { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', movimentacao: [ { nome: 'Cirúrgica', quant: '20'} ] },
-    { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', movimentacao: [ { nome: 'Cirúrgica', quant: '20'} ] },
-    { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Saída', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', movimentacao: [ { nome: 'Cirúrgica', quant: '20'} ]}
+    { id: 1, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
+    { id: 2, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
+    { id: 3, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: true, hora: '06:19', data: '12/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
+    { id: 4, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: true, hora: '06:19', data: '14/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
+    { id: 5, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
+    { id: 6, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
+    { id: 7, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
+    { id: 8, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
+    { id: 9, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' }
   ]
+
+  useEffect(() => {
+    let newObject = window.localStorage.getItem("loggedUser");
+    infoUsers = (JSON.parse(newObject));
+    console.log(infoUsers)
+    setNomeAluno(infoUsers.nome.split(' ')[0])
+    setMatriculaAluno(infoUsers.matricula)
+  }, []);
 
   function navigateToEntryAluno() {
     navigate('/entry-aluno')
   }
+
   function navigateToExitAluno() {
     navigate('/exit-aluno')
   }
@@ -36,42 +44,15 @@ function HomeAluno() {
     navigate('/signature-aluno')
   }
 
-  const matriculaDesejada = infoUsers.matricula;
-  var pedidosFiltrados = pedidos.filter(pedido => pedido.matricula === matriculaDesejada && !pedido.assinatura);
+  const matriculaDesejada = matriculaAluno;
+  var pedidosFiltrados = pedidos.filter(pedido => pedido.matricula_aluno === matriculaDesejada && !pedido.assinatura);
   var quantidadeAssinaturasPendentes = pedidosFiltrados.length;
-
-  function handleAssinarClick() {
-    const checkboxes = document.querySelectorAll('tbody input[type="checkbox"]');
-    const pedidosSelecionados = [];
-
-    checkboxes.forEach((checkbox, index) => {
-      if (checkbox.checked) {
-        const pedido = pedidos.find((pedido, pedidoIndex) => pedidoIndex === index);
-        if (pedido) {
-          pedidosSelecionados.push(pedido);
-        }
-      }
-    });
-
-    if (pedidosSelecionados.length === 0) {
-      setErrorMessage('Selecione pelo menos uma checkbox antes de assinar.');
-    } else {
-      setErrorMessage('');
-      console.log('Pedidos selecionados:', pedidosSelecionados);
-      setShowPop(false);
-    }
-  }
-
-  // function showPopAssintaura(){
-  //   setErrorMessage('');
-  //   setShowPop(true)
-  // }
 
   return (
     <>
       <HeaderHomeAluno />
       <Container className='containerMobileHome'>
-        <h1 className='heading-1'>Olá, {infoUsers.nome.split(' ')[0]} !</h1>
+        <h1 className='heading-1'>Olá, {nomeAluno} !</h1>
         <h3 className='body-light'>Seja bem-vindo.</h3>
         <div className="cardsSelect">
           <h2 className='body-medium'>Registrar pedidos</h2>
@@ -100,43 +81,6 @@ function HomeAluno() {
           </div>
         </div>
       </Container>
-      {showPopAssinatura && (
-        <div className="popUpCancelOperation">
-          <div className="popUpAssinaturaCard">
-            <p className='heading-4 text-align-center margin-bottom-10'>Pedido com assinaturas<br />pendentes</p>
-            <table className='table table-sm tableAssinatura'>
-              <thead>
-                <tr>
-                  <th scope="col">AÇÃO</th>
-                  <th scope="col">TIPO</th>
-                  <th scope="col">DATA</th>
-                </tr>
-              </thead>
-              <tbody>
-                {pedidos
-                  .filter((pedido) => !pedido.assinatura)
-                  .map((pedido, index) => (
-                    <tr key={index}>
-                      <td><input type='checkbox' /></td>
-                      <td>{pedido.tipo}</td>
-                      <td>{pedido.data}</td>
-                    </tr>
-                  ))
-                }
-              </tbody>
-            </table>
-            {errorMessage && <p className="error-message-mobile-assinatura">{errorMessage}</p>}
-            <div className='popUpAssinaturaButtons'>
-              <button className='button-2' onClick={() => setShowPop(false)} >
-                Voltar
-              </button>
-              <button className='button-3' onClick={handleAssinarClick}>
-                Assinar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   )
 }

@@ -17,8 +17,7 @@ const FamilyTable = ({ data, onEdit, onDelete }) => (
     <thead>
       <tr>
         <th scope="col">NOME</th>
-        <th scope="col">QUANTIDADE ESPERADA</th>
-        <th scope="col">MÁXIMO</th>
+        <th scope="col">MÁXIMO / ESPERADO</th>
         <th scope="col">MÍNIMO</th>
         <th scope="col">AÇÕES</th>
       </tr>
@@ -27,7 +26,6 @@ const FamilyTable = ({ data, onEdit, onDelete }) => (
       {data.map((objetos, index) => (
         <tr key={index}>
           <td>{objetos.nome}</td>
-          <td>{objetos.quantBase}</td>
           <td>{objetos.quantMax}</td>
           <td>{objetos.quantMin}</td>
           <td>
@@ -47,40 +45,39 @@ function FamilyAdmin() {
   const [resultadosPesquisa, setResultadosPesquisa] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [nome_fam, setFamilyName] = useState('');
-  const [quantBase_fam, setFamilyQuantBase] = useState('');
   const [quantMax_fam, setFamilyQuantMax] = useState('');
   const [quantMin_fam, setFamilyQuantMin] = useState('');
-  const [familyDataEdit, setFamilyDataEdit] = useState({ nome: '', quantBase: '', quantMax: '', quantMin: '' });
-  const [familyDataEditBefore, setFamilyDataEditBefore] = useState({ nome: '', quantBase: '', quantMax: '', quantMin: '' });
-  const [familyDataDelete, setFamilyDataDelete] = useState({ nome: '', quantBase: '', quantMax: '', quantMin: '' });
-  var matrixFamilia = { nome: '', quantBase: '', quantMin: '', quantMax: '' }
+  const [familyDataEdit, setFamilyDataEdit] = useState({ nome: '', quantMax: '', quantMin: '' });
+  const [familyDataEditBefore, setFamilyDataEditBefore] = useState({ nome: '', quantMax: '', quantMin: '' });
+  const [familyDataDelete, setFamilyDataDelete] = useState({ nome: '', quantMax: '', quantMin: '' });
+  var matrixFamilia = { nome: '', quantMin: '', quantMax: '' }
   const [open, setOpen] = React.useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('');
   const [snackBarStyle, setSnackBarStyle] = useState({
     sx: { background: 'white', color: 'black', borderRadius: '10px' }
   });
-  var families = [
-    { nome: 'Cirúrgica', quantBase: '20', quantMax: '20', quantMin: '17' },
-    { nome: 'Dentística', quantBase: '20', quantMax: '20', quantMin: '11' },
-    { nome: 'Implante Dentário', quantBase: '20', quantMax: '20', quantMin: '15' },
-    { nome: 'Ortodontia', quantBase: '20', quantMax: '20', quantMin: '18' },
-    { nome: 'Endodontia', quantBase: '20', quantMax: '20', quantMin: '16' },
-    { nome: 'Periodontia', quantBase: '20', quantMax: '20', quantMin: '12' },
-    { nome: 'Prótese Dentária', quantBase: '20', quantMax: '20', quantMin: '14' },
-    { nome: 'Radiologia Odontológica', quantBase: '20', quantMax: '20', quantMin: '10' },
-    { nome: 'Odontopediatria', quantBase: '20', quantMax: '20', quantMin: '13' },
-    { nome: 'Cirurgia Bucomaxilofacial', quantBase: '20', quantMax: '20', quantMin: '16' },
-    { nome: 'Odontologia Estética', quantBase: '20', quantMax: '20', quantMin: '14' },
-    { nome: 'Ortopedia Funcional dos Maxilares', quantBase: '20', quantMax: '20', quantMin: '17' },
-    { nome: 'Oclusão', quantBase: '20', quantMax: '20', quantMin: '15' },
-    { nome: 'Odontologia do Trabalho', quantBase: '20', quantMax: '20', quantMin: '13' },
-    { nome: 'Farmacologia em Odontologia', quantBase: '20', quantMax: '20', quantMin: '11' },
-    { nome: 'Odontologia Legal', quantBase: '20', quantMax: '20', quantMin: '10' },
-    { nome: 'Anatomia Dental', quantBase: '20', quantMax: '20', quantMin: '18' },
-    { nome: 'Microbiologia Oral', quantBase: '20', quantMax: '20', quantMin: '16' },
-    { nome: 'Patologia Oral', quantBase: '20', quantMax: '20', quantMin: '12' },
-    { nome: 'Cariologia', quantBase: '20', quantMax: '20', quantMin: '14' },
-    { nome: 'Materiais Dentários', quantBase: '20', quantMax: '20', quantMin: '11' }
+  var familias = [
+    { id: 1, nome: 'Cirúrgica', quantMax: '20', quantMin: '17' },
+    { id: 2, nome: 'Dentística', quantMax: '20', quantMin: '11' },
+    { id: 3, nome: 'Implante Dentário', quantMax: '20', quantMin: '15' },
+    { id: 4, nome: 'Ortodontia', quantMax: '20', quantMin: '18' },
+    { id: 5, nome: 'Endodontia', quantMax: '20', quantMin: '16' },
+    { id: 6, nome: 'Periodontia', quantMax: '20', quantMin: '12' },
+    { id: 7, nome: 'Prótese Dentária', quantMax: '20', quantMin: '14' },
+    { id: 8, nome: 'Radiologia Odontológica', quantMax: '20', quantMin: '10' },
+    { id: 9, nome: 'Odontopediatria', quantMax: '20', quantMin: '13' },
+    { id: 10, nome: 'Cirurgia Bucomaxilofacial', quantMax: '20', quantMin: '16' },
+    { id: 11, nome: 'Odontologia Estética', quantMax: '20', quantMin: '14' },
+    { id: 12, nome: 'Ortopedia Funcional dos Maxilares', quantMax: '20', quantMin: '17' },
+    { id: 13, nome: 'Oclusão', quantMax: '20', quantMin: '15' },
+    { id: 14, nome: 'Odontologia do Trabalho', quantMax: '20', quantMin: '13' },
+    { id: 15, nome: 'Farmacologia em Odontologia', quantMax: '20', quantMin: '11' },
+    { id: 16, nome: 'Odontologia Legal', quantMax: '20', quantMin: '10' },
+    { id: 17, nome: 'Anatomia Dental', quantMax: '20', quantMin: '18' },
+    { id: 18, nome: 'Microbiologia Oral', quantMax: '20', quantMin: '16' },
+    { id: 19, nome: 'Patologia Oral', quantMax: '20', quantMin: '12' },
+    { id: 20, nome: 'Cariologia', quantMax: '20', quantMin: '14' },
+    { id: 21, nome: 'Materiais Dentários', quantMax: '20', quantMin: '11' }
   ]
 
   const openSnackBarMessage = () => setOpen(true);
@@ -106,7 +103,7 @@ function FamilyAdmin() {
   const handleSearchTermChange = (e) => setSearchTerm(e.target.value);
 
   const handleSearchSimple = () => {
-    const resultadosFiltrados = families.filter(obj => {
+    const resultadosFiltrados = familias.filter(obj => {
       if (searchTerm === '') return true;
       return obj.nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(searchTerm.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
     });
@@ -114,7 +111,7 @@ function FamilyAdmin() {
   };
 
   useEffect(() => {
-    setResultadosPesquisa(families);
+    setResultadosPesquisa(familias);
   }, []);
 
   const returnSearch = () => {
@@ -122,12 +119,11 @@ function FamilyAdmin() {
     setShowPopEdit(false);
     setShowPopDelete(false);
     setSearchTerm('');
-    setFamilyDataEdit({ nome: '', quantBase: '', quantMax: '', quantMin: '' });
-    setFamilyDataDelete({ nome: '', quantBase: '', quantMax: '', quantMin: '' });
-    setFamilyDataEditBefore({ nome: '', quantBase: '', quantMax: '', quantMin: '' });
+    setFamilyDataEdit({ nome: '', quantMax: '', quantMin: '' });
+    setFamilyDataDelete({ nome: '', quantMax: '', quantMin: '' });
+    setFamilyDataEditBefore({ nome: '', quantMax: '', quantMin: '' });
     setErrorMessage('');
     setFamilyName('');
-    setFamilyQuantBase('')
     setFamilyQuantMax('')
     setFamilyQuantMin('');
   };
@@ -146,7 +142,7 @@ function FamilyAdmin() {
   };
 
   const handleEditFamily = () => {
-    const requiredFields = ['nome', 'quantBase', 'quantMax', 'quantMin']
+    const requiredFields = ['nome', 'quantMax', 'quantMin']
     if (requiredFields.some(field => !familyDataEdit[field])) {
       setErrorMessage('Preencha todos os campos antes de adicionar.');
     } else if (parseInt(familyDataEdit.quantMax) <= parseInt(familyDataEdit.quantMin)) {
@@ -155,8 +151,8 @@ function FamilyAdmin() {
       openSnackBarMessage();
       setSnackBarMessage('Família editada com sucesso');
       setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
-      console.log('Informações antigas da família editada:', familyDataEditBefore);
-      console.log('Novas informações da família editada:', familyDataEdit);
+      // console.log('Informações antigas da família editada:', familyDataEditBefore);
+      console.log('Novas informações da família editada:', familyDataEdit);  //Envio para a api da familia editada
       returnSearch();
     }
   };
@@ -174,21 +170,21 @@ function FamilyAdmin() {
     openSnackBarMessage();
     setSnackBarMessage('Família deletada com sucesso');
     setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
-    console.log('Informações da família deletada:', familyDataDelete);
+    console.log('Informações da família deletada:', familyDataDelete);  //Envio para a api da familia deletada
     returnSearch();
   };
 
   //Criar Familia
 
   const handleCreateFamily = () => {
-    const requiredFields = ['nome', 'quantBase', 'quantMax', 'quantMin']
+    const requiredFields = ['nome', 'quantMax', 'quantMin']
     if (requiredFields.some(field => !eval(`${field}_fam`))) {
       setErrorMessage('Preencha todos os campos antes de adicionar.');
     } else if (parseInt(quantMax_fam) <= parseInt(quantMin_fam)) {
       setErrorMessage('Quantidade máxima deve ser maior que a quantidade mínima.');
     } else {
       formatFamiliaData()
-      console.log('Informações da família:', matrixFamilia);
+      console.log('Informações da família:', matrixFamilia); //Envio para a api da familia criada
       openSnackBarMessage();
       setSnackBarMessage('Família criada com sucesso');
       setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
@@ -197,7 +193,7 @@ function FamilyAdmin() {
   };
 
   function formatFamiliaData() {
-    const familiaFields = ['nome', 'quantBase', 'quantMax', 'quantMin']
+    const familiaFields = ['nome', 'quantMax', 'quantMin']
     familiaFields.forEach(field => matrixFamilia[field] = eval(`${field}_fam`))
   }
 
@@ -242,11 +238,7 @@ function FamilyAdmin() {
                 <input placeholder='Digite o nome...' type="text" className='form-1' value={nome_fam} onChange={(e) => setFamilyName(e.target.value)} />
               </div>
               <div className='searchForms'>
-                <span className='body-normal margin-bottom-5'>Quantidade esperada</span>
-                <input placeholder='Digite um valor...' className='form-1' value={quantBase_fam} onChange={(e) => setFamilyQuantBase(e.target.value)} type='number' />
-              </div>
-              <div className='searchForms'>
-                <span className='body-normal margin-bottom-5'>Quantidade máxima</span>
+                <span className='body-normal margin-bottom-5'>Quantidade máxima / esperada</span>
                 <input placeholder='Digite um valor...' className='form-1' value={quantMax_fam} onChange={(e) => setFamilyQuantMax(e.target.value)} type='number' />
               </div>
               <div className='searchForms'>
@@ -272,11 +264,7 @@ function FamilyAdmin() {
                 <input placeholder='Digite o nome...' className='form-1' value={familyDataEdit.nome} onChange={(e) => setFamilyDataEdit({ ...familyDataEdit, familyName: e.target.value })} />
               </div>
               <div className='searchForms'>
-                <span className='body-normal margin-bottom-5'>Quantidade esperada</span>
-                <input placeholder='Digite um valor...' className='form-1' value={familyDataEdit.quantBase} onChange={(e) => setFamilyDataEdit({ ...familyDataEdit, quantBase: e.target.value })} />
-              </div>
-              <div className='searchForms'>
-                <span className='body-normal margin-bottom-5'>Quantidade máxima</span>
+                <span className='body-normal margin-bottom-5'>Quantidade máxima / esperada</span>
                 <input placeholder='Digite um valor...' className='form-1' value={familyDataEdit.quantMax} onChange={(e) => setFamilyDataEdit({ ...familyDataEdit, quantMax: e.target.value })} />
               </div>
               <div className='searchForms'>

@@ -8,8 +8,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import './headers/style.css';
 
 //Import Components
-import Title from '../components/Title';
 import PopUpSearch from '../components/popSearch';
+
 const HistoryTable = ({ data }) => (
   <table className='table table-sm tableHistory' id="table-history">
     <thead>
@@ -20,7 +20,7 @@ const HistoryTable = ({ data }) => (
         <th scope="col">BOX</th>
         <th scope="col">HORA</th>
         <th scope="col">DATA</th>
-        <th scope="col">TIPO</th>
+        <th scope="col">MODALIDADE</th>
         <th scope="col">STATUS</th>
         <th scope="col">COLABORADOR</th>
       </tr>
@@ -28,22 +28,22 @@ const HistoryTable = ({ data }) => (
     <tbody>
       {data.map((movimentacao, index) => (
         <tr key={index}>
-          <td>{movimentacao.nome}</td>
-          <td>{movimentacao.matricula}</td>
-          <td>{movimentacao.periodo}</td>
-          <td>{movimentacao.box}</td>
+          <td>{movimentacao.nome_aluno}</td>
+          <td>{movimentacao.matricula_aluno}</td>
+          <td>{movimentacao.periodo_aluno}</td>
+          <td>{movimentacao.box_aluno}</td>
           <td>{movimentacao.hora}</td>
           <td>{movimentacao.data}</td>
-          <td>{movimentacao.tipo}</td>
+          <td>{movimentacao.modalidade}</td>
           <td className={
             movimentacao.status === 'Validado' ? 'validado-class' :
-              movimentacao.status === 'Invalidado' ? 'invalidado-class' :
+              movimentacao.status === 'Inválido' ? 'invalidado-class' :
                 movimentacao.status === 'Pendente' ? 'pendente-class' :
                   ''
           }>
             {movimentacao.status}
           </td>
-          <td>{movimentacao.colaborador}</td>
+          <td>{movimentacao.nome_colab}</td>
         </tr>
       ))}
 
@@ -57,402 +57,59 @@ function History() {
   const [errorMessage, setErrorMessage] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [resultadosPesquisa, setResultadosPesquisa] = useState([]);
-  const [resultadosPesquisaCronologico, setResultadosPesquisaCronologico] = useState([]);
+  const [staff, setStaff] = useState([]);
+
+
   const [alunoName_his, setAlunoName] = useState('');
   const [alunoMatricula_his, setAlunoMatricula] = useState('');
   const [alunoPeriodo_his, setAlunoPeriodo] = useState('');
+  const [periodo_his, setPeriodo] = useState('');
   const [alunoBox_his, setAlunoBox] = useState('');
-  const [colabName_his, setColabName] = useState(null);
+  const [colabName_his, setColabName] = useState();
+  const [colaborador_his, setColaboradorName] = useState();
   const [tipo_his, setTipo] = useState('');
   const [date_his, setDate] = useState('');
   const [status_his, setStatus] = useState('');
+
+
   const [open, setOpen] = React.useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('')
   const [snackBarStyle, setSnackBarStyle] = useState({ sx: { background: "white", color: "black", borderRadius: '10px' } })
 
-  var history = [
-    {
-      matricula: '3456789',
-      nome: 'Isabela',
-      periodo: '8',
-      box: '201',
-      tipo: 'Saída',
-      status: 'Validado',
-      colaborador: 'Ana Silva',
-      assinatura: true,
-      hora: '14:30',
-      data: '15/03/2023',
-      movimentacao: [
-        {
-          nome: 'Restauração',
-          quant: '15',
-        }
-      ]
-    },
-    {
-      matricula: '4567890',
-      nome: 'Mariana',
-      periodo: '12',
-      box: '150',
-      tipo: 'Entrada',
-      status: 'Validado',
-      colaborador: 'Paulo Oliveira',
-      assinatura: true,
-      hora: '09:45',
-      data: '22/04/2023',
-      movimentacao: [
-        {
-          nome: 'Limpeza',
-          quant: '10',
-        }
-      ]
-    },
-    {
-      matricula: '5678901',
-      nome: 'Carolina',
-      periodo: '9',
-      box: '195',
-      tipo: 'Saída',
-      status: 'Pendente',
-      colaborador: 'Rodrigo Santos',
-      assinatura: false,
-      hora: '11:00',
-      data: '05/05/2023',
-      movimentacao: [
-        {
-          nome: 'Ortodontia',
-          quant: '18',
-        }
-      ]
-    },
-    {
-      matricula: '6789012',
-      nome: 'Fernando',
-      periodo: '11',
-      box: '162',
-      tipo: 'Entrada',
-      status: 'Invalidado',
-      colaborador: 'Camila Lima',
-      assinatura: false,
-      hora: '08:15',
-      data: '17/06/2023',
-      movimentacao: [
-        {
-          nome: 'Profilaxia',
-          quant: '25',
-        }
-      ]
-    },
-    {
-      matricula: '7890123',
-      nome: 'Gabriela',
-      periodo: '7',
-      box: '175',
-      tipo: 'Saída',
-      status: 'Validado',
-      colaborador: 'Renato Alves',
-      assinatura: true,
-      hora: '16:30',
-      data: '30/07/2023',
-      movimentacao: [
-        {
-          nome: 'Endodontia',
-          quant: '12',
-        }
-      ]
-    },
-    {
-      matricula: '8901234',
-      nome: 'Roberto',
-      periodo: '10',
-      box: '188',
-      tipo: 'Entrada',
-      status: 'Validado',
-      colaborador: 'Juliana Costa',
-      assinatura: true,
-      hora: '10:45',
-      data: '14/08/2023',
-      movimentacao: [
-        {
-          nome: 'Odontopediatria',
-          quant: '8',
-        }
-      ]
-    },
-    {
-      matricula: '9012345',
-      nome: 'Amanda',
-      periodo: '8',
-      box: '203',
-      tipo: 'Saída',
-      status: 'Pendente',
-      colaborador: 'Carlos Oliveira',
-      assinatura: false,
-      hora: '13:20',
-      data: '02/09/2023',
-      movimentacao: [
-        {
-          nome: 'Periodontia',
-          quant: '15',
-        }
-      ]
-    },
-    {
-      matricula: '0123456',
-      nome: 'Lucas',
-      periodo: '12',
-      box: '154',
-      tipo: 'Entrada',
-      status: 'Pendente',
-      colaborador: 'Mariana Santos',
-      assinatura: false,
-      hora: '09:00',
-      data: '18/10/2023',
-      movimentacao: [
-        {
-          nome: 'Cirurgia Oral',
-          quant: '22',
-        }
-      ]
-    },
-    {
-      matricula: '1234567',
-      nome: 'Tatiane',
-      periodo: '9',
-      box: '167',
-      tipo: 'Saída',
-      status: 'Invalidado',
-      colaborador: 'Pedro Almeida',
-      assinatura: false,
-      hora: '14:10',
-      data: '25/11/2023',
-      movimentacao: [
-        {
-          nome: 'Radiologia Odontológica',
-          quant: '10',
-        }
-      ]
-    },
-    {
-      matricula: '2345678',
-      nome: 'Vinícius',
-      periodo: '10',
-      box: '181',
-      tipo: 'Entrada',
-      status: 'Pendente',
-      colaborador: 'Lucas Rodrigues',
-      assinatura: false,
-      hora: '06:19',
-      data: '11/02/2023',
-      movimentacao: [
-        {
-          nome: 'Cirúrgica',
-          quant: '20',
-        }
-      ]
-    },
-    {
-      matricula: '3456789',
-      nome: 'Rafaela',
-      periodo: '11',
-      box: '190',
-      tipo: 'Saída',
-      status: 'Validado',
-      colaborador: 'Fernanda Silva',
-      assinatura: true,
-      hora: '12:45',
-      data: '09/12/2023',
-      movimentacao: [
-        {
-          nome: 'Estética Dental',
-          quant: '15',
-        }
-      ]
-    },
-    {
-      matricula: '4567890',
-      nome: 'Leandro',
-      periodo: '8',
-      box: '168',
-      tipo: 'Entrada',
-      status: 'Pendente',
-      colaborador: 'Márcia Oliveira',
-      assinatura: false,
-      hora: '07:30',
-      data: '22/01/2024',
-      movimentacao: [
-        {
-          nome: 'Implantodontia',
-          quant: '18',
-        }
-      ]
-    },
-    {
-      matricula: '5678901',
-      nome: 'Patrícia',
-      periodo: '9',
-      box: '178',
-      tipo: 'Saída',
-      status: 'Invalidado',
-      colaborador: 'Ricardo Almeida',
-      assinatura: false,
-      hora: '15:20',
-      data: '05/02/2024',
-      movimentacao: [
-        {
-          nome: 'Oclusão',
-          quant: '10',
-        }
-      ]
-    },
-    {
-      matricula: '6789012',
-      nome: 'Gustavo',
-      periodo: '12',
-      box: '195',
-      tipo: 'Entrada',
-      status: 'Pendente',
-      colaborador: 'Fernanda Costa',
-      assinatura: false,
-      hora: '09:15',
-      data: '18/03/2024',
-      movimentacao: [
-        {
-          nome: 'Prótese Dentária',
-          quant: '22',
-        }
-      ]
-    },
-    {
-      matricula: '7890123',
-      nome: 'Mariana',
-      periodo: '10',
-      box: '183',
-      tipo: 'Saída',
-      status: 'Validado',
-      colaborador: 'Renato Santos',
-      assinatura: true,
-      hora: '17:00',
-      data: '30/04/2024',
-      movimentacao: [
-        {
-          nome: 'Odontogeriatria',
-          quant: '12',
-        }
-      ]
-    },
-    {
-      matricula: '8901234',
-      nome: 'Rodrigo',
-      periodo: '7',
-      box: '202',
-      tipo: 'Entrada',
-      status: 'Validado',
-      colaborador: 'Camila Lima',
-      assinatura: true,
-      hora: '10:30',
-      data: '14/05/2024',
-      movimentacao: [
-        {
-          nome: 'Odontologia do Esporte',
-          quant: '8',
-        }
-      ]
-    },
-    {
-      matricula: '9012345',
-      nome: 'Isabel',
-      periodo: '11',
-      box: '157',
-      tipo: 'Saída',
-      status: 'Pendente',
-      colaborador: 'Lucas Oliveira',
-      assinatura: false,
-      hora: '13:45',
-      data: '02/06/2024',
-      movimentacao: [
-        {
-          nome: 'Radiologia Odontológica',
-          quant: '15',
-        }
-      ]
-    },
-    {
-      matricula: '0123456',
-      nome: 'Fábio',
-      periodo: '9',
-      box: '170',
-      tipo: 'Entrada',
-      status: 'Invalidado',
-      colaborador: 'Mariana Costa',
-      assinatura: false,
-      hora: '09:45',
-      data: '18/07/2024',
-      movimentacao: [
-        {
-          nome: 'Odontologia Legal',
-          quant: '20',
-        }
-      ]
-    },
-    {
-      matricula: '1234567',
-      nome: 'Renata',
-      periodo: '12',
-      box: '187',
-      tipo: 'Saída',
-      status: 'Pendente',
-      colaborador: 'Pedro Almeida',
-      assinatura: false,
-      hora: '14:00',
-      data: '25/08/2024',
-      movimentacao: [
-        {
-          nome: 'Endodontia',
-          quant: '10',
-        }
-      ]
-    },
-    {
-      matricula: '2345678',
-      nome: 'Vinícius',
-      periodo: '10',
-      box: '181',
-      tipo: 'Entrada',
-      status: 'Pendente',
-      colaborador: 'Lucas Rodrigues',
-      assinatura: false,
-      hora: '06:19',
-      data: '11/02/2023',
-      movimentacao: [
-        {
-          nome: 'Cirúrgica',
-          quant: '20',
-        }
-      ]
-    },
-  ];
+  var pedidos = [
+    { id: 1, matricula_aluno: 'aluno', nome_aluno: 'Ana', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Inválido', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
+    { id: 2, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Validado', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
+    { id: 3, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: true, hora: '12:19', data: '12/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
+    { id: 4, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Entrada', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: true, hora: '06:19', data: '14/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
+    { id: 5, matricula_aluno: 'aluno', nome_aluno: 'Marcela', periodo_aluno: '10', box_aluno: '181', modalidade: 'Entrada', status: 'Inválido', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '19:19', data: '11/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
+    { id: 6, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Entrada', status: 'Validado', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
+    { id: 7, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Inválido', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '23:19', data: '11/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
+    { id: 8, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
+    { id: 9, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Validado', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '08:19', data: '11/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] }
+  ]
 
-  var staff = [
-    { nome: 'Ana Silva', matricula: '14803291', email: 'example@website.com', senha: '123' },
-    { nome: 'Paulo Oliveira', matricula: '21506783', email: 'ana.silva@email.com', senha: '456' },
-    { nome: 'Rodrigo Santos', matricula: '18954374', email: 'carlos.cost@gmail.com', senha: '789' },
-    { nome: 'Camila Lima', matricula: '30567856', email: 'fernanda.lima@hotmail.com', senha: 'abc' },
-    { nome: 'Renato Alves', matricula: '12675429', email: 'rafaela.santos@gmail.com', senha: 'xyz' },
-    { nome: 'Juliana Costa', matricula: '43219837', email: 'gabriel.souza@yahoo.com', senha: '987' },
-    { nome: 'Carlos Oliveira', matricula: '56789045', email: 'patricia.oliveira@mail.com', senha: '654' },
-    { nome: 'Mariana Santos', matricula: '30987612', email: 'vinicius.pereira@gmail.com', senha: '321' },
-    { nome: 'Pedro Almeida', matricula: '16543298', email: 'larissa.alves@hotmail.com', senha: 'aaa' },
-    { nome: 'Lucas Rodrigues', matricula: '54321678', email: 'roberto.lima@mail.com', senha: 'bbb' },
-    { nome: 'Fernanda Silva', matricula: '87654321', email: 'juliana.pereira@yahoo.com', senha: 'ccc' },
-    { nome: 'Márcia Oliveira', matricula: '98765432', email: 'pedro.santos@gmail.com', senha: 'ddd' },
-    { nome: 'Ricardo Almeida', matricula: '23456789', email: 'camila.costa@mail.com', senha: 'eee' },
-    { nome: 'Fernanda Costa', matricula: '67890123', email: 'lucas.santos@hotmail.com', senha: 'fff' },
-    { nome: 'Renato Santos', matricula: '12345678', email: 'isabela.lima@gmail.com', senha: 'ggg' },
-    { nome: 'Camila Lima', matricula: '89012345', email: 'andre.pereira@mail.com', senha: 'hhh' },
-    { nome: 'Lucas Oliveira', matricula: '45678901', email: 'aline.oliveira@yahoo.com', senha: 'iii' },
-    { nome: 'Mariana Costa', matricula: '23456789', email: 'thiago.alves@mail.com', senha: 'jjj' },
-    { nome: 'Pedro Almeida', matricula: '90123456', email: 'marina.costa@hotmail.com', senha: 'kkk' }
+  const users = [
+    {
+      id: 1,
+      matricula: 'aluno',
+      senha: '123',
+      nome: 'Marcos Santos',
+      cargo: 'aluno'
+    },
+    {
+      id: 2,
+      matricula: 'colab',
+      senha: '123',
+      nome: 'Ana Souza',
+      cargo: 'colaborador',
+    },
+    {
+      id: 3,
+      matricula: 'admin',
+      senha: '123',
+      nome: 'João Marques',
+      cargo: 'administrador'
+    }
   ]
 
   const openSnackBarMessage = () => {
@@ -491,35 +148,35 @@ function History() {
 
   useEffect(() => {
     handleCronologicalResult()
-    setComponentData()
+    const addToStaff = () => {
+      const selectedUsers = users.filter(user => user.cargo === 'colaborador');
+      setStaff(selectedUsers);
+    };
+    addToStaff();
   }, []);
 
   function handleSearchSimple() {
     const normalizedSearchTerm = searchTerm.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-    const resultadosFiltrados = history.filter(aluno => {
+    const resultadosFiltrados = pedidos.filter(movimentacao => {
       if (searchCategory === 'Cronológico' || searchTerm === '') {
         return true;
       }
       switch (searchCategory) {
         case 'Nome':
-          return aluno.nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(normalizedSearchTerm);
+          return movimentacao.nome_aluno.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(normalizedSearchTerm);
         case 'Matrícula':
-          return aluno.matricula.includes(searchTerm);
+          return movimentacao.matricula_aluno.includes(searchTerm);
         case 'Período':
-          return aluno.periodo.includes(searchTerm);
+          return movimentacao.periodo_aluno.includes(searchTerm);
         case 'Box':
-          return aluno.box.includes(searchTerm);
-        case 'Hora':
-          return aluno.hora.includes(searchTerm);
-        case 'Data':
-          return aluno.data.includes(searchTerm);
+          return movimentacao.box_aluno.includes(searchTerm);
         case 'Status':
-          return aluno.status.toLowerCase().includes(searchTerm.toLowerCase());
+          return movimentacao.status.toLowerCase().includes(searchTerm.toLowerCase());
         case 'Colaborador':
-          return aluno.colaborador.toLowerCase().includes(searchTerm.toLowerCase());
-        case 'Tipo':
-          return aluno.tipo.toLowerCase().includes(searchTerm.toLowerCase());
+          return movimentacao.nome_colab.toLowerCase().includes(searchTerm.toLowerCase());
+        case 'Modalidade':
+          return movimentacao.modalidade.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(searchTerm.toLowerCase());
         default:
           return true;
       }
@@ -529,49 +186,62 @@ function History() {
   }
 
   function handleSearchAdvanced() {
-    const base = { alunoName: '', alunoMatricula: '', alunoPeriodo: '', alunoBox: '', date: '' };
+    const base = { nomeAluno: '', matriculaAluno: '', periodoAluno: '', boxAluno: '', nomeColab: '', data: '' };
 
     const filterConditions = [
-      { key: 'nome', value: alunoName_his.toLowerCase(), condition: alunoName_his !== base.alunoName },
-      { key: 'matricula', value: alunoMatricula_his, condition: alunoMatricula_his !== base.alunoMatricula },
-      { key: 'periodo', value: alunoPeriodo_his, condition: alunoPeriodo_his !== base.alunoPeriodo },
-      { key: 'box', value: alunoBox_his, condition: alunoBox_his !== base.alunoBox },
-      { key: 'colaborador', value: colabName_his, condition: colabName_his?.length >= 2 },
-      { key: 'tipo', value: tipo_his, condition: tipo_his?.length >= 3 },
+      { key: 'nome_aluno', value: alunoName_his.toLowerCase(), condition: alunoName_his !== base.nomeAluno },
+      { key: 'matricula_aluno', value: alunoMatricula_his, condition: alunoMatricula_his !== base.matriculaAluno },
+      { key: 'periodo_aluno', value: alunoPeriodo_his, condition: alunoPeriodo_his !== base.periodoAluno },
+      { key: 'box_aluno', value: alunoBox_his, condition: alunoBox_his !== base.boxAluno },
+      { key: 'modalidade', value: tipo_his, condition: tipo_his?.length >= 3 },
       { key: 'status', value: status_his, condition: status_his?.length >= 3 },
       { key: 'data', value: date_his, condition: date_his !== base.date && date_his?.includes('-') },
     ];
 
     const filteredConditions = filterConditions.filter(({ condition }) => condition);
-    const keys = filteredConditions.map(({ key }) => key);
-    const values = filteredConditions.map(({ value }) => String(value).toLowerCase());
+    let keys = filteredConditions.map(({ key }) => key);
+    let values = filteredConditions.map(({ value }) => String(value).toLowerCase());
 
     let result = [];
     let search = [];
 
+    if (colabName_his && colabName_his.value !== undefined) {
+      keys.push('nome_colab')
+      values.push(colabName_his.value)
+      setColaboradorName(colabName_his.value)
+    }
+
+    // if (alunoPeriodo_his !== '') {
+    //   keys.push('periodo_aluno')
+    //   values.push(alunoPeriodo_his)
+    //   setPeriodo(alunoPeriodo_his)
+    // }
+
     if (filteredConditions.some(({ key }) => key === 'data')) {
       const [start, end] = date_his.split('-').map(d => d.trim());
-      search = history.filter(e => isDateInRange(e['data'], start, end));
+      search = pedidos.filter(e => isDateInRange(e['data'], start, end));
       keys.splice(keys.indexOf('data'), 1);
       result = search.filter(e => keys.every(key => {
         const value = String(e[key]).toLowerCase();
         return values.some(val => value.includes(val));
       }));
-    }
-    else {
-      result = history.filter(e => keys.every(key => {
+    } else {
+      result = pedidos.filter(e => keys.every(key => {
         const value = String(e[key]).toLowerCase();
         return values.some(val => value.includes(val));
       }));
     }
 
+    // console.log(keys)
+    // // console.log(colaborador_his)
+    // console.log(colabName_his)
+    // console.log(values)
+    // console.log(result)
+
     handleSearchResult(result);
   }
-  
+
   function isDateInRange(date, start, end) {
-    console.log('Input Date:', date);
-    console.log('Start Date:', start);
-    console.log('End Date:', end);
     var dateObj = moment(date, ['DD/MM/YYYY'], true);
     var startDateObj = moment(start, ['DD/MM/YYYY'], true);
     var endDateObj = moment(end, ['DD/MM/YYYY'], true);
@@ -579,7 +249,7 @@ function History() {
   }
 
   function handleCronologicalResult() {
-    const sortedResultados = history.sort((a, b) => {
+    const sortedResultados = pedidos.sort((a, b) => {
       const dateTimeA = `${a.data} ${a.hora}`;
       const dateTimeB = `${b.data} ${b.hora}`;
       const dateObjectA = new Date(dateTimeA.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1'));
@@ -651,12 +321,6 @@ function History() {
     setDate(e.target.value);
   };
 
-  const [titleComponent, setTitleComponent] = useState('')
-
-  function setComponentData() {
-    setTitleComponent(['Histórico de Fluxo de Caixas', 'Movimentações'])
-  }
-
   const optionsColaborador = staff.map(e => ({
     label: e.nome,
     value: e.nome,
@@ -667,7 +331,8 @@ function History() {
       <Container className='containerDesktop'>
         <div className='boxContainerDesktop'>
           <div className="headContainerDesktop">
-            <Title parentToChild={titleComponent} />
+            <h2 className='body-normal text-color-5'>Movimentações</h2>
+            <h1 className='heading-4'>Histórico de Fluxo de Caixas</h1>
           </div>
           <div className="bodyContainerDesktop">
             <div className="historyContainer">
@@ -680,11 +345,9 @@ function History() {
                     <option>Matrícula</option>
                     <option>Período</option>
                     <option>Box</option>
-                    <option>Hora</option>
-                    <option>Data</option>
                     <option>Status</option>
                     <option>Colaborador</option>
-                    <option>Tipo</option>
+                    <option>Modalidade</option>
                   </select>
                 </div>
                 <div className="searchBoxButtons">
@@ -717,7 +380,7 @@ function History() {
                   <Select value={colabName_his} onChange={setColabName} options={optionsColaborador} placeholder='Selecione uma opção' className='select1' />
                 </div>
                 <div className='searchForms'>
-                  <span className='body-normal margin-bottom-5'>Tipo</span>
+                  <span className='body-normal margin-bottom-5'>Modalidade</span>
                   <select className='form-1' value={tipo_his} onChange={(e) => setTipo(e.target.value)} style={{ width: '220px', marginRight: '20px' }}>
                     <option value='' disabled>Selecionar</option>
                     <option>Entrada</option>
@@ -729,7 +392,7 @@ function History() {
                   <select className='form-1' value={status_his} onChange={(e) => setStatus(e.target.value)} style={{ width: '220px', marginRight: '20px' }}>
                     <option value='' disabled>Selecionar</option>
                     <option>Pendente</option>
-                    <option>Invalidado</option>
+                    <option>Inválido</option>
                     <option>Validado</option>
                   </select>
                 </div>

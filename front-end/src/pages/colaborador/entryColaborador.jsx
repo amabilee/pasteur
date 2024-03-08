@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import HeaderHomeColab from '../../components/headers/colabHomeindex'
 import { Container } from 'react-bootstrap'
 import './style.css';
@@ -15,10 +15,32 @@ function HomeColaborador() {
   const [open, setOpen] = React.useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('')
   const [snackBarStyle, setSnackBarStyle] = useState({ sx: { background: "white", color: "black", borderRadius: '10px' } })
-  var entryRequests = [
-    { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Entrada', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', movimentacao: [ { family: 'Cirúrgica', quantity: '20' }, { family: 'Dentística', quantity: '19' } ] },
-    { matricula: '2345678', nome: 'Vinícius', periodo: '10', box: '181', tipo: 'Entrada', status: 'Pendente', colaborador: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', movimentacao: [ { family: 'Cirúrgica', quantity: '20' }, { family: 'Dentística', quantity: '19' }, { family: 'Dentística', quantity: '19' }, { family: 'Dentística', quantity: '19' }, { family: 'Dentística', quantity: '19' }, { family: 'Dentística', quantity: '19' }, { family: 'Dentística', quantity: '19' } ]}
+  var pedidosEntrada = []
+
+  var pedidos = [
+    { id: 1, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
+    { id: 2, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
+    { id: 3, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: true, hora: '06:19', data: '12/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
+    { id: 4, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Entrada', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: true, hora: '06:19', data: '14/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
+    { id: 5, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Entrada', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
+    { id: 6, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Entrada', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
+    { id: 7, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
+    { id: 8, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
+    { id: 9, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] }
   ]
+
+
+  // async function getPedidos() {
+  //   try {
+  //     const response = server.post('/pedido')
+  //     if (response.status === 200) {
+  //       // entryRequests = response
+  //       console.log('get pedido right')
+  //     }
+  //   } catch (e) {
+  //     console.error(e)
+  //   }
+  // }
 
   const openSnackBarMessage = () => {
     setOpen(true);
@@ -50,6 +72,9 @@ function HomeColaborador() {
   }
 
   function invalidateBox() {
+    let formatedPedido = selectedAluno
+    formatedPedido.status = 'Invalidado'
+    console.log(formatedPedido) //post do pedido pós invalidação
     openSnackBarMessage()
     setSnackBarMessage('Pedido invalidado com sucesso')
     setSnackBarStyle({ sx: { background: "#79B874", color: "white", borderRadius: '15px' } })
@@ -57,6 +82,9 @@ function HomeColaborador() {
   }
 
   function validateBox() {
+    let formatedPedido = selectedAluno
+    formatedPedido.status = 'Validado'
+    console.log(formatedPedido) //post do pedido pós validação
     openSnackBarMessage()
     setSnackBarMessage('Pedido validado com sucesso')
     setSnackBarStyle({ sx: { background: "#79B874", color: "white", borderRadius: '15px' } })
@@ -66,7 +94,33 @@ function HomeColaborador() {
   function handleReturn() {
     setShowPopView(false)
     setErrorMessage(' ');
+    setSelectedAluno(null);
   }
+
+  function tableReportContent() {
+    pedidosEntrada = pedidos.filter(pedido => pedido.modalidade === 'Entrada' && pedido.status == 'Pendente');
+    return pedidosEntrada.map((pedido, index) => (
+      <tbody key={index}>
+        <tr>
+          <td>
+            <p className='body-normal'>{pedido.nome_aluno}</p>
+            <p className='body-normal'>
+              <button className='button-7' onClick={() => buttonView(pedido)}>
+                Visualizar
+              </button>
+            </p>
+          </td>
+        </tr>
+      </tbody>
+    ));
+
+  };
+
+  useEffect(() => {
+    pedidosEntrada = pedidos.filter(pedido => pedido.modalidade === 'Entrada' && pedido.status == 'Pendente');
+    console.log(pedidosEntrada)
+  }, [])
+
 
   return (
     <>
@@ -80,27 +134,12 @@ function HomeColaborador() {
           <div className="bodyContainerDesktop">
             <div className="tableRequests">
               <table>
-                <tbody>
-                  {entryRequests.map((aluno, index) => {
-                    return (
-                      <tr key={index}>
-                        <td>
-                          <p className='body-normal'>{aluno.nome}</p>
-                          <p className='body-normal'>
-                            <button className='button-7' onClick={() => buttonView(aluno)}>
-                              Visualizar
-                            </button>
-                          </p>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
+                {tableReportContent()}
               </table>
             </div>
           </div>
         </div>
-        <Snackbar open={open} autoHideDuration={4000} onClose={closeSnackBarMessage} message={snackBarMessage} action={alertBox} ContentProps={snackBarStyle}/>
+        <Snackbar open={open} autoHideDuration={4000} onClose={closeSnackBarMessage} message={snackBarMessage} action={alertBox} ContentProps={snackBarStyle} />
       </Container>
       {showPopView && (
         <div className="popUpView">
@@ -115,10 +154,10 @@ function HomeColaborador() {
                 <div className="viewCardLeftBox">
                   {selectedAluno && (
                     <ul>
-                      <li><p>Matrícula:</p><p>{selectedAluno.matricula}</p></li>
-                      <li><p>Acadêmico:</p><p>{selectedAluno.nome}</p></li>
-                      <li><p>Período:</p><p>{selectedAluno.periodo}</p></li>
-                      <li><p>Número da box:</p><p>{selectedAluno.box}</p></li>
+                      <li><p>Matrícula:</p><p>{selectedAluno.matricula_aluno}</p></li>
+                      <li><p>Acadêmico:</p><p>{selectedAluno.nome_aluno}</p></li>
+                      <li><p>Período:</p><p>{selectedAluno.periodo_aluno}</p></li>
+                      <li><p>Número da box:</p><p>{selectedAluno.box_aluno}</p></li>
                     </ul>
                   )}
                 </div>
@@ -128,20 +167,18 @@ function HomeColaborador() {
                 <div className="viewCardRightBox">
                   <div className="tableRequestInfo">
                     <table>
-                      {selectedAluno && selectedAluno.movimentacao && (
-                        <tbody>
-                          {selectedAluno.movimentacao.map((movimentacao, index) => (
-                            <tr key={index}>
-                              <td>
-                                <span>
-                                  <p>{movimentacao.family}</p>
-                                  <p>{movimentacao.quantity}</p>
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      )}
+                      <tbody>
+                        {selectedAluno.nome_familia.map((nomeFamilia, index) => (
+                          <tr key={index}>
+                            <td>
+                              <span>
+                                <p>{nomeFamilia}</p>
+                                <p>{selectedAluno.qnt_itens[index]}</p>
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
                     </table>
                   </div>
                 </div>

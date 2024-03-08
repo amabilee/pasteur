@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 function ExitAluno() {
     const [box, setBox] = useState('');
     const [family, setFamily] = useState('0');
+    const [periodo, setPeriodo] = useState('')
     const [showPop, setShowPop] = useState(false);
     const [showConfirmExit, setShowConfirmExit] = useState(false);
     const navigate = useNavigate();
@@ -15,44 +16,47 @@ function ExitAluno() {
     const [tableData, setTableData] = useState([]);
     const [errorMessage, setErrorMessage] = useState(' ');
     const newMovement = { family: family };
-    const finalDataMoviment = { matricula: '', nome: '', periodo: '', box: '', tipo: '', status: '', colaborador: '', assinatura: false, hora: '', data: '', movimentacao: tableData };
-    var infoUser = { matricula: '2345678' }
-    var infoUsers = { matricula: '2345678', nome: 'Vinícius Freitas', periodo: '10' }
+    const finalDataMoviment = { matricula_aluno: '', nome_aluno: '', periodo_aluno: '', box_aluno: '', modalidade: '', status: '', nome_colab: '', assinatura: false, hora: '', data: '', nome_familia: '', qnt_itens: '' };
+    var infoUser = {}
     var familias = [
-        { nome: 'Cirúrgica', quantBase: '20', quantMax: '20', quantMin: '17' },
-        { nome: 'Dentística', quantBase: '20', quantMax: '20', quantMin: '11' },
-        { nome: 'Implante Dentário', quantBase: '20', quantMax: '20', quantMin: '15' },
-        { nome: 'Ortodontia', quantBase: '20', quantMax: '20', quantMin: '18' },
-        { nome: 'Endodontia', quantBase: '20', quantMax: '20', quantMin: '16' },
-        { nome: 'Periodontia', quantBase: '20', quantMax: '20', quantMin: '12' },
-        { nome: 'Prótese Dentária', quantBase: '20', quantMax: '20', quantMin: '14' },
-        { nome: 'Radiologia Odontológica', quantBase: '20', quantMax: '20', quantMin: '10' },
-        { nome: 'Odontopediatria', quantBase: '20', quantMax: '20', quantMin: '13' },
-        { nome: 'Cirurgia Bucomaxilofacial', quantBase: '20', quantMax: '20', quantMin: '16' },
-        { nome: 'Odontologia Estética', quantBase: '20', quantMax: '20', quantMin: '14' },
-        { nome: 'Ortopedia Funcional dos Maxilares', quantBase: '20', quantMax: '20', quantMin: '17' },
-        { nome: 'Oclusão', quantBase: '20', quantMax: '20', quantMin: '15' },
-        { nome: 'Odontologia do Trabalho', quantBase: '20', quantMax: '20', quantMin: '13' },
-        { nome: 'Farmacologia em Odontologia', quantBase: '20', quantMax: '20', quantMin: '11' },
-        { nome: 'Odontologia Legal', quantBase: '20', quantMax: '20', quantMin: '10' },
-        { nome: 'Anatomia Dental', quantBase: '20', quantMax: '20', quantMin: '18' },
-        { nome: 'Microbiologia Oral', quantBase: '20', quantMax: '20', quantMin: '16' },
-        { nome: 'Patologia Oral', quantBase: '20', quantMax: '20', quantMin: '12' },
-        { nome: 'Cariologia', quantBase: '20', quantMax: '20', quantMin: '14' },
-        { nome: 'Materiais Dentários', quantBase: '20', quantMax: '20', quantMin: '11' }
+        { id: 1, nome: 'Cirúrgica', quantMax: '20', quantMin: '17' },
+        { id: 2, nome: 'Dentística', quantMax: '20', quantMin: '11' },
+        { id: 3, nome: 'Implante Dentário', quantMax: '20', quantMin: '15' },
+        { id: 4, nome: 'Ortodontia', quantMax: '20', quantMin: '18' },
+        { id: 5, nome: 'Endodontia', quantMax: '20', quantMin: '16' },
+        { id: 6, nome: 'Periodontia', quantMax: '20', quantMin: '12' },
+        { id: 7, nome: 'Prótese Dentária', quantMax: '20', quantMin: '14' },
+        { id: 8, nome: 'Radiologia Odontológica', quantMax: '20', quantMin: '10' },
+        { id: 9, nome: 'Odontopediatria', quantMax: '20', quantMin: '13' },
+        { id: 10, nome: 'Cirurgia Bucomaxilofacial', quantMax: '20', quantMin: '16' },
+        { id: 11, nome: 'Odontologia Estética', quantMax: '20', quantMin: '14' },
+        { id: 12, nome: 'Ortopedia Funcional dos Maxilares', quantMax: '20', quantMin: '17' },
+        { id: 13, nome: 'Oclusão', quantMax: '20', quantMin: '15' },
+        { id: 14, nome: 'Odontologia do Trabalho', quantMax: '20', quantMin: '13' },
+        { id: 15, nome: 'Farmacologia em Odontologia', quantMax: '20', quantMin: '11' },
+        { id: 16, nome: 'Odontologia Legal', quantMax: '20', quantMin: '10' },
+        { id: 17, nome: 'Anatomia Dental', quantMax: '20', quantMin: '18' },
+        { id: 18, nome: 'Microbiologia Oral', quantMax: '20', quantMin: '16' },
+        { id: 19, nome: 'Patologia Oral', quantMax: '20', quantMin: '12' },
+        { id: 20, nome: 'Cariologia', quantMax: '20', quantMin: '14' },
+        { id: 21, nome: 'Materiais Dentários', quantMax: '20', quantMin: '11' }
     ]
 
     function navigateToHomeAluno() {
         if (showPop) {
             setShowPop(false);
             navigate('/home-aluno')
+            setTableData([]);
         } else {
             navigate('/home-aluno')
+            setTableData([]);
         }
     }
 
     function navigateToConfirmExit() {
         if (box.trim() === '' || /^0+$/.test(box) || (box.length > 0 && box[0] === '0') || (tableData.length === 0)) {
+            setErrorMessage('Todos os campos devem ser preenchidos.');
+        } else if (periodo == '') {
             setErrorMessage('Todos os campos devem ser preenchidos.');
         } else {
             setErrorMessage(' ');
@@ -78,7 +82,7 @@ function ExitAluno() {
     };
 
     function addMovement() {
-        const existingIndex = tableData.findIndex((item) => item.nome === family);
+        const existingIndex = tableData.findIndex((item) => item.family === family);
         if (existingIndex !== -1) {
             const updatedTableData = [...tableData];
             setTableData(updatedTableData);
@@ -92,7 +96,6 @@ function ExitAluno() {
         setFamily('0');
         changeAddButtonStyle('button-6-disable');
         changeAddButtonState(true);
-        setTableData([]);
     }
 
     function requestConfirmed() {
@@ -104,17 +107,19 @@ function ExitAluno() {
     }
 
     function formatMovimentData() {
-        finalDataMoviment.matricula = infoUser.matricula;
-        finalDataMoviment.nome = infoUsers.nome;
-        finalDataMoviment.periodo = infoUsers.periodo;
-        finalDataMoviment.box = box;
-        finalDataMoviment.tipo = 'Saída';
+        let newObject = window.localStorage.getItem("loggedUser");
+        infoUser = (JSON.parse(newObject));
+        finalDataMoviment.matricula_aluno = infoUser.matricula;
+        finalDataMoviment.nome_aluno = infoUser.nome;
+        finalDataMoviment.periodo_aluno = periodo;
+        finalDataMoviment.box_aluno = box;
+        finalDataMoviment.modalidade = 'Saída';
         finalDataMoviment.status = 'Pendente';
-        finalDataMoviment.colaborador = '';
+        finalDataMoviment.nome_colab = '';
         finalDataMoviment.assinatura = false;
         finalDataMoviment.hora = { date_create: moment().format("hh:mm:ss") };
         finalDataMoviment.data = { date_create: moment().format("DD-MM-YYYY") };
-        finalDataMoviment.movimentacao = tableData
+        finalDataMoviment.nome_familia = tableData
     }
 
     const [loadedFamilyOptions, setLoadedFamilyOptions] = useState([]);
@@ -141,6 +146,19 @@ function ExitAluno() {
                 <div className="inputFormsExit">
                     <h1 className='title-1 margin-bottom-30'>Registrar pedido de saída</h1>
                     <input placeholder='Box de armazenamento' className='form-4' value={box} onChange={(e) => setBox(e.target.value)} type='number' />
+                    <select className='form-4' value={periodo} onChange={(e) => setPeriodo(e.target.value)}>
+                        <option value='' disabled>Selecionar um periodo</option>
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                        <option>6</option>
+                        <option>7</option>
+                        <option>8</option>
+                        <option>9</option>
+                        <option>10</option>
+                    </select>
                     <select className='form-4' value={family} onChange={detectEntryFamily} >
                         <option disabled={true} value='0'>Selecione a família</option>
                         {loadedFamilyOptions.map((option, index) => (
@@ -173,10 +191,10 @@ function ExitAluno() {
                         <p className='heading-3 text-align-center margin-bottom-10'>Tem certeza que<br />deseja voltar?</p>
                         <p className='body-light text-align-center margin-bottom-20'>Se continuar as alterações serão perdidas.</p>
                         <div className='popUpCancelButtons'>
-                            <button className='button-3' disabled={false} onClick={() => setShowPop(false)}>
+                            <button className='button-2' disabled={false} onClick={() => setShowPop(false)}>
                                 Voltar
                             </button>
-                            <button className='button-2' disabled={false} onClick={navigateToHomeAluno}>
+                            <button className='button-3' disabled={false} onClick={navigateToHomeAluno}>
                                 Continuar
                             </button>
                         </div>
