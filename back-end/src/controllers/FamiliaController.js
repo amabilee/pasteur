@@ -1,6 +1,5 @@
+//familiaController.js
 import Familia from '../models/Familia.js';
-import  bcrypt from "bcrypt";
-
 
 class FamiliaController {
   static async getAllEntities(req, res) {
