@@ -9,18 +9,21 @@ const familiaSeed = async () => {
     if (!existingFamilia) {
       await Familia.bulkCreate([
         {
+          id: 1,
           nome: 'Família A',
           quantidadeBase: '10',
           quantidadeMAX: '20',
           quantidadeMIN: '5',
         },
         {
+          id : 2,
           nome: 'Família B',
           quantidadeBase: '15',
           quantidadeMAX: '25',
           quantidadeMIN: '8',
         },
         {
+          id : 3,
           nome: 'Família C',
           quantidadeBase: '20',
           quantidadeMAX: '30',

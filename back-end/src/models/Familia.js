@@ -4,6 +4,11 @@ import db from '../config/dbConnect.js';
 const Familia = db.define(
     'Familia', 
     {
+        id : {
+            type: DataTypes.INTEGER,
+            primaryKey: true,
+            autoIncrement: true,
+        },
         nome: {
             type: DataTypes.STRING,
             allowNull: false,

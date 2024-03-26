@@ -1,4 +1,4 @@
-//loginController.js
+// loginController.js
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import User from '../models/User.js';
@@ -19,15 +19,14 @@ class AuthController {
                 return res.status(401).json({ error: 'Senha incorreta.' });
             }
 
-            // Gere o token JWT
+            // Gere o token JWT com expiração em uma hora
             const token = jwt.sign({ id: foundUser.id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
 
-            res.status(200).json({token,matricula });
+            res.status(200).json({ token, matricula });
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Erro ao processar login.' });
         }
-
     }
 
     static async logout(req, res) {

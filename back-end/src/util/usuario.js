@@ -12,23 +12,23 @@ const usuarioSeed = async () => {
       // Criar o usuário administrador
       const senhaAdmin = await bcrypt.hash(process.env.SENHA_ADMIN, 10);
       await Usuario.create({
-        matricula: 'admin',
+        matricula: 111,
         senha: senhaAdmin,
         NomeUser: 'Administrador',
         email: 'admin@',
-        cargo: 'Admin',
+        cargo: 1,
         box: 123,
-        periodo: '1',
+        periodo: "0",
       });
 
       // Criar o usuário aluno
       const senhaAluno = await bcrypt.hash(process.env.SENHA_ALUNO, 10);
       await Usuario.create({
-        matricula: 'aluno',
+        matricula: 333,
         senha: senhaAluno,
         NomeUser: 'Aluno',
         email: 'aluno@',
-        cargo: 'Aluno',
+        cargo: 3,
         box: 456,
         periodo: '2',
       });
@@ -36,11 +36,11 @@ const usuarioSeed = async () => {
       // Criar o usuário colaborador
       const senhaColaborador = await bcrypt.hash(process.env.SENHA_COLABORADOR, 10);
       await Usuario.create({
-        matricula: 'colaborador',
+        matricula: 222,
         senha: senhaColaborador,
         NomeUser: 'Colaborador',
         email: 'colaborador@',
-        cargo: 'Colaborador',
+        cargo: 2,
         box: 789,
         periodo: '3',
       });

@@ -6,7 +6,7 @@ const pedido = db.define(
   'pedido',
   {
     matricula: {
-      type: DataTypes.STRING,
+      type: DataTypes.INTEGER,
       allowNull: false,
     },
     numero: {

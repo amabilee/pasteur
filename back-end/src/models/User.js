@@ -5,7 +5,7 @@ const User = db.define(
     'User', 
     {
         matricula:{
-            type: DataTypes.STRING,
+            type: DataTypes.INTEGER,
             allowNull: false,
             primaryKey: true, 
         },
@@ -22,7 +22,7 @@ const User = db.define(
             allowNull: true,
         },
         cargo:{
-            type: DataTypes.STRING,
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
         box:{
@@ -35,20 +35,8 @@ const User = db.define(
         },
     },
     {
-        tableName: 'User',  
-    }   
-    //explemplo json
-    //    { {
-    // {
-    //     "matricula": "12345",
-    //     "senha": "senha123",
-    //     "nome": "João Silva",
-    //     "email": "joao.silva@example.com",
-    //     "cargo": "Analista de Dados",
-    //     "box": "A12"
-    //     "periodo": ""
-    //   }
-      
+        tableName: 'User',
+    }
 );
 
 export default User;
