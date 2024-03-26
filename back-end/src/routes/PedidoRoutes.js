@@ -1,6 +1,5 @@
 import express from 'express';
 import PedidoController from '../controllers/PedidoController.js';
-<<<<<<< Updated upstream
 import authorizationMiddleware from '../middlewares/authorizationMiddleware.js';
 import authoricationMiddleware from '../middlewares/authenticationMiddleware.js';
 
@@ -49,24 +48,5 @@ router.get('/pedido/:id', authorizationMiddleware, authoricationMiddleware({ req
 router.post('/pedido', authorizationMiddleware, authoricationMiddleware({ requiredRoles: ['admin', 'colaborador', 'aluno'] }), PedidoController.createEntity);
 router.put('/pedido/:id', authorizationMiddleware, authoricationMiddleware({ requiredRoles: ['admin', 'colaborador', 'aluno'] }), PedidoController.updateEntity);
 router.delete('/pedido/:id', authorizationMiddleware, authoricationMiddleware({ requiredRoles: ['admin', 'colaborador'] }), PedidoController.deleteEntity);
-=======
-import authenticationMiddleware from '../middlewares/authenticationMiddleware.js';
-
-const router = express.Router();
-
-
-router.use('/pedido', authenticationMiddleware);
-
-
-router.get('/pedido',PedidoController.getAllEntities);
-
-router.get('/pedido/:id',PedidoController.getEntity);
-
-router.post('/pedido',PedidoController.createEntity);
-
-router.put('/pedido/:id',PedidoController.updateEntity);
-
-router.delete('/pedido/:id',PedidoController.deleteEntity);
->>>>>>> Stashed changes
 
 export default router;
