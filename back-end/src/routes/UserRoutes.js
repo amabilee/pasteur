@@ -1,5 +1,6 @@
 import express from 'express';
 import UsuarioController from '../controllers/UserController.js';
+<<<<<<< Updated upstream
 import authorizationMiddleware from '../middlewares/authorizationMiddleware.js';
 import authoricationMiddleware from '../middlewares/authenticationMiddleware.js';
 
@@ -48,5 +49,22 @@ router.get('/usuario/:matricula', authoricationMiddleware({ requiredRoles: ['adm
 router.post('/usuario', authorizationMiddleware, authoricationMiddleware({ requiredRoles: ['admin'] }), UsuarioController.createEntity);
 router.put('/usuario/:matricula', authorizationMiddleware, authoricationMiddleware({ requiredRoles: ['admin'] }), UsuarioController.updateEntity);
 router.delete('/usuario/:matricula', authorizationMiddleware, authoricationMiddleware({ requiredRoles: ['admin'] }), UsuarioController.deleteEntity);
+=======
+import authenticationMiddleware from '../middlewares/authenticationMiddleware.js';
+
+const router = express.Router();
+
+router.use('/usuario', authenticationMiddleware);
+
+router.get('/usuario', UsuarioController.getAllEntities);
+
+router.get('/usuario/:id', UsuarioController.getEntity);
+
+router.post('/usuario', UsuarioController.createEntity);
+
+router.put('/usuario/:id', UsuarioController.updateEntity);
+
+router.delete('/usuario/:id', UsuarioController.deleteEntity);
+>>>>>>> Stashed changes
 
 export default router;

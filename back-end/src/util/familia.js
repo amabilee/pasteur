@@ -9,18 +9,30 @@ const familiaSeed = async () => {
     if (!existingFamilia) {
       await Familia.bulkCreate([
         {
+<<<<<<< Updated upstream
+=======
+          id:1,
+>>>>>>> Stashed changes
           nome: 'Família A',
           quantidadeBase: '10',
           quantidadeMAX: '20',
           quantidadeMIN: '5',
         },
         {
+<<<<<<< Updated upstream
+=======
+          id:2,
+>>>>>>> Stashed changes
           nome: 'Família B',
           quantidadeBase: '15',
           quantidadeMAX: '25',
           quantidadeMIN: '8',
         },
         {
+<<<<<<< Updated upstream
+=======
+          id:3,
+>>>>>>> Stashed changes
           nome: 'Família C',
           quantidadeBase: '20',
           quantidadeMAX: '30',

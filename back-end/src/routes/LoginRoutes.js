@@ -3,6 +3,7 @@ import loginController from '../controllers/LoginController.js';
 
 const router = express.Router();
 
+<<<<<<< Updated upstream
 /**
  * @swagger
  * tags:
@@ -45,6 +46,9 @@ const router = express.Router();
  *       401:
  *         description: Não autorizado.
  */
+=======
+
+>>>>>>> Stashed changes
 router.post('/login', loginController.login);
 router.get('/login', loginController.logout);
 

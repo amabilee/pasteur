@@ -4,15 +4,32 @@ import db from '../config/dbConnect.js';
 const User = db.define(
     'User', 
     {
+<<<<<<< Updated upstream
+        matricula:{
+            type: DataTypes.STRING,
+=======
+        id:{
+            type: DataTypes.INTEGER,
+>>>>>>> Stashed changes
+            allowNull: false,
+            primaryKey: true,
+            autoIncrement: true,
+        },
+<<<<<<< Updated upstream
+        senha:{
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+=======
         matricula:{
             type: DataTypes.STRING,
             allowNull: false,
-            primaryKey: true, 
         },
         senha:{
             type: DataTypes.STRING,
             allowNull: false,
         },
+>>>>>>> Stashed changes
         NomeUser:{
             type: DataTypes.STRING,
             allowNull: false,
@@ -22,7 +39,11 @@ const User = db.define(
             allowNull: true,
         },
         cargo:{
+<<<<<<< Updated upstream
             type: DataTypes.STRING,
+=======
+            type: DataTypes.INTEGER,
+>>>>>>> Stashed changes
             allowNull: false,
         },
         box:{
