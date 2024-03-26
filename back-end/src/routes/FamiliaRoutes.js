@@ -1,14 +1,10 @@
 import express from 'express';
 import FamiliaController from '../controllers/FamiliaController.js';
-<<<<<<< Updated upstream
 import authorizationMiddleware from '../middlewares/authorizationMiddleware.js';
-=======
->>>>>>> Stashed changes
 import authenticationMiddleware from '../middlewares/authenticationMiddleware.js';
 
 const router = express.Router();
 
-<<<<<<< Updated upstream
 /**
  * @swagger
  * /Familia:
@@ -127,16 +123,5 @@ router.put('/Familia/:id', authorizationMiddleware, authenticationMiddleware({ r
  *         description: Família não encontrada.
  */
 router.delete('/Familia/:id', authorizationMiddleware, authenticationMiddleware({ requiredRoles: ['admin'] }), FamiliaController.deleteEntity);
-=======
-router.use('/Familia', authenticationMiddleware);
-
-router.get('/Familia', FamiliaController.getAllEntities);
-
-router.get('/Familia/:id', FamiliaController.getEntity);
-
-router.post('/Familia',  FamiliaController.createEntity);
-
-router.delete('/Familia/:id', FamiliaController.deleteEntity);
->>>>>>> Stashed changes
 
 export default router;

@@ -3,7 +3,6 @@ import usuarios from './UserRoutes.js';
 import login from './LoginRoutes.js';
 import pedido from './PedidoRoutes.js';
 import Familia from './FamiliaRoutes.js';
-<<<<<<< Updated upstream
 import swaggerUi from 'swagger-ui-express';
 import swaggerFile from '../../swagger/swagger_output.json' assert { type: 'json' };
 
@@ -11,11 +10,6 @@ const routes = (app) => {
     const swaggerUiOptions = { }; // Defina suas opções do Swagger aqui
 
     app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile, swaggerUiOptions));
-=======
-
-const routes = (app) => {
-
->>>>>>> Stashed changes
     app.use(express.json());
 
     // Caminho das rotas

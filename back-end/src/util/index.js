@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 import usuarioSeed from './usuario.js'; // Importa a semente de usuário
 import familiaSeed from './familia.js'; // Importa a semente de família
 import pedidoSeed from './pedido.js';
@@ -19,20 +18,4 @@ const seed = async () => {
 };
 
 // Exporta a função de semeação
-=======
-import usuarioSeed from './usuario.js';
-import familiaSeed from './familia.js';
-
-const seed = async () => {
-  try {
-    await usuarioSeed();
-    await familiaSeed();
-
-  } catch (error) {
-    console.error('Erro no seed', error);
-  }
-};
-
-
->>>>>>> Stashed changes
 export default seed;

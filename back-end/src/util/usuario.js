@@ -12,16 +12,11 @@ const usuarioSeed = async () => {
       // Criar o usuário administrador
       const senhaAdmin = await bcrypt.hash(process.env.SENHA_ADMIN, 10);
       await Usuario.create({
-        id:1,
         matricula: 'admin',
         senha: senhaAdmin,
         NomeUser: 'Administrador',
         email: 'admin@',
-<<<<<<< Updated upstream
         cargo: 'Admin',
-=======
-        cargo: 1,
->>>>>>> Stashed changes
         box: 123,
         periodo: '1',
       });
@@ -29,19 +24,11 @@ const usuarioSeed = async () => {
       // Criar o usuário aluno
       const senhaAluno = await bcrypt.hash(process.env.SENHA_ALUNO, 10);
       await Usuario.create({
-<<<<<<< Updated upstream
-=======
-        id :3,
->>>>>>> Stashed changes
         matricula: 'aluno',
         senha: senhaAluno,
         NomeUser: 'Aluno',
         email: 'aluno@',
-<<<<<<< Updated upstream
         cargo: 'Aluno',
-=======
-        cargo: 3,
->>>>>>> Stashed changes
         box: 456,
         periodo: '2',
       });
@@ -49,19 +36,11 @@ const usuarioSeed = async () => {
       // Criar o usuário colaborador
       const senhaColaborador = await bcrypt.hash(process.env.SENHA_COLABORADOR, 10);
       await Usuario.create({
-<<<<<<< Updated upstream
-=======
-        id:2,
->>>>>>> Stashed changes
         matricula: 'colaborador',
         senha: senhaColaborador,
         NomeUser: 'Colaborador',
         email: 'colaborador@',
-<<<<<<< Updated upstream
         cargo: 'Colaborador',
-=======
-        cargo: 2,
->>>>>>> Stashed changes
         box: 789,
         periodo: '3',
       });
