@@ -14,8 +14,8 @@ class UserController {
 
   static async getEntity(req, res) {
     try {
-      const { id } = req.params;
-      const user = await User.findByPk(id);
+      const { matricula } = req.params;
+      const user = await User.findByPk(matricula);
       res.json(user);
     } catch (error) {
       console.error(error);
@@ -25,12 +25,12 @@ class UserController {
 
   static async createEntity(req, res) {
     try {
-      const { matricula, senha } = req.body;
+      const { matricula, senha, nomeUser, cargo } = req.body;
       if (!senha) {
         return res.status(400).json({ error: 'A senha não pode estar vazia.' });
       }
       const hashedPassword = await bcrypt.hash(senha, 10);
-      const createdUser = await User.create({ matricula, senha: hashedPassword });
+      const createdUser = await User.create({ matricula, senha: hashedPassword, nomeUser, cargo });
       res.status(201).json({ user: createdUser });
     } catch (error) {
       console.error(error);
@@ -40,13 +40,13 @@ class UserController {
 
   static async updateEntity(req, res) {
     try {
-      const { matricula } = req.params; // Change this line
-      const { senha } = req.body;
+      const { matricula } = req.params;
+      const { senha, nomeUser, cargo } = req.body;
       if (!senha) {
         return res.status(400).json({ error: 'A senha não pode estar vazia.' });
       }
       const hashedPassword = await bcrypt.hash(senha, 10);
-      await User.update({ senha: hashedPassword }, { where: { matricula } }); // Change this line
+      await User.update({ senha: hashedPassword, nomeUser, cargo }, { where: { matricula } });
       res.json({ message: 'Usuário atualizado com sucesso.' });
     } catch (error) {
       console.error(error);

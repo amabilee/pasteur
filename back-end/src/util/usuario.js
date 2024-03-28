@@ -1,48 +1,36 @@
 import bcrypt from 'bcrypt';
-import Usuario from '../models/User.js'; // Certifique-se de que este caminho está correto para o seu modelo de usuário
+import User from '../models/User.js';
 import dotenv from 'dotenv';
 
-dotenv.config(); // Carregar variáveis de ambiente do arquivo .env
+dotenv.config();
 
 const usuarioSeed = async () => {
-  const existingUser = await Usuario.findOne();
+  const existingUser = await User.findOne();
 
   if (!existingUser) {
     try {
-      // Criar o usuário administrador
       const senhaAdmin = await bcrypt.hash(process.env.SENHA_ADMIN, 10);
-      await Usuario.create({
+      await User.create({
         matricula: 111,
         senha: senhaAdmin,
-        NomeUser: 'Administrador',
-        email: 'admin@',
+        nomeUser: 'Administrador',
         cargo: 1,
-        box: 123,
-        periodo: "0",
       });
 
-      // Criar o usuário aluno
       const senhaAluno = await bcrypt.hash(process.env.SENHA_ALUNO, 10);
-      await Usuario.create({
+      await User.create({
         matricula: 333,
         senha: senhaAluno,
-        NomeUser: 'Aluno',
-        email: 'aluno@',
-        cargo: 3,
-        box: 456,
-        periodo: '2',
+        nomeUser: 'Aluno',
+        cargo: 2,
       });
 
-      // Criar o usuário colaborador
       const senhaColaborador = await bcrypt.hash(process.env.SENHA_COLABORADOR, 10);
-      await Usuario.create({
+      await User.create({
         matricula: 222,
         senha: senhaColaborador,
-        NomeUser: 'Colaborador',
-        email: 'colaborador@',
-        cargo: 2,
-        box: 789,
-        periodo: '3',
+        nomeUser: 'Colaborador',
+        cargo: 3,
       });
 
       console.log('Usuários criados com sucesso!');

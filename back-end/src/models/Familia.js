@@ -4,7 +4,7 @@ import db from '../config/dbConnect.js';
 const Familia = db.define(
     'Familia', 
     {
-        id : {
+        id: {
             type: DataTypes.INTEGER,
             primaryKey: true,
             autoIncrement: true,
@@ -13,22 +13,15 @@ const Familia = db.define(
             type: DataTypes.STRING,
             allowNull: false,
         },
-        quantidadeBase: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
         quantidadeMAX: {
-            type: DataTypes.STRING,
+            type: DataTypes.INTEGER, // Alterado para INTEGER, ajuste conforme necessário
             allowNull: false,
         },
         quantidadeMIN: {
-            type: DataTypes.STRING,
+            type: DataTypes.INTEGER, // Alterado para INTEGER, ajuste conforme necessário
             allowNull: false,
         },
-    }, 
-    {
-        tableName: 'Familia',  
-    }   
+    }
 );
 
 export default Familia;

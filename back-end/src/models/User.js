@@ -13,30 +13,32 @@ const User = db.define(
             type: DataTypes.STRING,
             allowNull: false,
         },
-        NomeUser:{
+        nomeUser:{
             type: DataTypes.STRING,
             allowNull: false,
-        },
-        email:{
-            type: DataTypes.STRING,
-            allowNull: true,
         },
         cargo:{
             type: DataTypes.INTEGER,
             allowNull: false,
-        },
-        box:{
-            type: DataTypes.INTEGER,
-            allowNull: true,
-        },
-        periodo:{
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-    },
-    {
-        tableName: 'User',
+            validate: {
+                isIn: [[1, 2, 3]] // Aceita apenas os valores 1, 2 e 3
+            }
+        }
     }
 );
+
+// Mapeamento dos valores do campo cargo para os tipos de cargos correspondentes
+User.getCargoName = function(cargo) {
+    switch (cargo) {
+        case 1:
+            return 'admin';
+        case 2:
+            return 'colaborador';
+        case 3:
+            return 'aluno';
+        default:
+            return ''; // ou 'cargo inválido'
+    }
+};
 
 export default User;

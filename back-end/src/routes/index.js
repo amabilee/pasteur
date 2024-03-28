@@ -7,7 +7,7 @@ import swaggerUi from 'swagger-ui-express';
 import swaggerFile from '../../swagger/swagger_output.json' assert { type: 'json' };
 
 const routes = (app) => {
-    const swaggerUiOptions = { }; // Defina suas opções do Swagger aqui
+    const swaggerUiOptions = { };
 
     app.use('/doc', swaggerUi.serve, swaggerUi.setup(swaggerFile, swaggerUiOptions));
     app.use(express.json());

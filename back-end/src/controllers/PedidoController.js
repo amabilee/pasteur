@@ -13,8 +13,8 @@ class PedidoController {
 
   static async getEntity(req, res) {
     try {
-      const { id } = req.params;
-      const pedido = await Pedido.findByPk(id);
+      const { numero } = req.params;
+      const pedido = await Pedido.findByPk(numero);
       res.json(pedido);
     } catch (error) {
       console.error(error);

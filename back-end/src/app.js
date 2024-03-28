@@ -21,12 +21,6 @@ app.use(cors());
 app.use(express.json());
 
 seed()
-    .then(() => {
-        console.log('Seeds feitas com sucesso');
-    })
-    .catch((error) => {
-        console.error('Erro ao fazer seeds: ', error);
-    });
 
 routes(app);
 
