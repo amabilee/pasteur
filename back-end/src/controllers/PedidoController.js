@@ -24,9 +24,9 @@ class PedidoController {
 
   static async createEntity(req, res) {
     try {
-      const { matricula, quantidadeItens, box, tipo, status, colaborador, assinatura, data, hora } = req.body;
+      const { matricula, quantidadeItens, nomeAluno, periodoAluno, familias, box, tipo, status, colaborador, assinatura } = req.body;
 
-      const createdPedido = await Pedido.create({ matricula, quantidadeItens, box, tipo, status, colaborador, assinatura, data, hora });
+      const createdPedido = await Pedido.create({ matricula, periodoAluno, quantidadeItens, familias, nomeAluno, box, tipo, status, colaborador, assinatura });
 
       res.status(201).json({ pedido: createdPedido });
     } catch (error) {
@@ -37,10 +37,10 @@ class PedidoController {
 
   static async updateEntity(req, res) {
     try {
-      const { numero } = req.params;
-      const { quantidadeItens, box, tipo, status, colaborador, assinatura, data, hora } = req.body;
+      const { id } = req.params;
+      const { quantidadeItens, familias, nomeAluno, box, periodoAluno, tipo, status, colaborador, assinatura } = req.body;
 
-      await Pedido.update({ quantidadeItens, box, tipo, status, colaborador, assinatura, data, hora }, { where: { numero } });
+      await Pedido.update({ quantidadeItens,familias, nomeAluno, periodoAluno, box, tipo, status, colaborador, assinatura }, { where: { id } });
 
       res.json({ message: 'Pedido atualizado com sucesso.' });
     } catch (error) {
@@ -51,8 +51,8 @@ class PedidoController {
 
   static async deleteEntity(req, res) {
     try {
-      const { numero } = req.params;
-      await Pedido.destroy({ where: { numero } });
+      const { id } = req.params;
+      await Pedido.destroy({ where: { id } });
       res.json({ message: 'Pedido deletado com sucesso.' });
     } catch (error) {
       console.error(error);

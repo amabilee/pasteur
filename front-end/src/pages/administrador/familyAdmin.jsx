@@ -6,6 +6,7 @@ import deleteIcon from '../../assets/deleteIcon.svg';
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import { server } from "../../services/server";
 import './style.css';
 
 //Component
@@ -26,8 +27,8 @@ const FamilyTable = ({ data, onEdit, onDelete }) => (
       {data.map((objetos, index) => (
         <tr key={index}>
           <td>{objetos.nome}</td>
-          <td>{objetos.quantMax}</td>
-          <td>{objetos.quantMin}</td>
+          <td>{objetos.quantidadeMAX}</td>
+          <td>{objetos.quantidadeMIN}</td>
           <td>
             <button className='button-13' onClick={() => onEdit(objetos)}><img src={viewIcon} /></button>
             <button className='button-13' onClick={() => onDelete(objetos)}><img src={deleteIcon} /></button></td>
@@ -45,40 +46,40 @@ function FamilyAdmin() {
   const [resultadosPesquisa, setResultadosPesquisa] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
   const [nome_fam, setFamilyName] = useState('');
-  const [quantMax_fam, setFamilyQuantMax] = useState('');
-  const [quantMin_fam, setFamilyQuantMin] = useState('');
-  const [familyDataEdit, setFamilyDataEdit] = useState({ nome: '', quantMax: '', quantMin: '' });
-  const [familyDataEditBefore, setFamilyDataEditBefore] = useState({ nome: '', quantMax: '', quantMin: '' });
-  const [familyDataDelete, setFamilyDataDelete] = useState({ nome: '', quantMax: '', quantMin: '' });
-  var matrixFamilia = { nome: '', quantMin: '', quantMax: '' }
+  const [quantidadeMAX_fam, setFamilyquantidadeMAX] = useState('');
+  const [quantidadeMIN_fam, setFamilyquantidadeMIN] = useState('');
+  const [familyDataEdit, setFamilyDataEdit] = useState({ id: 0, nome: '', quantidadeMAX: '', quantidadeMIN: '' });
+  const [familyDataEditBefore, setFamilyDataEditBefore] = useState({ id: 0, nome: '', quantidadeMAX: '', quantidadeMIN: '' });
+  const [familyDataDelete, setFamilyDataDelete] = useState({ id: 0, nome: '', quantidadeMAX: '', quantidadeMIN: '' });
+  var matrixFamilia = {nome: '', quantidadeMIN: '', quantidadeMAX: '' }
   const [open, setOpen] = React.useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('');
   const [snackBarStyle, setSnackBarStyle] = useState({
     sx: { background: 'white', color: 'black', borderRadius: '10px' }
   });
-  var familias = [
-    { id: 1, nome: 'Cirúrgica', quantMax: '20', quantMin: '17' },
-    { id: 2, nome: 'Dentística', quantMax: '20', quantMin: '11' },
-    { id: 3, nome: 'Implante Dentário', quantMax: '20', quantMin: '15' },
-    { id: 4, nome: 'Ortodontia', quantMax: '20', quantMin: '18' },
-    { id: 5, nome: 'Endodontia', quantMax: '20', quantMin: '16' },
-    { id: 6, nome: 'Periodontia', quantMax: '20', quantMin: '12' },
-    { id: 7, nome: 'Prótese Dentária', quantMax: '20', quantMin: '14' },
-    { id: 8, nome: 'Radiologia Odontológica', quantMax: '20', quantMin: '10' },
-    { id: 9, nome: 'Odontopediatria', quantMax: '20', quantMin: '13' },
-    { id: 10, nome: 'Cirurgia Bucomaxilofacial', quantMax: '20', quantMin: '16' },
-    { id: 11, nome: 'Odontologia Estética', quantMax: '20', quantMin: '14' },
-    { id: 12, nome: 'Ortopedia Funcional dos Maxilares', quantMax: '20', quantMin: '17' },
-    { id: 13, nome: 'Oclusão', quantMax: '20', quantMin: '15' },
-    { id: 14, nome: 'Odontologia do Trabalho', quantMax: '20', quantMin: '13' },
-    { id: 15, nome: 'Farmacologia em Odontologia', quantMax: '20', quantMin: '11' },
-    { id: 16, nome: 'Odontologia Legal', quantMax: '20', quantMin: '10' },
-    { id: 17, nome: 'Anatomia Dental', quantMax: '20', quantMin: '18' },
-    { id: 18, nome: 'Microbiologia Oral', quantMax: '20', quantMin: '16' },
-    { id: 19, nome: 'Patologia Oral', quantMax: '20', quantMin: '12' },
-    { id: 20, nome: 'Cariologia', quantMax: '20', quantMin: '14' },
-    { id: 21, nome: 'Materiais Dentários', quantMax: '20', quantMin: '11' }
-  ]
+  const [familias, setFamilias] = useState([])
+
+  async function getFamilia() {
+    var token = localStorage.getItem("loggedUserToken")
+    try {
+      const response = await server.get('/familia', {
+        method: 'GET',
+        headers: {
+          "Authorization": `${token}`,
+          "Content-Type": "application/json"
+        }
+      })
+      setTableData(response.data)
+
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const setTableData = (data) => {
+    setFamilias(data)
+    setResultadosPesquisa(data)
+  }
 
   const openSnackBarMessage = () => setOpen(true);
 
@@ -111,7 +112,7 @@ function FamilyAdmin() {
   };
 
   useEffect(() => {
-    setResultadosPesquisa(familias);
+    getFamilia()
   }, []);
 
   const returnSearch = () => {
@@ -119,13 +120,13 @@ function FamilyAdmin() {
     setShowPopEdit(false);
     setShowPopDelete(false);
     setSearchTerm('');
-    setFamilyDataEdit({ nome: '', quantMax: '', quantMin: '' });
-    setFamilyDataDelete({ nome: '', quantMax: '', quantMin: '' });
-    setFamilyDataEditBefore({ nome: '', quantMax: '', quantMin: '' });
+    setFamilyDataEdit({ nome: '', quantidadeMAX: '', quantidadeMIN: '' });
+    setFamilyDataDelete({ nome: '', quantidadeMAX: '', quantidadeMIN: '' });
+    setFamilyDataEditBefore({ nome: '', quantidadeMAX: '', quantidadeMIN: '' });
     setErrorMessage('');
     setFamilyName('');
-    setFamilyQuantMax('')
-    setFamilyQuantMin('');
+    setFamilyquantidadeMAX('')
+    setFamilyquantidadeMIN('');
   };
 
   //Editar Familia
@@ -141,21 +142,34 @@ function FamilyAdmin() {
     setFamilyDataEditBefore(familyDataEdit);
   };
 
-  const handleEditFamily = () => {
-    const requiredFields = ['nome', 'quantMax', 'quantMin']
+  const handleEditFamily = async () => {
+    const requiredFields = ['nome', 'quantidadeMAX', 'quantidadeMIN'];
     if (requiredFields.some(field => !familyDataEdit[field])) {
       setErrorMessage('Preencha todos os campos antes de adicionar.');
-    } else if (parseInt(familyDataEdit.quantMax) <= parseInt(familyDataEdit.quantMin)) {
+    } else if (parseInt(familyDataEdit.quantidadeMAX) <= parseInt(familyDataEdit.quantidadeMIN)) {
       setErrorMessage('Quantidade máxima deve ser maior que a quantidade mínima.');
     } else {
       openSnackBarMessage();
       setSnackBarMessage('Família editada com sucesso');
       setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
-      // console.log('Informações antigas da família editada:', familyDataEditBefore);
-      console.log('Novas informações da família editada:', familyDataEdit);  //Envio para a api da familia editada
-      returnSearch();
+      console.log('Novas informações da família editada:', familyDataEdit);
+      var token = localStorage.getItem("loggedUserToken");
+      try {
+        const response = await server.put(`/familia/${familyDataEdit.id}`, familyDataEdit, {
+          headers: {
+            "Authorization": `${token}`,
+            "Content-Type": "application/json"
+          }
+        });
+        console.log(response);
+        returnSearch();
+        getFamilia()
+      } catch (e) {
+        console.error(e);
+      }
     }
   };
+
 
   //Delete Familia
 
@@ -166,21 +180,35 @@ function FamilyAdmin() {
     setShowPopDelete(true);
   };
 
-  const handleDeleteFamily = () => {
+  const handleDeleteFamily = async () => {
     openSnackBarMessage();
     setSnackBarMessage('Família deletada com sucesso');
     setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
     console.log('Informações da família deletada:', familyDataDelete);  //Envio para a api da familia deletada
+    var token = localStorage.getItem("loggedUserToken");
+    try {
+      const response = await server.delete(`/familia/${familyDataDelete.id}`, {
+        headers: {
+          "Authorization": `${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+      console.log(response);
+      returnSearch();
+      getFamilia()
+    } catch (e) {
+      console.error(e);
+    }
     returnSearch();
   };
 
   //Criar Familia
 
-  const handleCreateFamily = () => {
-    const requiredFields = ['nome', 'quantMax', 'quantMin']
+  const handleCreateFamily = async () => {
+    const requiredFields = ['nome', 'quantidadeMAX', 'quantidadeMIN']
     if (requiredFields.some(field => !eval(`${field}_fam`))) {
       setErrorMessage('Preencha todos os campos antes de adicionar.');
-    } else if (parseInt(quantMax_fam) <= parseInt(quantMin_fam)) {
+    } else if (parseInt(quantidadeMAX_fam) <= parseInt(quantidadeMIN_fam)) {
       setErrorMessage('Quantidade máxima deve ser maior que a quantidade mínima.');
     } else {
       formatFamiliaData()
@@ -188,12 +216,26 @@ function FamilyAdmin() {
       openSnackBarMessage();
       setSnackBarMessage('Família criada com sucesso');
       setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
+      var token = localStorage.getItem("loggedUserToken");
+      try {
+        const response = await server.post("/familia", matrixFamilia, {
+          headers: {
+            "Authorization": `${token}`,
+            "Content-Type": "application/json"
+          }
+        });
+        console.log(response);
+        returnSearch();
+        getFamilia()
+      } catch (e) {
+        console.error(e);
+      }
       returnSearch();
     }
   };
 
   function formatFamiliaData() {
-    const familiaFields = ['nome', 'quantMax', 'quantMin']
+    const familiaFields = ['nome', 'quantidadeMAX', 'quantidadeMIN']
     familiaFields.forEach(field => matrixFamilia[field] = eval(`${field}_fam`))
   }
 
@@ -239,11 +281,11 @@ function FamilyAdmin() {
               </div>
               <div className='searchForms'>
                 <span className='body-normal margin-bottom-5'>Quantidade máxima / esperada</span>
-                <input placeholder='Digite um valor...' className='form-1' value={quantMax_fam} onChange={(e) => setFamilyQuantMax(e.target.value)} type='number' />
+                <input placeholder='Digite um valor...' className='form-1' value={quantidadeMAX_fam} onChange={(e) => setFamilyquantidadeMAX(e.target.value)} type='number' />
               </div>
               <div className='searchForms'>
                 <span className='body-normal margin-bottom-5'>Quantidade mínima</span>
-                <input placeholder='Digite um valor...' className='form-1' value={quantMin_fam} onChange={(e) => setFamilyQuantMin(e.target.value)} type='number' />
+                <input placeholder='Digite um valor...' className='form-1' value={quantidadeMIN_fam} onChange={(e) => setFamilyquantidadeMIN(e.target.value)} type='number' />
               </div>
             </div>
           </>
@@ -261,15 +303,15 @@ function FamilyAdmin() {
             <div className="editCardTopBox">
               <div className='searchForms'>
                 <span className='body-normal margin-bottom-5'>Nome da família</span>
-                <input placeholder='Digite o nome...' className='form-1' value={familyDataEdit.nome} onChange={(e) => setFamilyDataEdit({ ...familyDataEdit, familyName: e.target.value })} />
+                <input placeholder='Digite o nome...' className='form-1' value={familyDataEdit.nome} onChange={(e) => setFamilyDataEdit({ ...familyDataEdit, nome: e.target.value })} />
               </div>
               <div className='searchForms'>
                 <span className='body-normal margin-bottom-5'>Quantidade máxima / esperada</span>
-                <input placeholder='Digite um valor...' className='form-1' value={familyDataEdit.quantMax} onChange={(e) => setFamilyDataEdit({ ...familyDataEdit, quantMax: e.target.value })} />
+                <input placeholder='Digite um valor...' className='form-1' value={familyDataEdit.quantidadeMAX} onChange={(e) => setFamilyDataEdit({ ...familyDataEdit, quantidadeMAX: e.target.value })} />
               </div>
               <div className='searchForms'>
                 <span className='body-normal margin-bottom-5'>Quantidade mínima</span>
-                <input placeholder='Digite um valor...' className='form-1' value={familyDataEdit.quantMin} onChange={(e) => setFamilyDataEdit({ ...familyDataEdit, quantMin: e.target.value })} />
+                <input placeholder='Digite um valor...' className='form-1' value={familyDataEdit.quantidadeMIN} onChange={(e) => setFamilyDataEdit({ ...familyDataEdit, quantidadeMIN: e.target.value })} />
               </div>
             </div>
           </>

@@ -3,7 +3,7 @@ import './style.css';
 import HeaderPagesAluno from '../../components/headers/alunoPagesIndex'
 import { Container } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom';
-import moment from "moment";
+import { server } from "../../services/server";
 
 function EntryAluno() {
     const [box, setBox] = useState('');
@@ -28,44 +28,17 @@ function EntryAluno() {
     const [buttonNegativeQuant, changeStatusQuantButtonNegative] = useState('button-5-disable');
     const [buttonPositiveQuant, changeStatusQuantButtonPositive] = useState('button-5-disable');
     const [errorMessage, setErrorMessage] = useState(' ');
-    const [loadedFamilyOptions, setLoadedFamilyOptions] = useState([]);
-    const finalDataMoviment = { matricula_aluno: '', nome_aluno: '', periodo_aluno: '', box_aluno: '', modalidade: '', status: '', nome_colab: '', assinatura: false, hora: '', data: '', nome_familia: '', qnt_itens: '' };
-    var infoUser = {}
-    var familias = [
-        { id: 1, nome: 'Cirúrgica', quantMax: '20', quantMin: '17' },
-        { id: 2, nome: 'Dentística', quantMax: '20', quantMin: '11' },
-        { id: 3, nome: 'Implante Dentário', quantMax: '20', quantMin: '15' },
-        { id: 4, nome: 'Ortodontia', quantMax: '20', quantMin: '18' },
-        { id: 5, nome: 'Endodontia', quantMax: '20', quantMin: '16' },
-        { id: 6, nome: 'Periodontia', quantMax: '20', quantMin: '12' },
-        { id: 7, nome: 'Prótese Dentária', quantMax: '20', quantMin: '14' },
-        { id: 8, nome: 'Radiologia Odontológica', quantMax: '20', quantMin: '10' },
-        { id: 9, nome: 'Odontopediatria', quantMax: '20', quantMin: '13' },
-        { id: 10, nome: 'Cirurgia Bucomaxilofacial', quantMax: '20', quantMin: '16' },
-        { id: 11, nome: 'Odontologia Estética', quantMax: '20', quantMin: '14' },
-        { id: 12, nome: 'Ortopedia Funcional dos Maxilares', quantMax: '20', quantMin: '17' },
-        { id: 13, nome: 'Oclusão', quantMax: '20', quantMin: '15' },
-        { id: 14, nome: 'Odontologia do Trabalho', quantMax: '20', quantMin: '13' },
-        { id: 15, nome: 'Farmacologia em Odontologia', quantMax: '20', quantMin: '11' },
-        { id: 16, nome: 'Odontologia Legal', quantMax: '20', quantMin: '10' },
-        { id: 17, nome: 'Anatomia Dental', quantMax: '20', quantMin: '18' },
-        { id: 18, nome: 'Microbiologia Oral', quantMax: '20', quantMin: '16' },
-        { id: 19, nome: 'Patologia Oral', quantMax: '20', quantMin: '12' },
-        { id: 20, nome: 'Cariologia', quantMax: '20', quantMin: '14' },
-        { id: 21, nome: 'Materiais Dentários', quantMax: '20', quantMin: '11' }
-    ]
+    const finalDataMoviment = {};
+    var infoUsers = {}
+    const [familias, setFamilias] = useState([])
 
-    // async function getInfoAluno(matricula) {
-    //     try {
-    //         const response = server.post('/pedido', {matricula})
-    //         if (response.status === 200) {
-    //             // entryRequests = response
-    //             console.log('get info aluno right')
-    //         }
-    //     } catch (e) {
-    //         console.error(e)
-    //     }
-    // }
+    useEffect(() => {
+        getFamilias();
+        infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+        console.log(infoUsers)
+        setNomeAluno(infoUsers.NomeUser.split(' ')[0])
+        setMatriculaAluno(infoUsers.matricula)
+    }, []);
 
     function navigateToHomeAluno() {
         if (showPop) {
@@ -79,36 +52,48 @@ function EntryAluno() {
             stagesReturn()
         }
     }
+
     function navigateToConfirmEntry() {
-        if (box.trim() === '' || /^0+$/.test(box) || (box.length > 0 && box[0] === '0') || (tableData.length === 0)) {
+        if (box === undefined || /^0+$/.test(box) || (box.length > 0 && box[0] === '0') || (tableData.length === 0)) {
             setErrorMessage('Todos os campos devem ser preenchidos.');
         } else if (periodo == '') {
             setErrorMessage('Todos os campos devem ser preenchidos.');
         } else {
             setErrorMessage(' ');
             formatMovimentData()
+            console.log(finalDataMoviment);
             setShowConfirmEntry(true);
-            setShowPop(false)
+            sendPedidoRequest()
         }
     }
 
+    const sendPedidoRequest = async () => {
+        var token = localStorage.getItem("loggedUserToken");
+        try {
+            const response = await server.post("/pedido", finalDataMoviment, {
+                headers: {
+                    "Authorization": `${token}`,
+                    "Content-Type": "application/json"
+                }
+            });
+            console.log(response);
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+
     function formatMovimentData() {
-        let newObject = window.localStorage.getItem("loggedUser");
-        infoUser = (JSON.parse(newObject));
-        setNomeAluno(infoUser.nome)
-        setMatriculaAluno(infoUser.matricula)
-        finalDataMoviment.matricula_aluno = matriculaAluno;
-        finalDataMoviment.nome_aluno = nomeAluno;
-        finalDataMoviment.periodo_aluno = periodo;
-        finalDataMoviment.box_aluno = box;
-        finalDataMoviment.modalidade = 'Entrada';
+        finalDataMoviment.matricula = matriculaAluno;
+        finalDataMoviment.nomeAluno = nomeAluno;
+        finalDataMoviment.periodoAluno = Number(periodo);
+        finalDataMoviment.box = Number(box);
+        finalDataMoviment.tipo = 'Entrada';
         finalDataMoviment.status = 'Pendente';
-        finalDataMoviment.nome_colab = '';
+        finalDataMoviment.colaborador = '';
         finalDataMoviment.assinatura = false;
-        finalDataMoviment.hora = { date_create: moment().format("hh:mm:ss") };
-        finalDataMoviment.data = { date_create: moment().format("DD-MM-YYYY") };
-        finalDataMoviment.nome_familia = familiasMov
-        finalDataMoviment.qnt_itens = qntMov
+        finalDataMoviment.familias = String(familiasMov);
+        finalDataMoviment.quantidadeItens = String(qntMov)
     }
 
     function detectEntryFamily(e) {
@@ -120,7 +105,7 @@ function EntryAluno() {
 
     function changeSelectorStateNegative() {
         changeStatusQuantSelect(false);
-        changeStatusQuantSelectStyle('disable-form margin-bottom-20')
+        changeStatusQuantSelectStyle('form-4 margin-bottom-20')
         changeStatusQuantButtonNegative('button-5-enable')
         changeStatusQuantButtonPositive('button-5')
         changeAddButtonStyle('button-6-disable')
@@ -133,8 +118,8 @@ function EntryAluno() {
         changequantSelectBase(true)
         changeAddButtonStyle('button-6')
         changeAddButtonState(false)
-        var quantityBase = loadedFamilyOptions.find(option => option.nome === family)
-        setQuantity(quantityBase.quantMax)
+        var quantityBase = familias.find(option => option.nome === family)
+        setQuantity(quantityBase.quantidadeMAX)
         changeStatusQuantButtonNegative('button-5')
         changeStatusQuantButtonPositive('button-5-enable')
     };
@@ -147,17 +132,13 @@ function EntryAluno() {
     };
 
     function renderOptionsQuant() {
-        useEffect(() => {
-            getFamilias();
-        }, []);
-        const selectedFamilyOption = loadedFamilyOptions.find(option => option.nome === family);
-
+        const selectedFamilyOption = familias.find(option => option.nome === family);
         if (selectedFamilyOption) {
             return (
                 <>
-                    {[...Array(Number(selectedFamilyOption.quantMax) - Number(selectedFamilyOption.quantMin) + 1).keys()].map(value => (
-                        <option key={value + parseInt(selectedFamilyOption.quantMin)} value={value + parseInt(selectedFamilyOption.quantMin)}>
-                            {value + parseInt(selectedFamilyOption.quantMin)}
+                    {[...Array(Number(selectedFamilyOption.quantidadeMAX) - Number(selectedFamilyOption.quantidadeMIN) + 1).keys()].map(value => (
+                        <option key={value + parseInt(selectedFamilyOption.quantidadeMIN)} value={value + parseInt(selectedFamilyOption.quantidadeMIN)}>
+                            {value + parseInt(selectedFamilyOption.quantidadeMIN)}
                         </option>
                     ))}
                 </>
@@ -214,25 +195,27 @@ function EntryAluno() {
         changeAddButtonStyle('button-6-disable')
     }
 
-    function requestConfirmed() {
+    async function requestConfirmed() {
         navigate('/home-aluno')
         setShowConfirmEntry(false)
-        formatMovimentData()
-        console.log(finalDataMoviment);
-        setTableData([]);
         stagesReturn();
+        setTableData([]);
     }
 
-    function getFamilias() {
+    async function getFamilias() {
+        var token = localStorage.getItem("loggedUserToken")
         try {
-            const storedData = familias
-            if (storedData) {
-                setLoadedFamilyOptions(storedData)//(JSON.parse(storedData));
-            } else {
-                throw new Error('Nenhum dado encontrado no localStorage para famílias');
-            }
-        } catch (error) {
-            console.error(error);
+            const response = await server.get('/familia', {
+                method: 'GET',
+                headers: {
+                    "Authorization": `${token}`,
+                    "Content-Type": "application/json"
+                }
+            })
+            setFamilias(response.data)
+            console.log(response.data)
+        } catch (e) {
+            console.error(e)
         }
     }
 
@@ -266,7 +249,7 @@ function EntryAluno() {
                 </select>
                 <select className='form-4' value={family} onChange={detectEntryFamily} >
                     <option disabled={true} value='0'>Selecione a família</option>
-                    {loadedFamilyOptions.map((option, index) => (
+                    {familias.map((option, index) => (
                         <option key={index} value={option.nome}>
                             {option.nome}
                         </option>

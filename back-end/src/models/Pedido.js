@@ -1,43 +1,47 @@
 import { DataTypes } from 'sequelize';
 import db from '../config/dbConnect.js';
-import User from './User.js';
 
-const pedido = db.define(
-  'pedido',
+const Pedido = db.define(
+  'Pedido',
   {
-    matricula: {
-      type: DataTypes.INTEGER,
-      allowNull: false,
-    },
-    numero: {
+    id: {
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true,
       autoIncrement: true,
     },
+    matricula: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    nomeAluno: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    periodoAluno: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     quantidadeItens: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    familias: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     box: {
       type: DataTypes.INTEGER,
       allowNull: false,
-      validate: {
-        async isValidBox(value) {
-          const user = await User.findOne({ where: { box: value } });
-          if (!user) {
-            throw new Error('O valor de "box" não é válido.');
-          }
-        }
-      }
     },
     tipo: {
       type: DataTypes.STRING,
       allowNull: false,
     },
     status: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.ENUM('Pendente', 'Aprovado', 'Reprovado'),
       allowNull: false,
+      defaultValue: 'Pendente',
     },
     colaborador: {
       type: DataTypes.STRING,
@@ -46,20 +50,6 @@ const pedido = db.define(
     assinatura: {
       type: DataTypes.BOOLEAN,
       allowNull: false,
-      validate: {
-        async isValidSignature(value) {
-          if (value !== true) {
-          }
-        }
-      }
-    },
-    data: {
-      type: DataTypes.DATE,
-      allowNull: false,
-    },
-    hora: {
-      type: DataTypes.DATE,
-      allowNull: false,
     },
   },
   {
@@ -67,7 +57,4 @@ const pedido = db.define(
   }
 );
 
-User.hasMany(pedido, { foreignKey: 'matricula' });
-pedido.belongsTo(User, { foreignKey: 'matricula' });
-
-export default pedido;
+export default Pedido;

@@ -24,7 +24,7 @@
     "application/json"
   ],
   "paths": {
-    "/Familia": {
+    "/familia": {
       "get": {
         "description": "",
         "responses": {
@@ -51,10 +51,7 @@
                 "quantidadeMIN": {
                   "example": "any"
                 },
-                "quantidadeBase": {
-                  "example": "any"
-                },
-                "quantidadeMax": {
+                "quantidadeMAX": {
                   "example": "any"
                 }
               }
@@ -71,7 +68,7 @@
         }
       }
     },
-    "/Familia/{id}": {
+    "/familia/{id}": {
       "get": {
         "description": "",
         "parameters": [
@@ -108,12 +105,21 @@
               "properties": {
                 "nome": {
                   "example": "any"
+                },
+                "quantidadeMIN": {
+                  "example": "any"
+                },
+                "quantidadeMAX": {
+                  "example": "any"
                 }
               }
             }
           }
         ],
         "responses": {
+          "200": {
+            "description": "OK"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -164,6 +170,12 @@
                   "example": "any"
                 },
                 "senha": {
+                  "example": "any"
+                },
+                "nomeUser": {
+                  "example": "any"
+                },
+                "cargo": {
                   "example": "any"
                 }
               }
@@ -219,6 +231,12 @@
               "type": "object",
               "properties": {
                 "senha": {
+                  "example": "any"
+                },
+                "nomeUser": {
+                  "example": "any"
+                },
+                "cargo": {
                   "example": "any"
                 }
               }
@@ -304,68 +322,6 @@
         }
       }
     },
-    "/pedido": {
-      "get": {
-        "description": "",
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      },
-      "post": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "matricula": {
-                  "example": "any"
-                },
-                "quantidadeItens": {
-                  "example": "any"
-                },
-                "box": {
-                  "example": "any"
-                },
-                "tipo": {
-                  "example": "any"
-                },
-                "status": {
-                  "example": "any"
-                },
-                "colaborador": {
-                  "example": "any"
-                },
-                "assinatura": {
-                  "example": "any"
-                },
-                "data": {
-                  "example": "any"
-                },
-                "hora": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
-        "responses": {
-          "201": {
-            "description": "Created"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
     "/pedido/{id}": {
       "get": {
         "description": "",
@@ -404,7 +360,16 @@
                 "quantidadeItens": {
                   "example": "any"
                 },
+                "familias": {
+                  "example": "any"
+                },
+                "nomeAluno": {
+                  "example": "any"
+                },
                 "box": {
+                  "example": "any"
+                },
+                "periodoAluno": {
                   "example": "any"
                 },
                 "tipo": {
@@ -417,12 +382,6 @@
                   "example": "any"
                 },
                 "assinatura": {
-                  "example": "any"
-                },
-                "data": {
-                  "example": "any"
-                },
-                "hora": {
                   "example": "any"
                 }
               }
@@ -451,6 +410,71 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/pedido": {
+      "get": {
+        "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      },
+      "post": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "matricula": {
+                  "example": "any"
+                },
+                "quantidadeItens": {
+                  "example": "any"
+                },
+                "nomeAluno": {
+                  "example": "any"
+                },
+                "periodoAluno": {
+                  "example": "any"
+                },
+                "familias": {
+                  "example": "any"
+                },
+                "box": {
+                  "example": "any"
+                },
+                "tipo": {
+                  "example": "any"
+                },
+                "status": {
+                  "example": "any"
+                },
+                "colaborador": {
+                  "example": "any"
+                },
+                "assinatura": {
+                  "example": "any"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created"
           },
           "500": {
             "description": "Internal Server Error"

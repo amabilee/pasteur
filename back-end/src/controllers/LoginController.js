@@ -22,7 +22,7 @@ class AuthController {
             // Gere o token JWT com expiração em uma hora
             const token = jwt.sign({ id: foundUser.id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
 
-            res.status(200).json({ token, matricula,cargo: foundUser.cargo });
+            res.status(200).json({ token, matricula,cargo: foundUser.cargo, NomeUser: foundUser.nomeUser });
         } catch (error) {
             console.error(error);
             res.status(500).json({ error: 'Erro ao processar login.' });

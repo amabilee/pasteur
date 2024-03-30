@@ -5,6 +5,7 @@ import authorizationMiddleware from '../middlewares/authorizationMiddleware.js';
 
 const router = express.Router();
 
+router.get('/familia', authorizationMiddleware, FamiliaController.getAllEntities);''
 router.get('/familia/:id', authorizationMiddleware, FamiliaController.getEntity);
 router.post('/familia', authorizationMiddleware, FamiliaController.createEntity);
 router.put('/familia/:id', authorizationMiddleware, FamiliaController.updateEntity);

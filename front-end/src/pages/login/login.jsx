@@ -15,8 +15,8 @@ export default function LoginAluno() {
     const {signIn, loginAdmin, error, loading, auth1, auth2, auth3} = UseAuth()
 
     function handleLogin(){
-        // loginAdmin(username, pwd)
-        signIn(username, pwd)
+        loginAdmin(username, pwd)
+        // signIn(username, pwd)
     }
 
     useEffect(() => { //função de intervalo

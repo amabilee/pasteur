@@ -6,6 +6,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import HeaderHomeAdmin from '../../components/headers/adminHomeindex';
 import viewIcon from '../../assets/viewIcon.svg';
 import deleteIcon from '../../assets/deleteIcon.svg';
+import { server } from "../../services/server";
 import './style.css';
 
 //Component
@@ -19,30 +20,28 @@ const UsuarioTable = ({ data, onEdit, onDelete }) => (
         <th scope="col">NOME</th>
         <th scope="col">MATRÍCULA</th>
         <th scope="col">CARGO</th>
-        <th scope="col">SENHA</th>
         <th scope="col">AÇÕES</th>
       </tr>
     </thead>
     <tbody>
-      {data.map((usuario, index) => (
+      {data && data.map((usuario, index) => (
         <tr key={index}>
-          <td>{usuario.nome}</td>
+          <td>{usuario.nomeUser}</td>
           <td>{usuario.matricula}</td>
           <td>
-            {usuario.cargo == 'aluno' ? 'Aluno' :
-              usuario.cargo == 'colaborador' ? 'Colaborador' :
-                usuario.cargo == 'administrador' ? 'Administrador' :
+            {usuario.cargo == '2' ? 'Aluno' :
+              usuario.cargo == '3' ? 'Colaborador' :
+                usuario.cargo == '1' ? 'Administrador' :
                   ''}
           </td>
-          <td>{usuario.senha}</td>
           <td>
-            <button className='button-13' onClick={() => onEdit(usuario)}><img src={viewIcon} /></button>
             <button className='button-13' onClick={() => onDelete(usuario)}><img src={deleteIcon} /></button></td>
         </tr>
       ))}
     </tbody>
   </table>
-)
+);
+
 
 function StaffAdmin() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -52,42 +51,35 @@ function StaffAdmin() {
   const [showPopCreate, setShowPopCreate] = useState(false);
   const [showPopEdit, setShowPopEdit] = useState(false);
   const [showPopDelete, setShowPopDelete] = useState(false);
-  const [nome_colab, setColabName] = useState('');
+  const [nomeUser_colab, setColabName] = useState('');
   const [matricula_colab, setColabMatricula] = useState('');
   const [cargo_colab, setColabCargo] = useState('');
   const [senha_colab, setColabSenha] = useState('');
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [colaboradorDataEdit, setColaboradorDataEdit] = useState({ nome: '', matricula: '', cargo: '', senha: '' });
-  const [colaboradorDataEditBefore, setColaboradorDataEditBefore] = useState({ nome: '', matricula: '', cargo: '', senha: '' });
-  const [colaboradorDataDelete, setColaboradorDataDelete] = useState({ nome: '', matricula: '', cargo: '', senha: '' });
-  var matrixColab = { nome: '', matricula: '', cargo: '', senha: '' }
+  const [colaboradorDataEdit, setColaboradorDataEdit] = useState({ nomeUser: '', matricula: '', cargo: '', senha: '' });
+  const [colaboradorDataEditBefore, setColaboradorDataEditBefore] = useState({ nomeUser: '', matricula: '', cargo: '', senha: '' });
+  const [colaboradorDataDelete, setColaboradorDataDelete] = useState({ nomeUser: '', matricula: '', cargo: '', senha: '' });
+  var matrixColab = { nomeUser: '', matricula: '', cargo: '', senha: '' }
   const [open, setOpen] = React.useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('');
   const [snackBarStyle, setSnackBarStyle] = useState({ sx: { background: 'white', color: 'black', borderRadius: '10px' } });
+  const [users, setUsers] = useState([])
 
-  const users = [
-    {
-      id: 1,
-      matricula: 'aluno',
-      senha: '123',
-      nome: 'Marcos Santos',
-      cargo: 'aluno'
-    },
-    {
-      id: 2,
-      matricula: 'colab',
-      senha: '123',
-      nome: 'Ana Souza',
-      cargo: 'colaborador',
-    },
-    {
-      id: 3,
-      matricula: 'admin',
-      senha: '123',
-      nome: 'João Marques',
-      cargo: 'administrador'
+  async function getUsers() {
+    var token = localStorage.getItem("loggedUserToken");
+    try {
+      const response = await server.get('/usuario', {
+        headers: {
+          "Authorization": `${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+      setUsers(response.data);
+      setResultadosPesquisa(response.data);
+    } catch (e) {
+      console.error(e);
     }
-  ]
+  }
 
   const openSnackBarMessage = () => setOpen(true);
 
@@ -102,7 +94,9 @@ function StaffAdmin() {
     </IconButton>
   );
 
-  useEffect(() => setResultadosPesquisa(users), []);
+  useEffect(() => {
+    getUsers()
+  }, []);
 
   const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
 
@@ -121,11 +115,11 @@ function StaffAdmin() {
 
         switch (searchCategory) {
           case 'Nome':
-            return usuario.nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(normalizedSearchTerm);
+            return usuario.nomeUser.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(normalizedSearchTerm);
           case 'Matrícula':
-            return usuario.matricula.includes(searchTerm);
-          case 'Cargo':
-            return usuario.cargo.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(normalizedSearchTerm);
+            // return String.usuario.matricula.includes(searchTerm);
+            const matriculaString = String(usuario.matricula);
+            return matriculaString.includes(searchTerm);
           default:
             return true;
         }
@@ -145,33 +139,47 @@ function StaffAdmin() {
     setColabMatricula('');
     setColabCargo('');
     setColabSenha('');
-    setColaboradorDataEdit({ nome: '', matricula: '', cargo: '', senha: '' });
-    setColaboradorDataDelete({ nome: '', matricula: '', cargo: '', senha: '' });
-    setColaboradorDataEditBefore({ nome: '', matricula: '', cargo: '', senha: '' });
+    setColaboradorDataEdit({ nomeUser: '', matricula: '', cargo: '', senha: '' });
+    setColaboradorDataDelete({ nomeUser: '', matricula: '', cargo: '', senha: '' });
+    setColaboradorDataEditBefore({ nomeUser: '', matricula: '', cargo: '', senha: '' });
     setErrorMessage('');
   };
 
   // Criar Usuário
 
-  const handleCreateStaff = () => {
-    const requiredFields = ['nome', 'matricula', 'cargo', 'senha']
+  const handleCreateStaff = async () => {
+    const requiredFields = ['nomeUser', 'matricula', 'cargo', 'senha']
     const existingColab = users.find(usuario => usuario.matricula === matricula_colab);
     if (requiredFields.some(field => !eval(`${field}_colab`))) {
       setErrorMessage('Preencha todos os campos antes de adicionar.');
     } else if (existingColab) {
-      setErrorMessage('Já existe um colaborador com essa matrícula.');
+      setErrorMessage('Já existe um usuário com essa matrícula.');
     } else {
       formatColabData()
-      console.log('Informações do colaborador:', matrixColab); //Envio para a API do usuario criado
+      console.log('Informações do usuário:', matrixColab); //Envio para a API do usuario criado
       openSnackBarMessage();
-      setSnackBarMessage('Colaborador criada com sucesso');
+      setSnackBarMessage('Usuário criado com sucesso');
       setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
+      var token = localStorage.getItem("loggedUserToken");
+      try {
+        const response = await server.post("/usuario", matrixColab, {
+          headers: {
+            "Authorization": `${token}`,
+            "Content-Type": "application/json"
+          }
+        });
+        console.log(response);
+        returnSearch();
+        getUsers()
+      } catch (e) {
+        console.error(e);
+      }
       returnSearch();
     }
   };
 
   function formatColabData() {
-    const colabFields = ['nome', 'matricula', 'cargo', 'senha']
+    const colabFields = ['nomeUser', 'matricula', 'cargo', 'senha']
     colabFields.forEach(field => matrixColab[field] = eval(`${field}_colab`))
   }
 
@@ -188,15 +196,15 @@ function StaffAdmin() {
   };
 
   const handleEditColaborador = () => {
-    const requiredFields = ['nome', 'matricula', 'cargo', 'senha']
+    const requiredFields = ['nomeUser', 'matricula', 'cargo', 'senha']
     if (requiredFields.some(field => !colaboradorDataEdit[field])) {
       setErrorMessage('Preencha todos os campos antes de adicionar.');
     } else {
       openSnackBarMessage();
-      setSnackBarMessage('Colaborador editado com sucesso');
+      setSnackBarMessage('Usuário editado com sucesso');
       setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
       // console.log('Informações antigas do colaborador editado:', colaboradorDataEditBefore);
-      console.log('Novas informações do colaborador editado:', colaboradorDataEdit); //Envio para a API do usuario editado
+      console.log('Novas informações do usuário editado:', colaboradorDataEdit); //Envio para a API do usuario editado
       returnSearch();
     }
   };
@@ -210,11 +218,26 @@ function StaffAdmin() {
     setShowPopDelete(true);
   };
 
-  const handleDeleteStaff = () => {
-    openSnackBarMessage();
-    setSnackBarMessage('Colaborador deletado com sucesso');
-    setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
-    console.log('Informações do colaborador deletado:', colaboradorDataDelete);
+  const handleDeleteStaff = async () => {
+    var token = localStorage.getItem("loggedUserToken");
+    try {
+      const response = await server.delete(`/usuario/${colaboradorDataDelete.matricula}`, {
+        headers: {
+          "Authorization": `${token}`,
+          "Content-Type": "application/json"
+        }
+      });
+      console.log(response);
+      openSnackBarMessage();
+      setSnackBarMessage(response.data.message);
+      setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
+      getUsers()
+    } catch (e) {
+      openSnackBarMessage();
+      setSnackBarMessage(e);
+      setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
+      // console.error(e);
+    }
     returnSearch();
   };
 
@@ -245,7 +268,6 @@ function StaffAdmin() {
                     <option value='Selecione'>Selecione uma categoria</option>
                     <option>Nome</option>
                     <option>Matrícula</option>
-                    <option>Cargo</option>
                   </select>
                 </div>
                 <div className="searchBoxButtonsFamily">
@@ -261,14 +283,14 @@ function StaffAdmin() {
       <PopupCreate
         showPopCreate={showPopCreate}
         onClose={returnSearch}
-        headerText="Adicionar colaborador"
+        headerText="Adicionar Usuário"
         sectionOneContent={
           <>
-            <p className='body-medium margin-bottom-20'>Informações do colaborador</p>
+            <p className='body-medium margin-bottom-20'>Informações do usuário</p>
             <div className="createCardTopBox">
               <div className='searchForms'>
                 <span className='body-normal margin-bottom-5'>Nome do usuário</span>
-                <input placeholder='Digite o nome...' type="text" className='form-1' value={nome_colab} onChange={(e) => setColabName(e.target.value)} />
+                <input placeholder='Digite o nome...' type="text" className='form-1' value={nomeUser_colab} onChange={(e) => setColabName(e.target.value)} />
               </div>
               <div className='searchForms'>
                 <span className='body-normal margin-bottom-5'>Matrícula</span>
@@ -278,9 +300,9 @@ function StaffAdmin() {
                 <span className='body-normal margin-bottom-5'>Cargo</span>
                 <select className='form-1' value={cargo_colab} onChange={(e) => setColabCargo(e.target.value)}>
                   <option value='' disabled>Selecionar um cargo</option>
-                  <option value='aluno'>Aluno</option>
-                  <option value='colaborador'>Colaborador</option>
-                  <option value='administrador'>Administrador</option>
+                  <option value='2'>Aluno</option>
+                  <option value='3'>Colaborador</option>
+                  <option value='1'>Administrador</option>
                 </select>
               </div>
               <div className='searchForms'>
@@ -295,27 +317,27 @@ function StaffAdmin() {
       />
       <PopUpEdit
         showPopEdit={showPopEdit}
-        headerText="Editar colaborador"
+        headerText="Editar Usuário"
         onClose={returnSearch}
         sectionOneContent={
           <>
-            <p className='body-medium margin-bottom-20'>Informações do colaborador</p>
+            <p className='body-medium margin-bottom-20'>Informações do usuário</p>
             <div className="editCardTopBox">
               <div className='searchForms'>
-                <span className='body-normal margin-bottom-5'>Nome do colaborador</span>
-                <input placeholder='Digite o nome...' type="text" className='form-1' value={colaboradorDataEdit.nome} onChange={(e) => setColaboradorDataEdit({ ...colaboradorDataEdit, nome: e.target.value })} />
+                <span className='body-normal margin-bottom-5'>Nome do usuário</span>
+                <input placeholder='Digite o nome...' type="text" className='form-1' value={colaboradorDataEdit.nomeUser} onChange={(e) => setColaboradorDataEdit({ ...colaboradorDataEdit, nome: e.target.value })} />
               </div>
               <div className='searchForms'>
                 <span className='body-normal margin-bottom-5'>Matrícula</span>
-                <input placeholder='Digite a matrícula...' className='form-1' value={colaboradorDataEdit.matricula} onChange={(e) => setColaboradorDataEdit({ ...colaboradorDataEdit, matricula: e.target.value })}/>
+                <input placeholder='Digite a matrícula...' className='form-1' value={colaboradorDataEdit.matricula} onChange={(e) => setColaboradorDataEdit({ ...colaboradorDataEdit, matricula: e.target.value })} />
               </div>
               <div className='searchForms'>
                 <span className='body-normal margin-bottom-5'>Cargo</span>
                 <select className='form-1' value={colaboradorDataEdit.cargo} onChange={(e) => setColaboradorDataEdit({ ...colaboradorDataEdit, cargo: e.target.value })}>
                   <option value='' disabled>Selecionar um cargo</option>
-                  <option value='aluno'>Aluno</option>
-                  <option value='colaborador'>Colaborador</option>
-                  <option value='administrador'>Administrador</option>
+                  <option value='3'>Aluno</option>
+                  <option value='2'>Colaborador</option>
+                  <option value='1'>Administrador</option>
                 </select>
               </div>
               <div className='searchForms'>
@@ -336,7 +358,7 @@ function StaffAdmin() {
           <div className="popUpDeleteCard">
             <div className="popUpSearchBody">
               <div className="viewFamilyCardTop">
-                <p className='body-large text-align-center margin-bottom-10'>Tem certeza que deseja deletar o cadastro do usuário: <strong>{colaboradorDataDelete.nome}</strong>?</p>
+                <p className='body-large text-align-center margin-bottom-10'>Tem certeza que deseja deletar o cadastro do usuário: <strong>{colaboradorDataDelete.nomeUser}</strong>?</p>
                 <p className='body-light text-align-center margin-bottom-20'>Esta ação não pode ser desfeita.</p>
               </div>
             </div >

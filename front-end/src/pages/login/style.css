@@ -525,7 +525,7 @@
     box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 
-.button-11:hover{
+.button-11:hover {
     background-color: #006c94;
 }
 
@@ -596,15 +596,17 @@
 
 .disable-form {
     background-color: #EFEFEF;
+    font-family: 'Inter', sans-serif;
     padding: 5px 10px;
     height: 42px;
     min-height: 42px;
     border: none;
     border-radius: 5px;
     margin-bottom: 20px;
-    font-size: 15px;
-    font-weight: 200;
+    font-size: 13px;
+    font-weight: 300;
     color: #A9A9A9;
+    width: 100%;
 }
 
 .form-1 {
@@ -662,7 +664,7 @@
     border: 2px solid #3391FF;
 }
 
-.select1{
+.select1 {
     width: 300px;
     min-width: 300px;
     font-size: 13px;
@@ -671,7 +673,8 @@
     min-height: 42px;
     margin-right: 20px;
 }
-.select1 input{
+
+.select1 input {
     height: 28px;
     min-height: 28px;
 }

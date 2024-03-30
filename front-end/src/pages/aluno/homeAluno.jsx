@@ -4,6 +4,7 @@ import { Container } from 'react-bootstrap'
 import entryIcon from '../../assets/aluno/entryIcon.svg'
 import exitIcon from '../../assets/aluno/exitIcon.svg'
 import arrowIcon from '../../assets/aluno/arrow.svg'
+import { server } from "../../services/server";
 import './style.css';
 import { useNavigate } from 'react-router-dom';
 
@@ -11,26 +12,35 @@ function HomeAluno() {
   const navigate = useNavigate();
   const [nomeAluno, setNomeAluno] = useState('');
   const [matriculaAluno, setMatriculaAluno] = useState('');
+  const [quantidadeAssinaturasPendentes, setQuantidadeAssinaturasPendentes] = useState(0);
   var infoUsers = {}
-  var pedidos = [
-    { id: 1, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
-    { id: 2, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
-    { id: 3, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: true, hora: '06:19', data: '12/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
-    { id: 4, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: true, hora: '06:19', data: '14/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
-    { id: 5, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
-    { id: 6, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
-    { id: 7, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
-    { id: 8, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' },
-    { id: 9, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', nome_familia: 'Cirúrgica', qnt_itens: '20' }
-  ]
+  var pedidos = []
 
   useEffect(() => {
-    let newObject = window.localStorage.getItem("loggedUser");
-    infoUsers = (JSON.parse(newObject));
+    infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
     console.log(infoUsers)
-    setNomeAluno(infoUsers.nome.split(' ')[0])
-    setMatriculaAluno(infoUsers.matricula)
+    setNomeAluno(infoUsers.NomeUser.split(' ')[0])
+    getPedidos()
   }, []);
+
+  async function getPedidos() {
+    var token = localStorage.getItem("loggedUserToken")
+    try {
+      const response = await server.get('/pedido', {
+        method: 'GET',
+        headers: {
+          "Authorization": `${token}`,
+          "Content-Type": "application/json"
+        }
+      })
+      pedidos = response.data
+      let matricula = Number(infoUsers.matricula)
+      let pedidoFiltrados = response.data.filter(pedido => pedido.matricula === matricula && !pedido.assinatura)
+      setQuantidadeAssinaturasPendentes(pedidoFiltrados.length)
+    } catch (e) {
+      console.error(e)
+    }
+  }
 
   function navigateToEntryAluno() {
     navigate('/entry-aluno')
@@ -43,10 +53,6 @@ function HomeAluno() {
   function navigateToSignatureAluno() {
     navigate('/signature-aluno')
   }
-
-  const matriculaDesejada = matriculaAluno;
-  var pedidosFiltrados = pedidos.filter(pedido => pedido.matricula_aluno === matriculaDesejada && !pedido.assinatura);
-  var quantidadeAssinaturasPendentes = pedidosFiltrados.length;
 
   return (
     <>

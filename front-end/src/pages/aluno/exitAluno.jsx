@@ -3,9 +3,12 @@ import './style.css';
 import HeaderPagesAluno from '../../components/headers/alunoPagesIndex'
 import { Container } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom';
+import { server } from "../../services/server";
 
 function ExitAluno() {
     const [box, setBox] = useState('');
+    const [nomeAluno, setNomeAluno] = useState('');
+    const [matriculaAluno, setMatriculaAluno] = useState('');
     const [family, setFamily] = useState('0');
     const [periodo, setPeriodo] = useState('')
     const [showPop, setShowPop] = useState(false);
@@ -16,31 +19,18 @@ function ExitAluno() {
     const [tableData, setTableData] = useState([]);
     const [errorMessage, setErrorMessage] = useState(' ');
     const newMovement = { family: family };
-    const finalDataMoviment = { matricula_aluno: '', nome_aluno: '', periodo_aluno: '', box_aluno: '', modalidade: '', status: '', nome_colab: '', assinatura: false, hora: '', data: '', nome_familia: '', qnt_itens: '' };
-    var infoUser = {}
-    var familias = [
-        { id: 1, nome: 'Cirúrgica', quantMax: '20', quantMin: '17' },
-        { id: 2, nome: 'Dentística', quantMax: '20', quantMin: '11' },
-        { id: 3, nome: 'Implante Dentário', quantMax: '20', quantMin: '15' },
-        { id: 4, nome: 'Ortodontia', quantMax: '20', quantMin: '18' },
-        { id: 5, nome: 'Endodontia', quantMax: '20', quantMin: '16' },
-        { id: 6, nome: 'Periodontia', quantMax: '20', quantMin: '12' },
-        { id: 7, nome: 'Prótese Dentária', quantMax: '20', quantMin: '14' },
-        { id: 8, nome: 'Radiologia Odontológica', quantMax: '20', quantMin: '10' },
-        { id: 9, nome: 'Odontopediatria', quantMax: '20', quantMin: '13' },
-        { id: 10, nome: 'Cirurgia Bucomaxilofacial', quantMax: '20', quantMin: '16' },
-        { id: 11, nome: 'Odontologia Estética', quantMax: '20', quantMin: '14' },
-        { id: 12, nome: 'Ortopedia Funcional dos Maxilares', quantMax: '20', quantMin: '17' },
-        { id: 13, nome: 'Oclusão', quantMax: '20', quantMin: '15' },
-        { id: 14, nome: 'Odontologia do Trabalho', quantMax: '20', quantMin: '13' },
-        { id: 15, nome: 'Farmacologia em Odontologia', quantMax: '20', quantMin: '11' },
-        { id: 16, nome: 'Odontologia Legal', quantMax: '20', quantMin: '10' },
-        { id: 17, nome: 'Anatomia Dental', quantMax: '20', quantMin: '18' },
-        { id: 18, nome: 'Microbiologia Oral', quantMax: '20', quantMin: '16' },
-        { id: 19, nome: 'Patologia Oral', quantMax: '20', quantMin: '12' },
-        { id: 20, nome: 'Cariologia', quantMax: '20', quantMin: '14' },
-        { id: 21, nome: 'Materiais Dentários', quantMax: '20', quantMin: '11' }
-    ]
+    const finalDataMoviment = {};
+    var infoUsers = {}
+    const [familiasMov, setFamiliasMov] = useState([])
+    const [familias, setFamilias] = useState([])
+
+    useEffect(() => {
+        getFamilias();
+        infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+        console.log(infoUsers)
+        setNomeAluno(infoUsers.NomeUser.split(' ')[0])
+        setMatriculaAluno(infoUsers.matricula)
+    }, []);
 
     function navigateToHomeAluno() {
         if (showPop) {
@@ -61,6 +51,24 @@ function ExitAluno() {
         } else {
             setErrorMessage(' ');
             setShowConfirmExit(true);
+            formatMovimentData()
+            console.log(finalDataMoviment);
+            sendPedidoRequest()
+        }
+    }
+
+    const sendPedidoRequest = async () => {
+        var token = localStorage.getItem("loggedUserToken");
+        try {
+            const response = await server.post("/pedido", finalDataMoviment, {
+                headers: {
+                    "Authorization": `${token}`,
+                    "Content-Type": "application/json"
+                }
+            });
+            console.log(response);
+        } catch (e) {
+            console.error(e);
         }
     }
 
@@ -88,6 +96,7 @@ function ExitAluno() {
             setTableData(updatedTableData);
         } else {
             setTableData((prevData) => [...prevData, newMovement]);
+            setFamiliasMov((prevData) => [...prevData, newMovement.family]);
         }
         stagesReturn()
     };
@@ -101,41 +110,36 @@ function ExitAluno() {
     function requestConfirmed() {
         navigate('/home-aluno')
         setShowConfirmExit(false)
-        formatMovimentData()
-        console.log(finalDataMoviment);
         stagesReturn();
     }
 
     function formatMovimentData() {
-        let newObject = window.localStorage.getItem("loggedUser");
-        infoUser = (JSON.parse(newObject));
-        finalDataMoviment.matricula_aluno = infoUser.matricula;
-        finalDataMoviment.nome_aluno = infoUser.nome;
-        finalDataMoviment.periodo_aluno = periodo;
-        finalDataMoviment.box_aluno = box;
-        finalDataMoviment.modalidade = 'Saída';
+        finalDataMoviment.matricula = Number(matriculaAluno);
+        finalDataMoviment.nomeAluno = nomeAluno;
+        finalDataMoviment.periodoAluno = Number(periodo);
+        finalDataMoviment.box = Number(box);
+        finalDataMoviment.tipo = 'Saída';
         finalDataMoviment.status = 'Pendente';
-        finalDataMoviment.nome_colab = '';
+        finalDataMoviment.colaborador = '';
         finalDataMoviment.assinatura = false;
-        finalDataMoviment.hora = { date_create: moment().format("hh:mm:ss") };
-        finalDataMoviment.data = { date_create: moment().format("DD-MM-YYYY") };
-        finalDataMoviment.nome_familia = tableData
+        finalDataMoviment.familias = String(familiasMov)
+        finalDataMoviment.quantidadeItens = ''
     }
 
-    const [loadedFamilyOptions, setLoadedFamilyOptions] = useState([]);
-
-    useEffect(() => { getFamilias() }, []);
-
-    function getFamilias() {
+    async function getFamilias() {
+        var token = localStorage.getItem("loggedUserToken")
         try {
-            const storedData = familias
-            if (storedData) {
-                setLoadedFamilyOptions(storedData)//(JSON.parse(storedData));
-            } else {
-                throw new Error('Nenhum dado encontrado no localStorage para famílias');
-            }
-        } catch (error) {
-            console.error(error);
+            const response = await server.get('/familia', {
+                method: 'GET',
+                headers: {
+                    "Authorization": `${token}`,
+                    "Content-Type": "application/json"
+                }
+            })
+            setFamilias(response.data)
+            console.log(response.data)
+        } catch (e) {
+            console.error(e)
         }
     }
 
@@ -161,7 +165,7 @@ function ExitAluno() {
                     </select>
                     <select className='form-4' value={family} onChange={detectEntryFamily} >
                         <option disabled={true} value='0'>Selecione a família</option>
-                        {loadedFamilyOptions.map((option, index) => (
+                        {familias.map((option, index) => (
                             <option key={index} value={option.nome}>
                                 {option.nome}
                             </option>

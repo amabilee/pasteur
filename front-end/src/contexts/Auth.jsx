@@ -51,35 +51,68 @@ export const AuthProvider = ({ children }) => {
     async function loginAdmin(matricula, senha) {
         try {
             const response = await server.post('/login', { matricula, senha })
-            if (response.status === 200) {
-                if (window.innerWidth <= 767) {
-                    const token = response.data.token
-                    console.log(token)
-                    setAuth1(true)
-                    setAuth2(false)
-                    setAuth3(false)
-                } else {
-                    const token = response.data.token
-                    console.log(token)
-                    setAuth1(false)
-                    setAuth2(false)
-                    setAuth3(false)
+            console.log(response.data)
+            if (window.innerWidth <= 767) {
+                switch (response.data.cargo) {
+                    case 3:
+                        setAuth1(false)
+                        setAuth2(false)
+                        setAuth3(false)
+                        setError('Colaboradores devem acessar somente em dispositivos da clinica.')
+                        return
+                    case 2:
+                        setAuth1(true)
+                        setAuth2(false)
+                        setAuth3(false)
+                        setLocalLogged(response)
+                        localStorage.setItem("loggedUserToken", response.data.token);
+                        localStorage.setItem("loggedUserData", JSON.stringify(response.data));
+                        return
+                    case 1:
+                        setAuth1(false)
+                        setAuth2(false)
+                        setAuth3(false)
+                        setError('Admins devem acessar somente em dispositivos da clinica.')
+                        return
+
                 }
-                // if (token === tokenAdminCode) {
-                //     setAuth1(false)
-                //     setAuth2(false)
-                //     setAuth3(true)
-                // }
-                // localStorage.setItem('userToken', token)
-            }
+            } else {
+                switch (response.data.cargo) {
+                    case 3:
+                        setAuth1(false)
+                        setAuth2(true)
+                        setAuth3(false)
+                        localStorage.setItem("loggedUserToken", response.data.token);
+                        localStorage.setItem("loggedUserData", JSON.stringify(response.data));
+                        console.log(response.data.token)
+                        return
+                    case 2:
+                        setAuth1(false)
+                        setAuth2(false)
+                        setAuth3(false)
+                        setError('Aluno devem acessar somente em dispositivos mobile.')
+                        // localStorage.setItem("loggedUserToken", response.data.token);
+                        // localStorage.setItem("loggedUserData", JSON.stringify(response.data));
+                        // console.log(response.data.token)
+                        return
+                    case 1:
+                        setAuth1(false)
+                        setAuth2(false)
+                        setAuth3(true)
+                        localStorage.setItem("loggedUserToken", response.data.token);
+                        localStorage.setItem("loggedUserData", JSON.stringify(response.data));
+                        console.log(response.data.token)
+                        return
+                }
+            };
         } catch (e) {
             // const errorData = e.response.data
             setAuth1(false)
             setAuth2(false)
             setAuth3(false)
             // setError(errorData.error
-            // console.log(errorData.error)
-            console.error(e)
+            // console.log(e.response.data.error)
+            setError(e.response.data.error)
         }
     }
 
@@ -94,7 +127,7 @@ export const AuthProvider = ({ children }) => {
                         setAuth2(false)
                         setAuth3(false)
                         setLocalLogged(credenciais)
-                        window.localStorage.setItem("loggedUser", JSON.stringify(credenciais));
+                        localStorage.setItem("loggedUserToken", JSON.stringify(credenciais));
                         return
                     case 'colaborador':
                         setAuth1(false)
@@ -141,6 +174,7 @@ export const AuthProvider = ({ children }) => {
         }
     }
 
+
     function signOut() {
         setUser("");
         setAuth1(false);
@@ -149,7 +183,8 @@ export const AuthProvider = ({ children }) => {
         setError('')
         setLocalLogged()
         localStorage.removeItem('user');
-        localStorage.removeItem('loggedUser');
+        localStorage.removeItem('loggedUserToken');
+        localStorage.removeItem('loggedUserData');
         localStorage.removeItem('auth1');
         localStorage.removeItem('auth2');
         localStorage.removeItem('auth3');

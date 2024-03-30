@@ -6,50 +6,10 @@ import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import './headers/style.css';
+import { server } from "../services/server";
 
 //Import Components
 import PopUpSearch from '../components/popSearch';
-
-const HistoryTable = ({ data }) => (
-  <table className='table table-sm tableHistory' id="table-history">
-    <thead>
-      <tr>
-        <th scope="col">NOME</th>
-        <th scope="col">MATRÍCULA</th>
-        <th scope="col">PERÍODO</th>
-        <th scope="col">BOX</th>
-        <th scope="col">HORA</th>
-        <th scope="col">DATA</th>
-        <th scope="col">MODALIDADE</th>
-        <th scope="col">STATUS</th>
-        <th scope="col">COLABORADOR</th>
-      </tr>
-    </thead>
-    <tbody>
-      {data.map((movimentacao, index) => (
-        <tr key={index}>
-          <td>{movimentacao.nome_aluno}</td>
-          <td>{movimentacao.matricula_aluno}</td>
-          <td>{movimentacao.periodo_aluno}</td>
-          <td>{movimentacao.box_aluno}</td>
-          <td>{movimentacao.hora}</td>
-          <td>{movimentacao.data}</td>
-          <td>{movimentacao.modalidade}</td>
-          <td className={
-            movimentacao.status === 'Validado' ? 'validado-class' :
-              movimentacao.status === 'Inválido' ? 'invalidado-class' :
-                movimentacao.status === 'Pendente' ? 'pendente-class' :
-                  ''
-          }>
-            {movimentacao.status}
-          </td>
-          <td>{movimentacao.nome_colab}</td>
-        </tr>
-      ))}
-
-    </tbody>
-  </table>
-);
 
 function History() {
   const [showPopSearch, setShowPopSearch] = useState(false);
@@ -70,47 +30,107 @@ function History() {
   const [tipo_his, setTipo] = useState('');
   const [date_his, setDate] = useState('');
   const [status_his, setStatus] = useState('');
-
-
   const [open, setOpen] = React.useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('')
   const [snackBarStyle, setSnackBarStyle] = useState({ sx: { background: "white", color: "black", borderRadius: '10px' } })
+  const [pedidos, setPedidos] = useState([])
 
-  var pedidos = [
-    { id: 1, matricula_aluno: 'aluno', nome_aluno: 'Ana', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Inválido', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
-    { id: 2, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Validado', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
-    { id: 3, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: true, hora: '12:19', data: '12/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
-    { id: 4, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Entrada', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: true, hora: '06:19', data: '14/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
-    { id: 5, matricula_aluno: 'aluno', nome_aluno: 'Marcela', periodo_aluno: '10', box_aluno: '181', modalidade: 'Entrada', status: 'Inválido', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '19:19', data: '11/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
-    { id: 6, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Entrada', status: 'Validado', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
-    { id: 7, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Inválido', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '23:19', data: '11/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
-    { id: 8, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
-    { id: 9, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Validado', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '08:19', data: '11/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] }
-  ]
+  const usersSet = new Set();
 
-  const users = [
-    {
-      id: 1,
-      matricula: 'aluno',
-      senha: '123',
-      nome: 'Marcos Santos',
-      cargo: 'aluno'
-    },
-    {
-      id: 2,
-      matricula: 'colab',
-      senha: '123',
-      nome: 'Ana Souza',
-      cargo: 'colaborador',
-    },
-    {
-      id: 3,
-      matricula: 'admin',
-      senha: '123',
-      nome: 'João Marques',
-      cargo: 'administrador'
+  pedidos.forEach(pedido => {
+    usersSet.add(pedido.colaborador);
+  });
+
+  const users = Array.from(usersSet);
+
+
+  const HistoryTable = ({ data }) => (
+    <table className='table table-sm tableHistory' id="table-history">
+      <thead>
+        <tr>
+          <th scope="col">NOME</th>
+          <th scope="col">MATRÍCULA</th>
+          <th scope="col">PERÍODO</th>
+          <th scope="col">BOX</th>
+          <th scope="col">DATA</th>
+          <th scope="col">HORA</th>
+          <th scope="col">MODALIDADE</th>
+          <th scope="col">STATUS</th>
+          <th scope="col">COLABORADOR</th>
+        </tr>
+      </thead>
+      <tbody>
+        {data.map((movimentacao, index) => (
+          <tr key={index}>
+            <td>{movimentacao.nomeAluno}</td>
+            <td>{movimentacao.matricula}</td>
+            <td>{movimentacao.periodoAluno}</td>
+            <td>{movimentacao.box}</td>
+            <td>{formatarData(movimentacao.createdAt)}</td>
+            <td>{formatarHora(movimentacao.createdAt)}</td>
+            <td>{movimentacao.tipo}</td>
+            <td className={
+              movimentacao.status === 'Aprovado' ? 'validado-class' :
+                movimentacao.status === 'Reprovado' ? 'invalidado-class' :
+                  movimentacao.status === 'Pendente' ? 'pendente-class' :
+                    ''
+            }>
+              {movimentacao.status}
+            </td>
+            <td>{movimentacao.colaborador}</td>
+          </tr>
+        ))}
+
+      </tbody>
+    </table>
+  );
+
+  useEffect(() => {
+    getPedidos();
+    handleCronologicalResult()
+    const addToStaff = () => {
+      setStaff(users);
+    };
+    addToStaff();
+  }, []);
+
+  function formatarData(dataMov) {
+    const data = new Date(dataMov);
+    const dia = String(data.getDate()).padStart(2, '0');
+    const mes = String(data.getMonth() + 1).padStart(2, '0');
+    const ano = data.getFullYear();
+    return `${dia}/${mes}/${ano}`;
+  }
+
+  function formatarHora(horaMov) {
+    const data = new Date(horaMov);
+    const horas = String(data.getHours()).padStart(2, '0');
+    const minutos = String(data.getMinutes()).padStart(2, '0');
+    return `${horas}:${minutos}`;
+  }
+
+  useEffect(() => {
+    handleCronologicalResult();
+  }, [pedidos]);
+
+
+
+
+  async function getPedidos() {
+    var token = localStorage.getItem("loggedUserToken")
+    try {
+      const response = await server.get('/pedido', {
+        method: 'GET',
+        headers: {
+          "Authorization": `${token}`,
+          "Content-Type": "application/json"
+        }
+      })
+      setPedidos(response.data)
+    } catch (e) {
+      console.error(e)
     }
-  ]
+  }
 
   const openSnackBarMessage = () => {
     setOpen(true);
@@ -146,15 +166,6 @@ function History() {
     setSearchCategory(e.target.value);
   };
 
-  useEffect(() => {
-    handleCronologicalResult()
-    const addToStaff = () => {
-      const selectedUsers = users.filter(user => user.cargo === 'colaborador');
-      setStaff(selectedUsers);
-    };
-    addToStaff();
-  }, []);
-
   function handleSearchSimple() {
     const normalizedSearchTerm = searchTerm.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
@@ -164,19 +175,21 @@ function History() {
       }
       switch (searchCategory) {
         case 'Nome':
-          return movimentacao.nome_aluno.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(normalizedSearchTerm);
+          return movimentacao.nomeAluno.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(normalizedSearchTerm);
         case 'Matrícula':
-          return movimentacao.matricula_aluno.includes(searchTerm);
+          return String(movimentacao.matricula).includes(searchTerm);
         case 'Período':
-          return movimentacao.periodo_aluno.includes(searchTerm);
+          return String(movimentacao.periodoAluno).includes(searchTerm);
         case 'Box':
-          return movimentacao.box_aluno.includes(searchTerm);
+          return String(movimentacao.box).includes(searchTerm);
         case 'Status':
           return movimentacao.status.toLowerCase().includes(searchTerm.toLowerCase());
         case 'Colaborador':
-          return movimentacao.nome_colab.toLowerCase().includes(searchTerm.toLowerCase());
+          return movimentacao.colaborador.toLowerCase().includes(searchTerm.toLowerCase());
         case 'Modalidade':
-          return movimentacao.modalidade.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(searchTerm.toLowerCase());
+          const modalidadeLowerCase = movimentacao.tipo.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          const searchTermLowerCase = searchTerm.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+          return modalidadeLowerCase.includes(searchTermLowerCase);
         default:
           return true;
       }
@@ -186,16 +199,16 @@ function History() {
   }
 
   function handleSearchAdvanced() {
-    const base = { nomeAluno: '', matriculaAluno: '', periodoAluno: '', boxAluno: '', nomeColab: '', data: '' };
+    const base = { nomeAluno: '', matriculaAluno: '', periodoAluno: '', boxAluno: '', colaborador: '', createdAt: '' };
 
     const filterConditions = [
-      { key: 'nome_aluno', value: alunoName_his.toLowerCase(), condition: alunoName_his !== base.nomeAluno },
-      { key: 'matricula_aluno', value: alunoMatricula_his, condition: alunoMatricula_his !== base.matriculaAluno },
-      { key: 'periodo_aluno', value: alunoPeriodo_his, condition: alunoPeriodo_his !== base.periodoAluno },
-      { key: 'box_aluno', value: alunoBox_his, condition: alunoBox_his !== base.boxAluno },
-      { key: 'modalidade', value: tipo_his, condition: tipo_his?.length >= 3 },
+      { key: 'nomeAluno', value: alunoName_his.toLowerCase(), condition: alunoName_his !== base.nomeAluno },
+      { key: 'matricula', value: alunoMatricula_his, condition: alunoMatricula_his !== base.matriculaAluno },
+      { key: 'periodoAluno', value: alunoPeriodo_his, condition: alunoPeriodo_his !== base.periodoAluno },
+      { key: 'box', value: alunoBox_his, condition: alunoBox_his !== base.boxAluno },
+      { key: 'tipo', value: tipo_his, condition: tipo_his?.length >= 3 },
       { key: 'status', value: status_his, condition: status_his?.length >= 3 },
-      { key: 'data', value: date_his, condition: date_his !== base.date && date_his?.includes('-') },
+      { key: 'createdAt', value: date_his, condition: date_his !== base.date && date_his?.includes('-') },
     ];
 
     const filteredConditions = filterConditions.filter(({ condition }) => condition);
@@ -206,21 +219,15 @@ function History() {
     let search = [];
 
     if (colabName_his && colabName_his.value !== undefined) {
-      keys.push('nome_colab')
-      values.push(colabName_his.value)
-      setColaboradorName(colabName_his.value)
+      keys.push('colaborador');
+      values.push(colabName_his.value.toLowerCase()); // Lowercase the value for consistent comparison
+      setColaboradorName(colabName_his.value);
     }
 
-    // if (alunoPeriodo_his !== '') {
-    //   keys.push('periodo_aluno')
-    //   values.push(alunoPeriodo_his)
-    //   setPeriodo(alunoPeriodo_his)
-    // }
-
-    if (filteredConditions.some(({ key }) => key === 'data')) {
+    if (filteredConditions.some(({ key }) => key === 'createdAt')) {
       const [start, end] = date_his.split('-').map(d => d.trim());
-      search = pedidos.filter(e => isDateInRange(e['data'], start, end));
-      keys.splice(keys.indexOf('data'), 1);
+      search = pedidos.filter(e => isDateInRange(e['createdAt'], start, end));
+      keys.splice(keys.indexOf('createdAt'), 1); // Corrected the key here
       result = search.filter(e => keys.every(key => {
         const value = String(e[key]).toLowerCase();
         return values.some(val => value.includes(val));
@@ -232,43 +239,44 @@ function History() {
       }));
     }
 
-    // console.log(keys)
-    // // console.log(colaborador_his)
-    // console.log(colabName_his)
-    // console.log(values)
-    // console.log(result)
-
+    console.log(keys);
+    console.log(values);
+    console.log(result);
     handleSearchResult(result);
   }
 
+
   function isDateInRange(date, start, end) {
-    var dateObj = moment(date, ['DD/MM/YYYY'], true);
+    const data = new Date(date);
+    const dia = String(data.getDate()).padStart(2, '0');
+    const mes = String(data.getMonth() + 1).padStart(2, '0');
+    const ano = data.getFullYear();
+    `${dia}/${mes}/${ano}`;
+    var dateObj = moment(`${dia}/${mes}/${ano}`, ['DD/MM/YYYY'], true);
     var startDateObj = moment(start, ['DD/MM/YYYY'], true);
     var endDateObj = moment(end, ['DD/MM/YYYY'], true);
     return dateObj.isSameOrAfter(startDateObj) && dateObj.isSameOrBefore(endDateObj);
   }
 
-  function handleCronologicalResult() {
-    const sortedResultados = pedidos.sort((a, b) => {
-      const dateTimeA = `${a.data} ${a.hora}`;
-      const dateTimeB = `${b.data} ${b.hora}`;
-      const dateObjectA = new Date(dateTimeA.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1'));
-      const dateObjectB = new Date(dateTimeB.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1'));
-      return dateObjectB - dateObjectA;
-    });
 
-    setResultadosPesquisa(sortedResultados);
-  }
+  const handleCronologicalResult = () => {
+    const sortedPedidos = pedidos.slice().sort((a, b) => {
+      const dateA = new Date(a.CreatedAt);
+      const dateB = new Date(b.CreatedAt);
+      return dateB - dateA;
+    });
+    setResultadosPesquisa(sortedPedidos);
+  };
 
   function handleSearchResult(result) {
-    const sortedResultados = result.sort((a, b) => {
+    const pedidosCronologicos = result.sort((a, b) => {
       const dateTimeA = `${a.data} ${a.hora}`;
       const dateTimeB = `${b.data} ${b.hora}`;
       const dateObjectA = new Date(dateTimeA.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1')); // Convert to 'YYYY-MM-DD'
       const dateObjectB = new Date(dateTimeB.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1'));
       return dateObjectB - dateObjectA;
     });
-    setResultadosPesquisa(sortedResultados);
+    setResultadosPesquisa(pedidosCronologicos);
     openSnackBarMessage()
     if (result.length === 0) {
       setSnackBarMessage('Não foram encontrados resultados')
@@ -322,9 +330,10 @@ function History() {
   };
 
   const optionsColaborador = staff.map(e => ({
-    label: e.nome,
-    value: e.nome,
+    label: e,
+    value: e,
   }));
+
 
   return (
     <>
@@ -392,8 +401,8 @@ function History() {
                   <select className='form-1' value={status_his} onChange={(e) => setStatus(e.target.value)} style={{ width: '220px', marginRight: '20px' }}>
                     <option value='' disabled>Selecionar</option>
                     <option>Pendente</option>
-                    <option>Inválido</option>
-                    <option>Validado</option>
+                    <option>Reprovado</option>
+                    <option>Aprovado</option>
                   </select>
                 </div>
               </div>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import HeaderHomeColab from '../../components/headers/colabHomeindex'
 import { Container } from 'react-bootstrap'
 import './style.css';
-
+import { server } from "../../services/server";
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
@@ -10,37 +10,41 @@ import CloseIcon from '@mui/icons-material/Close';
 
 function HomeColaborador() {
   const [showPopView, setShowPopView] = useState(false);
-  const [selectedAluno, setSelectedAluno] = useState(null);
+  const [selectedAluno, setSelectedAluno] = useState({});
   const [errorMessage, setErrorMessage] = useState(' ');
   const [open, setOpen] = React.useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('')
   const [snackBarStyle, setSnackBarStyle] = useState({ sx: { background: "white", color: "black", borderRadius: '10px' } })
   var pedidosEntrada = []
-
-  var pedidos = [
-    { id: 1, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
-    { id: 2, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
-    { id: 3, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: true, hora: '06:19', data: '12/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
-    { id: 4, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Entrada', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: true, hora: '06:19', data: '14/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
-    { id: 5, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Entrada', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
-    { id: 6, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Entrada', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
-    { id: 7, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
-    { id: 8, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '14/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] },
-    { id: 9, matricula_aluno: 'aluno', nome_aluno: 'Vinícius', periodo_aluno: '10', box_aluno: '181', modalidade: 'Saída', status: 'Pendente', nome_colab: 'Lucas Rodrigues', assinatura: false, hora: '06:19', data: '11/02/2023', nome_familia: ['Cirúrgica', 'Dentística'], qnt_itens: ['20', '18'] }
-  ]
+  const [pedidos, setPedidos] = useState([])
+  const [nome, setNome] = useState('')
+  var infoUsers = {}
+  const [movimentacoesArray, setMovimentacoesArray] = useState([]);
 
 
-  // async function getPedidos() {
-  //   try {
-  //     const response = server.post('/pedido')
-  //     if (response.status === 200) {
-  //       // entryRequests = response
-  //       console.log('get pedido right')
-  //     }
-  //   } catch (e) {
-  //     console.error(e)
-  //   }
-  // }
+  useEffect(() => {
+    getPedidos();
+    infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+    setNome(infoUsers.NomeUser)
+    console.log(infoUsers)
+  }, []);
+
+  async function getPedidos() {
+    var token = localStorage.getItem("loggedUserToken")
+    try {
+      const response = await server.get('/pedido', {
+        method: 'GET',
+        headers: {
+          "Authorization": `${token}`,
+          "Content-Type": "application/json"
+        }
+      })
+      setPedidos(response.data)
+      console.log(response.data)
+    } catch (e) {
+      console.error(e)
+    }
+  }
 
   const openSnackBarMessage = () => {
     setOpen(true);
@@ -69,22 +73,49 @@ function HomeColaborador() {
   function buttonView(aluno) {
     setShowPopView(true);
     setSelectedAluno(aluno);
+    var familiasArray = aluno.familias.split(',');
+    var quantidadesArray = aluno.quantidadeItens.split(',');
+    for (let i = 0; i < quantidadesArray.length; i++) {
+      const familia = familiasArray[i].trim();
+      const quantidade = parseInt(quantidadesArray[i].trim());
+      movimentacoesArray.push({ familia, quantidade });
+      console.log(movimentacoesArray)
+    }
   }
 
   function invalidateBox() {
     let formatedPedido = selectedAluno
-    formatedPedido.status = 'Invalidado'
-    console.log(formatedPedido) //post do pedido pós invalidação
+    formatedPedido.status = 'Reprovado'
+    formatedPedido.colaborador = nome
+    console.log(formatedPedido)
+    postPedidoAvaliado(formatedPedido.id, formatedPedido)
     openSnackBarMessage()
     setSnackBarMessage('Pedido invalidado com sucesso')
     setSnackBarStyle({ sx: { background: "#79B874", color: "white", borderRadius: '15px' } })
     handleReturn()
   }
 
+  async function postPedidoAvaliado(idPedido, pedido) {
+    var token = localStorage.getItem("loggedUserToken");
+    try {
+        const response = await server.put(`/pedido/${idPedido}`, pedido, {
+            headers: {
+                "Authorization": `${token}`,
+                "Content-Type": "application/json"
+            }
+        });
+        console.log(response);
+    } catch (e) {
+        console.error(e);
+    }
+}
+
   function validateBox() {
     let formatedPedido = selectedAluno
-    formatedPedido.status = 'Validado'
-    console.log(formatedPedido) //post do pedido pós validação
+    formatedPedido.status = 'Aprovado'
+    formatedPedido.colaborador = nome
+    console.log(formatedPedido)
+    postPedidoAvaliado(formatedPedido.id, formatedPedido)
     openSnackBarMessage()
     setSnackBarMessage('Pedido validado com sucesso')
     setSnackBarStyle({ sx: { background: "#79B874", color: "white", borderRadius: '15px' } })
@@ -95,15 +126,16 @@ function HomeColaborador() {
     setShowPopView(false)
     setErrorMessage(' ');
     setSelectedAluno(null);
+    setMovimentacoesArray([])
   }
 
   function tableReportContent() {
-    pedidosEntrada = pedidos.filter(pedido => pedido.modalidade === 'Entrada' && pedido.status == 'Pendente');
+    pedidosEntrada = pedidos.filter(pedido => pedido.tipo === 'Entrada' && pedido.status == 'Pendente');
     return pedidosEntrada.map((pedido, index) => (
       <tbody key={index}>
         <tr>
           <td>
-            <p className='body-normal'>{pedido.nome_aluno}</p>
+            <p className='body-normal'>{pedido.nomeAluno}</p>
             <p className='body-normal'>
               <button className='button-7' onClick={() => buttonView(pedido)}>
                 Visualizar
@@ -117,10 +149,10 @@ function HomeColaborador() {
   };
 
   useEffect(() => {
-    pedidosEntrada = pedidos.filter(pedido => pedido.modalidade === 'Entrada' && pedido.status == 'Pendente');
+    pedidosEntrada = pedidos.filter(pedido => pedido.tipo === 'Entrada' && pedido.status == 'Pendente');
     console.log(pedidosEntrada)
   }, [])
-
+  
 
   return (
     <>
@@ -154,10 +186,10 @@ function HomeColaborador() {
                 <div className="viewCardLeftBox">
                   {selectedAluno && (
                     <ul>
-                      <li><p>Matrícula:</p><p>{selectedAluno.matricula_aluno}</p></li>
-                      <li><p>Acadêmico:</p><p>{selectedAluno.nome_aluno}</p></li>
-                      <li><p>Período:</p><p>{selectedAluno.periodo_aluno}</p></li>
-                      <li><p>Número da box:</p><p>{selectedAluno.box_aluno}</p></li>
+                      <li><p>Matrícula:</p><p>{selectedAluno.matricula}</p></li>
+                      <li><p>Acadêmico:</p><p>{selectedAluno.nomeAluno}</p></li>
+                      <li><p>Período:</p><p>{selectedAluno.periodoAluno}</p></li>
+                      <li><p>Número da box:</p><p>{selectedAluno.box}</p></li>
                     </ul>
                   )}
                 </div>
@@ -168,12 +200,12 @@ function HomeColaborador() {
                   <div className="tableRequestInfo">
                     <table>
                       <tbody>
-                        {selectedAluno.nome_familia.map((nomeFamilia, index) => (
+                        {movimentacoesArray.map((option, index) => (
                           <tr key={index}>
                             <td>
                               <span>
-                                <p>{nomeFamilia}</p>
-                                <p>{selectedAluno.qnt_itens[index]}</p>
+                                <p>{option.familia}</p>
+                                <p>{option.quantidade}</p>
                               </span>
                             </td>
                           </tr>
@@ -192,10 +224,10 @@ function HomeColaborador() {
               )}
               <div className='popUpViewButtons'>
                 <button className='button-8' disabled={false} onClick={invalidateBox} variant="outlined" >
-                  Invalidar
+                  Reprovar
                 </button>
                 <button className='button-9' disabled={false} onClick={validateBox} variant="outlined" >
-                  Validar
+                  Aprovar
                 </button>
               </div>
             </div>
