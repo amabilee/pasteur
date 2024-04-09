@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Container } from 'react-bootstrap';
 import './style.css'
-import leaveIcon from '../../assets/leaveIconAdmin.svg'
-import menuIcon from '../../assets/menuIconAdmin.svg'
+import leaveIcon from '../../assets/leaveIconColab.svg'
+import menuIcon from '../../assets/menuIconColab.svg'
 import userIcon from '../../assets/userIcon.svg'
 import boxIcon from '../../assets/boxIcon.svg'
+import minusIcon from '../../assets/minusBlack.svg'
+import configOptionsIcon from '../../assets/configOptionsIcon.svg'
+import addIcon from '../../assets/addBlackIcon.svg'
 import historyIcon from '../../assets/historyIconAdmin.svg'
 import { useNavigate } from 'react-router-dom';
 import { UseAuth } from '../../hooks/index';
@@ -16,11 +19,16 @@ import { styled } from '@mui/material/styles';
 export default function HeaderHomeColab() {
     const navigate = useNavigate();
     const [showMenu, setShowMenu] = useState(true);
-    const [showMenuStyle, setShowMenuStyle] = useState('menuColab');
-    const [buttonEntryStyle, setbuttonEntryStyle] = useState('button-16-enable');
+    const [showMenuStyle, setShowMenuStyle] = useState('menuAdmin');
+    const [buttonUsersStyle, setbuttonUsersStyle] = useState('button-16-enable');
+    const [buttonFamilyStyle, setbuttonFamilyStyle] = useState('button-16-disable');
+    const [buttonEntryStyle, setbuttonEntryStyle] = useState('button-16-disable');
     const [buttonExitStyle, setbuttonExitStyle] = useState('button-16-disable');
     const [buttonHistoryStyle, setbuttonHistoryStyle] = useState('button-16-disable');
-    const {signOut} = UseAuth()
+    const [showMenuUser, setShowMenuUser] = useState(false);
+    
+    
+    const { signOut } = UseAuth()
 
     function returnLogin() {
         navigate('/login')
@@ -31,9 +39,9 @@ export default function HeaderHomeColab() {
     function handleMenu() {
         if (showMenu == false) {
             setShowMenu(true)
-            setShowMenuStyle('menuColab-slide-down')
+            setShowMenuStyle('menuAdmin-slide-down')
         } else if (showMenu == true) {
-            setShowMenuStyle('menuColab-slide-up')
+            setShowMenuStyle('menuAdmin-slide-up')
             setTimeout(() => {
                 setShowMenu(false);
             }, 500);
@@ -42,33 +50,44 @@ export default function HeaderHomeColab() {
 
     useEffect(() => {
         const path = location.pathname;
-        if (path === '/staff-admin') {
-            setButtonStyles('button-16-enable', 'button-16-disable', 'button-16-disable');
-        } else if (path === '/familia-admin') {
-            setButtonStyles('button-16-disable', 'button-16-enable', 'button-16-disable');
-        } else {
-            setButtonStyles('button-16-disable', 'button-16-disable', 'button-16-enable');
+        if (path === '/staff-admin'){
+        setButtonStyles('button-16-enable', 'button-16-disable', 'button-16-disable', 'button-16-disable', 'button-16-disable')
+        } else if (path === '/familia-admin'){
+            setButtonStyles('button-16-disable', 'button-16-enable', 'button-16-disable', 'button-16-disable', 'button-16-disable');
+        } else if (path === '/entry-admin'){
+            setButtonStyles('button-16-disable', 'button-16-disable', 'button-16-enable', 'button-16-disable', 'button-16-disable');
+        } else if (path === '/exit-admin'){
+            setButtonStyles('button-16-disable', 'button-16-disable', 'button-16-disable', 'button-16-enable', 'button-16-disable');
+        } else if (path === '/history-admin'){
+            setButtonStyles('button-16-disable', 'button-16-disable', 'button-16-disable', 'button-16-disable', 'button-16-enable');
         }
     }, [location.pathname]);
 
-    function setButtonStyles(entry, exit, history) {
+    function setButtonStyles(users, family, entry, exit, history) {
+        setbuttonUsersStyle(users);
+        setbuttonFamilyStyle(family)
         setbuttonEntryStyle(entry);
         setbuttonExitStyle(exit);
         setbuttonHistoryStyle(history);
     }
 
     function buttonUserClicked() {
-        setButtonStyles('button-16-enable', 'button-16-disable', 'button-16-disable');
         navigate('/staff-admin');
     }
 
     function buttonBoxClicked() {
-        setButtonStyles('button-16-disable', 'button-16-enable', 'button-16-disable');
         navigate('/familia-admin');
     }
 
+    function buttonEntryClicked() {
+        navigate('/entry-admin');
+    }
+
+    function buttonExitClicked() {
+        navigate('/exit-admin')
+    }
+
     function buttonHistoryClicked() {
-        setButtonStyles('button-16-disable', 'button-16-disable', 'button-16-enable');
         navigate('/history-admin')
     }
 
@@ -87,33 +106,62 @@ export default function HeaderHomeColab() {
         },
     }));
 
+    function buttonConfigClicked() {
+        if (showMenuUser) {
+            setShowMenuUser(false)
+        } else {
+            setShowMenuUser(true)
+            console.log('mostrando')
+        }
+    }
+
+    function spaceOutClicked() {
+        setShowMenuUser(false)
+    }
 
     return (
         <Container>
-            <div className="headerHomeAdmin">
-                <div className='headerHomeAdminContainer'>
+            <div className="headerHomeColab">
+                <div className='headerHomeColabContainer'>
                     <button className='button-17' onClick={handleMenu}>
                         <img src={menuIcon} />
                     </button>
-                    <div className="logoHomeAdmin"></div>
+                    <div className="logoHomeColab"></div>
                 </div>
-                <LightTooltip title="Sair" placement="bottom" >
-                    <button className='button-17' onClick={returnLogin}><img src={leaveIcon} /></button>
+                <LightTooltip title="Opções" placement="bottom" >
+                    <button className='button-17' onClick={buttonConfigClicked}><img src={configOptionsIcon} /></button>
                 </LightTooltip>
             </div>
             {showMenu && (
                 <div className={showMenuStyle}>
-                    <LightTooltip title="Colaboradores" placement="right" >
-                        <button className={buttonEntryStyle} onClick={buttonUserClicked}><img src={userIcon} /></button>
+                    <LightTooltip title="Usuários" placement="right" >
+                        <button className={buttonUsersStyle} onClick={buttonUserClicked}><img src={userIcon} /></button>
                     </LightTooltip>
                     <LightTooltip title="Famílias" placement="right" >
-                        <button className={buttonExitStyle} onClick={buttonBoxClicked}><img src={boxIcon} className='boxIcon' /></button>
+                        <button className={buttonFamilyStyle} onClick={buttonBoxClicked}><img src={boxIcon} className='boxIcon' /></button>
+                    </LightTooltip>
+                    <LightTooltip title="Entrada" placement="right" >
+                        <button className={buttonEntryStyle} onClick={buttonEntryClicked}><img src={addIcon} /></button>
+                    </LightTooltip>
+                    <LightTooltip title="Saída" placement="right" >
+                        <button className={buttonExitStyle} onClick={buttonExitClicked}><img src={minusIcon}/></button>
                     </LightTooltip>
                     <LightTooltip title="Histórico" placement="right" >
                         <button className={buttonHistoryStyle} onClick={buttonHistoryClicked}><img src={historyIcon} /></button>
                     </LightTooltip>
                 </div>
             )}
+            {showMenuUser && (
+                        <div className="showMenuContainer" onClick={spaceOutClicked}>
+                            <div className="showMenuStyleModal">
+                                <ul>
+                                    <li>Nível: Administrador</li>
+                                    <li><button>Mudar senha</button></li>
+                                    <li><button onClick={returnLogin}>Sair</button></li>
+                                </ul>
+                            </div>
+                        </div>
+                    )}
         </Container>
     );
 }

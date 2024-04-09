@@ -30,7 +30,7 @@ const FamilyTable = ({ data, onEdit, onDelete }) => (
           <td>{objetos.quantidadeMAX}</td>
           <td>{objetos.quantidadeMIN}</td>
           <td>
-            <button className='button-13' onClick={() => onEdit(objetos)}><img src={viewIcon} /></button>
+            <button className='button-14' onClick={() => onEdit(objetos)}><img src={viewIcon} /></button>
             <button className='button-13' onClick={() => onDelete(objetos)}><img src={deleteIcon} /></button></td>
         </tr>
       ))}

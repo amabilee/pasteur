@@ -87,6 +87,7 @@ function HomeAluno() {
           </div>
         </div>
       </Container>
+      <div className="blockerMobile"></div>
     </>
   )
 }

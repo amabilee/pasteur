@@ -15,6 +15,7 @@ const usuarioSeed = async () => {
         senha: senhaAdmin,
         nomeUser: 'Administrador',
         cargo: 1,
+        status: true
       });
 
       const senhaAluno = await bcrypt.hash(process.env.SENHA_ALUNO, 10);
@@ -23,6 +24,7 @@ const usuarioSeed = async () => {
         senha: senhaAluno,
         nomeUser: 'Aluno',
         cargo: 2,
+        status: true
       });
 
       const senhaColaborador = await bcrypt.hash(process.env.SENHA_COLABORADOR, 10);
@@ -31,6 +33,7 @@ const usuarioSeed = async () => {
         senha: senhaColaborador,
         nomeUser: 'Colaborador',
         cargo: 3,
+        status: true
       });
 
       console.log('Usuários criados com sucesso!');

@@ -11,6 +11,8 @@ import HistoryColaborador from '../pages/colaborador/historyColaborador';
 import HistoryAdmin from '../pages/administrador/historyAdmin';
 import StaffAdmin from '../pages/administrador/staffAdmin';
 import FamilyAdmin from '../pages/administrador/familyAdmin';
+import EntryAdmin from '../pages/administrador/entryAdmin';
+import ExitAdmin from '../pages/administrador/exitAdmin';
 
 
 const PrivateRoute = ({ component: Component, authKey, ...rest }) => {
@@ -33,6 +35,8 @@ const PrivateRouteColaboradorExit = (props) => <PrivateRoute component={ExitCola
 const PrivateRouteAdminHome = (props) => <PrivateRoute component={HistoryAdmin} authKey="auth3" {...props} />;
 const PrivateRouteAdminStaff = (props) => <PrivateRoute component={StaffAdmin} authKey="auth3" {...props} />;
 const PrivateRouteAdminFamily = (props) => <PrivateRoute component={FamilyAdmin} authKey="auth3" {...props} />;
+const PrivateRouteAdminEntry = (props) => <PrivateRoute component={EntryAdmin} authKey="auth3" {...props} />;
+const PrivateRouteAdminExit = (props) => <PrivateRoute component={ExitAdmin} authKey="auth3" {...props} />;
 
 export {
   PrivateRouteAlunoHome,
@@ -45,4 +49,6 @@ export {
   PrivateRouteAdminHome,
   PrivateRouteAdminStaff,
   PrivateRouteAdminFamily,
+  PrivateRouteAdminEntry,
+  PrivateRouteAdminExit
 };

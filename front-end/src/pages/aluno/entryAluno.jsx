@@ -54,8 +54,8 @@ function EntryAluno() {
     }
 
     function navigateToConfirmEntry() {
-        if (box === undefined || /^0+$/.test(box) || (box.length > 0 && box[0] === '0') || (tableData.length === 0)) {
-            setErrorMessage('Todos os campos devem ser preenchidos.');
+        if (box.trim() === '' || /^0+$/.test(box) || (box.length > 0 && box[0] === '0') || (tableData.length === 0)) {
+            setErrorMessage('Todos os campos devem ser preenchidos corretamente.');
         } else if (periodo == '') {
             setErrorMessage('Todos os campos devem ser preenchidos.');
         } else {
@@ -228,12 +228,16 @@ function EntryAluno() {
 
     }
 
+    function onChangeTagInput(e) {
+        setBox(e.target.value.replace(/[^0-9]/g, ""));
+    }
+
     return (
         <>
             <HeaderPagesAluno />
             <Container className='containerMobileEntry'>
                 <h1 className='title-1 margin-bottom-30'>Registrar pedido de entrada</h1>
-                <input placeholder='Box de armazenamento' className='form-4' value={box} onChange={(e) => setBox(e.target.value)} type='number' />
+                <input placeholder='Box de armazenamento' className='form-4' value={box} onChange={(e) => onChangeTagInput(e)} type='text' maxlength="3" />
                 <select className='form-4' value={periodo} onChange={(e) => setPeriodo(e.target.value)}>
                     <option value='' disabled>Selecionar um periodo</option>
                     <option>1</option>
@@ -311,6 +315,7 @@ function EntryAluno() {
                     </div>
                 </div>
             )}
+            <div className="blockerMobile"></div>
         </>
     )
 }

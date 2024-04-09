@@ -37,15 +37,17 @@ function ExitAluno() {
             setShowPop(false);
             navigate('/home-aluno')
             setTableData([]);
+            stagesReturn()
         } else {
             navigate('/home-aluno')
             setTableData([]);
+            stagesReturn()
         }
     }
 
     function navigateToConfirmExit() {
         if (box.trim() === '' || /^0+$/.test(box) || (box.length > 0 && box[0] === '0') || (tableData.length === 0)) {
-            setErrorMessage('Todos os campos devem ser preenchidos.');
+            setErrorMessage('Todos os campos devem ser preenchidos corretamente.');
         } else if (periodo == '') {
             setErrorMessage('Todos os campos devem ser preenchidos.');
         } else {
@@ -143,13 +145,28 @@ function ExitAluno() {
         }
     }
 
+    function navigateToConfirmHome() {
+        if (box !== '' || periodo !== '' || (tableData.length !== 0)) {
+            setShowPop(true)
+        } else {
+            navigateToHomeAluno()
+        }
+
+    }
+
+    function onChangeTagInput(e) {
+        setBox(e.target.value.replace(/[^0-9]/g, ""));
+    }
+
+
+
     return (
         <>
             <HeaderPagesAluno />
             <Container className='containerMobileExit'>
                 <div className="inputFormsExit">
                     <h1 className='title-1 margin-bottom-30'>Registrar pedido de saída</h1>
-                    <input placeholder='Box de armazenamento' className='form-4' value={box} onChange={(e) => setBox(e.target.value)} type='number' />
+                    <input placeholder='Box de armazenamento' className='form-4' value={box} onChange={(e) => onChangeTagInput(e)} type='text' maxlength="3" />
                     <select className='form-4' value={periodo} onChange={(e) => setPeriodo(e.target.value)}>
                         <option value='' disabled>Selecionar um periodo</option>
                         <option>1</option>
@@ -182,7 +199,7 @@ function ExitAluno() {
                 </div>
                 {errorMessage && <p className="error-message-mobile">{errorMessage}</p>}
                 <div className='sendButtonsEntry'>
-                    <button className='button-2' disabled={false} onClick={() => setShowPop(true)} >
+                    <button className='button-2' disabled={false} onClick={navigateToConfirmHome} >
                         Cancelar
                     </button>
                     <button className='button-3' disabled={false} onClick={navigateToConfirmExit} > Confimar
@@ -214,6 +231,7 @@ function ExitAluno() {
                     </div>
                 </div>
             )}
+            <div className="blockerMobile"></div>
         </>
     )
 }

@@ -3,7 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import LoginAluno from '../pages/login/login';
 
 
-import { PrivateRouteAlunoHome, PrivateRouteAlunoEntry, PrivateRouteAlunoExit, PrivateRouteAlunoSignature, PrivateRouteColaboradorHome, PrivateRouteColaboradorHistory, PrivateRouteColaboradorExit, PrivateRouteAdminHome, PrivateRouteAdminStaff, PrivateRouteAdminFamily } from '../components/PrivateRoute.jsx';
+import { PrivateRouteAlunoHome, PrivateRouteAlunoEntry, PrivateRouteAlunoExit, PrivateRouteAlunoSignature, PrivateRouteColaboradorHome, PrivateRouteColaboradorHistory, PrivateRouteColaboradorExit, PrivateRouteAdminHome, PrivateRouteAdminStaff, PrivateRouteAdminFamily, PrivateRouteAdminEntry, PrivateRouteAdminExit } from '../components/PrivateRoute.jsx';
 
 function Router() {
   return (
@@ -20,6 +20,8 @@ function Router() {
         <Route path="/history-admin" element={<PrivateRouteAdminHome />} />
         <Route path="/staff-admin" element={<PrivateRouteAdminStaff />} />
         <Route path="/familia-admin" element={<PrivateRouteAdminFamily />} />
+        <Route path="/entry-admin" element={<PrivateRouteAdminEntry />} />
+        <Route path="/exit-admin" element={<PrivateRouteAdminExit />} />
       </Routes>
     </BrowserRouter>
   )

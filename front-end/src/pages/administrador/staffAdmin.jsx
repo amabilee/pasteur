@@ -7,6 +7,8 @@ import HeaderHomeAdmin from '../../components/headers/adminHomeindex';
 import viewIcon from '../../assets/viewIcon.svg';
 import deleteIcon from '../../assets/deleteIcon.svg';
 import { server } from "../../services/server";
+import eyeOn from '../../assets/eyeOn.svg'
+import eyeOff from '../../assets/eyeOff.svg'
 import './style.css';
 
 //Component
@@ -20,6 +22,7 @@ const UsuarioTable = ({ data, onEdit, onDelete }) => (
         <th scope="col">NOME</th>
         <th scope="col">MATRÍCULA</th>
         <th scope="col">CARGO</th>
+        <th scope="col">STATUS</th>
         <th scope="col">AÇÕES</th>
       </tr>
     </thead>
@@ -35,6 +38,16 @@ const UsuarioTable = ({ data, onEdit, onDelete }) => (
                   ''}
           </td>
           <td>
+            <div className={
+              usuario.status === true ? 'ativo-class' :
+                usuario.status === false ? 'invativo-class' :
+                  ''
+            }></div>
+            {usuario.status === true ? 'Ativo' :
+              usuario.status === false ? 'Inativo' :
+                ''}
+          </td>
+          <td>
             <button className='button-13' onClick={() => onDelete(usuario)}><img src={deleteIcon} /></button></td>
         </tr>
       ))}
@@ -44,6 +57,9 @@ const UsuarioTable = ({ data, onEdit, onDelete }) => (
 
 
 function StaffAdmin() {
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isPasswordVisible2, setIsPasswordVisible2] = useState(false);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [searchCategory, setSearchCategory] = useState('Selecione');
   const [resultadosPesquisa, setResultadosPesquisa] = useState([]);
@@ -55,15 +71,24 @@ function StaffAdmin() {
   const [matricula_colab, setColabMatricula] = useState('');
   const [cargo_colab, setColabCargo] = useState('');
   const [senha_colab, setColabSenha] = useState('');
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [colaboradorDataEdit, setColaboradorDataEdit] = useState({ nomeUser: '', matricula: '', cargo: '', senha: '' });
-  const [colaboradorDataEditBefore, setColaboradorDataEditBefore] = useState({ nomeUser: '', matricula: '', cargo: '', senha: '' });
-  const [colaboradorDataDelete, setColaboradorDataDelete] = useState({ nomeUser: '', matricula: '', cargo: '', senha: '' });
-  var matrixColab = { nomeUser: '', matricula: '', cargo: '', senha: '' }
+  const [senhaConfirm_colab, setColabSenhaConfirm] = useState('');
+  const [colaboradorDataEdit, setColaboradorDataEdit] = useState({ nomeUser: '', matricula: '', cargo: '', senha: '', status: true });
+  const [colaboradorDataEditBefore, setColaboradorDataEditBefore] = useState({ nomeUser: '', matricula: '', cargo: '', senha: '', status: true });
+  const [colaboradorDataDelete, setColaboradorDataDelete] = useState({ nomeUser: '', matricula: '', cargo: '', senha: '', status: true });
+  const [colaboradorDataDeleteOption, setColaboradorDataDeleteOption] = useState(false);
+  var matrixColab = { nomeUser: '', matricula: '', cargo: '', senha: '', status: true }
   const [open, setOpen] = React.useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('');
   const [snackBarStyle, setSnackBarStyle] = useState({ sx: { background: 'white', color: 'black', borderRadius: '10px' } });
   const [users, setUsers] = useState([])
+
+  const togglePasswordVisibility = () => {
+    setIsPasswordVisible((prev) => !prev);
+  };
+
+  const togglePasswordVisibility2 = () => {
+    setIsPasswordVisible2((prev) => !prev);
+  };
 
   async function getUsers() {
     var token = localStorage.getItem("loggedUserToken");
@@ -75,6 +100,7 @@ function StaffAdmin() {
         }
       });
       setUsers(response.data);
+      console.log(users)
       setResultadosPesquisa(response.data);
     } catch (e) {
       console.error(e);
@@ -97,8 +123,6 @@ function StaffAdmin() {
   useEffect(() => {
     getUsers()
   }, []);
-
-  const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
 
   //Pesquisar Usuário
 
@@ -139,21 +163,30 @@ function StaffAdmin() {
     setColabMatricula('');
     setColabCargo('');
     setColabSenha('');
-    setColaboradorDataEdit({ nomeUser: '', matricula: '', cargo: '', senha: '' });
-    setColaboradorDataDelete({ nomeUser: '', matricula: '', cargo: '', senha: '' });
-    setColaboradorDataEditBefore({ nomeUser: '', matricula: '', cargo: '', senha: '' });
+    setColabSenhaConfirm('');
+    setColaboradorDataEdit({ nomeUser: '', matricula: '', cargo: '', senha: '', status: true });
+    setColaboradorDataDelete({ nomeUser: '', matricula: '', cargo: '', senha: '', status: true });
+    setColaboradorDataEditBefore({ nomeUser: '', matricula: '', cargo: '', senha: '', status: true });
     setErrorMessage('');
   };
 
   // Criar Usuário
 
   const handleCreateStaff = async () => {
-    const requiredFields = ['nomeUser', 'matricula', 'cargo', 'senha']
-    const existingColab = users.find(usuario => usuario.matricula === matricula_colab);
+    const requiredFields = ['nomeUser', 'matricula', 'cargo', 'senha', 'senhaConfirm']
+    const existingColab = users.find(usuario => {
+      const userExist = usuario.matricula
+      if (Number(userExist) === Number(matricula_colab)) {
+        return true;
+      }
+    })
     if (requiredFields.some(field => !eval(`${field}_colab`))) {
       setErrorMessage('Preencha todos os campos antes de adicionar.');
     } else if (existingColab) {
       setErrorMessage('Já existe um usuário com essa matrícula.');
+      console.log('Já existe um usuário com essa matrícula.');
+    } else if (senha_colab !== senhaConfirm_colab) {
+      setErrorMessage(`A senha deve ser igual nos campos 'Senha' e 'Confirmar senha'.`);
     } else {
       formatColabData()
       console.log('Informações do usuário:', matrixColab); //Envio para a API do usuario criado
@@ -220,23 +253,47 @@ function StaffAdmin() {
 
   const handleDeleteStaff = async () => {
     var token = localStorage.getItem("loggedUserToken");
-    try {
-      const response = await server.delete(`/usuario/${colaboradorDataDelete.matricula}`, {
-        headers: {
-          "Authorization": `${token}`,
-          "Content-Type": "application/json"
-        }
-      });
-      console.log(response);
-      openSnackBarMessage();
-      setSnackBarMessage(response.data.message);
-      setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
-      getUsers()
-    } catch (e) {
-      openSnackBarMessage();
-      setSnackBarMessage(e);
-      setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
-      // console.error(e);
+    if (colaboradorDataDeleteOption === true) {
+      try {
+        const response = await server.delete(`/usuario/${colaboradorDataDelete.matricula}`, {
+          headers: {
+            "Authorization": `${token}`,
+            "Content-Type": "application/json"
+          }
+        });
+        console.log(response);
+        openSnackBarMessage();
+        setSnackBarMessage(response.data.message);
+        setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
+        getUsers()
+      } catch (e) {
+        openSnackBarMessage();
+        setSnackBarMessage(e);
+        setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
+        // console.error(e);
+      }
+    } else {
+      console.log('desativar')
+      colaboradorDataDelete.status = false
+      console.log(colaboradorDataDelete)
+      try {
+        const response = await server.put(`/usuario/${colaboradorDataDelete.matricula}`, colaboradorDataDelete,  {
+          headers: {
+            "Authorization": `${token}`,
+            "Content-Type": "application/json"
+          }
+        });
+        console.log(response);
+        openSnackBarMessage();
+        setSnackBarMessage(response.data.message);
+        setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
+        getUsers()
+      } catch (e) {
+        openSnackBarMessage();
+        setSnackBarMessage(e);
+        setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
+        // console.error(e);
+      }
     }
     returnSearch();
   };
@@ -305,9 +362,21 @@ function StaffAdmin() {
                   <option value='1'>Administrador</option>
                 </select>
               </div>
-              <div className='searchForms'>
+            </div>
+            <div className="createCardBottom" style={{ display: 'flex', marginTop: '20px' }}>
+              <div className='searchForms' style={{ marginRight: '20px' }}>
                 <span className='body-normal margin-bottom-5'>Senha</span>
-                <input placeholder='Digite a senha...' className='form-1' value={senha_colab} onChange={(e) => setColabSenha(e.target.value)} type='text' />
+                <div className='iconPasswordContainer'>
+                  <input style={{ width: "200px" }} maxLength="10" placeholder='Senha' className='form-1' value={senha_colab} onChange={(e) => setColabSenha(e.target.value)} type={isPasswordVisible ? 'text' : 'password'} />
+                  <img src={isPasswordVisible ? eyeOn : eyeOff} className="eyePassword" onClick={togglePasswordVisibility} />
+                </div>
+              </div>
+              <div className='searchForms'>
+                <span className='body-normal margin-bottom-5'>Confirmar senha</span>
+                <div className='iconPasswordContainer'>
+                  <input style={{ width: "200px" }} maxLength="10" placeholder='Senha' className='form-1' value={senhaConfirm_colab} onChange={(e) => setColabSenhaConfirm(e.target.value)} type={isPasswordVisible2 ? 'text' : 'password'} />
+                  <img src={isPasswordVisible2 ? eyeOn : eyeOff} className="eyePassword" onClick={togglePasswordVisibility2} />
+                </div>
               </div>
             </div>
           </>
@@ -355,14 +424,44 @@ function StaffAdmin() {
       />
       {showPopDelete && (
         <div className="popUpView">
-          <div className="popUpDeleteCard">
-            <div className="popUpSearchBody">
-              <div className="viewFamilyCardTop">
-                <p className='body-large text-align-center margin-bottom-10'>Tem certeza que deseja deletar o cadastro do usuário: <strong>{colaboradorDataDelete.nomeUser}</strong>?</p>
-                <p className='body-light text-align-center margin-bottom-20'>Esta ação não pode ser desfeita.</p>
+          <div className="popUpDeleteCard2" style={{ height: "350px" }}>
+            <div className="popUpDelete">
+              <div className="deleteCardTop">
+                <p className='heading-4 text-align-left margin-bottom-10'>Deletar {colaboradorDataDelete.nomeUser} - Confirmação necessária<br></br><br></br><span className='body-normal'>Escolha uma das opções:</span></p>
+                <div>
+                  <input
+                    type='checkbox'
+                    id='desativar-checkbox'
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setColaboradorDataDeleteOption(false);
+                      }
+                    }}
+                    checked={!colaboradorDataDeleteOption}
+                  />
+                  <label htmlFor='desativar-checkbox'>
+                    <p>Desativar usuário</p>
+                  </label>
+                </div>
+                <div>
+                  <input
+                    type='checkbox'
+                    id='deletar-checkbox'
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setColaboradorDataDeleteOption(true);
+                      }
+                    }}
+                    checked={colaboradorDataDeleteOption}
+                  />
+                  <label htmlFor='deletar-checkbox'>
+                    <p>Deletar usuário</p>
+                  </label>
+                </div>
+                <p className='body-small text-align-left margin-bottom-20' style={{ paddingTop: "5px" }}>Nota importante: Se este usuário for deletado este processo não pode ser desfeito.</p>
               </div>
             </div >
-            <div className='popUpDeleteButtons'>
+            <div className='popUpDeleteButtons' style={{ height: "30px", margin: "0px 0px" }}>
               <button className='button-8' disabled={false} onClick={returnSearch}>
                 Cancelar
               </button>

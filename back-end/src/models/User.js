@@ -23,7 +23,11 @@ const User = db.define(
             validate: {
                 isIn: [[1, 2, 3]] // Aceita apenas os valores 1, 2 e 3
             }
-        }
+        },
+        status: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+        },
     }
 );
 

@@ -25,12 +25,12 @@ class UserController {
 
   static async createEntity(req, res) {
     try {
-      const { matricula, senha, nomeUser, cargo } = req.body;
+      const { matricula, senha, nomeUser, cargo, status } = req.body;
       if (!senha) {
         return res.status(400).json({ error: 'A senha não pode estar vazia.' });
       }
       const hashedPassword = await bcrypt.hash(senha, 10);
-      const createdUser = await User.create({ matricula, senha: hashedPassword, nomeUser, cargo });
+      const createdUser = await User.create({ matricula, senha: hashedPassword, nomeUser, cargo, status });
       res.status(201).json({ user: createdUser });
     } catch (error) {
       console.error(error);
@@ -41,12 +41,12 @@ class UserController {
   static async updateEntity(req, res) {
     try {
       const { matricula } = req.params;
-      const { senha, nomeUser, cargo } = req.body;
+      const { senha, nomeUser, cargo, status } = req.body;
       if (!senha) {
         return res.status(400).json({ error: 'A senha não pode estar vazia.' });
       }
       const hashedPassword = await bcrypt.hash(senha, 10);
-      await User.update({ senha: hashedPassword, nomeUser, cargo }, { where: { matricula } });
+      await User.update({ senha: hashedPassword, nomeUser, cargo, status }, { where: { matricula } });
       res.json({ message: 'Usuário atualizado com sucesso.' });
     } catch (error) {
       console.error(error);

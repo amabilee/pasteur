@@ -3,18 +3,25 @@ import './style.css';
 import { Card } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { UseAuth } from '../../hooks/index';
+import eyeOn from '../../assets/eyeOn.svg'
+import eyeOff from '../../assets/eyeOff.svg'
 
 
 export default function LoginAluno() {
+    const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [username, setUsername] = useState('');
     const [pwd, setPwd] = useState('');
     const navigate = useNavigate();
     const [showLogin, setShowLogin] = useState(false);
     const [errorMessage, setErrorMessage] = useState(' ');
 
-    const {signIn, loginAdmin, error, loading, auth1, auth2, auth3} = UseAuth()
+    const { signIn, loginAdmin, error, loading, auth1, auth2, auth3 } = UseAuth()
 
-    function handleLogin(){
+    const togglePasswordVisibility = () => {
+        setIsPasswordVisible((prev) => !prev);
+    };
+
+    function handleLogin() {
         loginAdmin(username, pwd)
         // signIn(username, pwd)
     }
@@ -26,13 +33,13 @@ export default function LoginAluno() {
     }, []);
 
     useEffect(() => {
-        if(auth1){ 
+        if (auth1) {
             navigate('/home-aluno')
             setErrorMessage('')
-        } else if (auth2){
+        } else if (auth2) {
             navigate('/entry-colaborador')
             setErrorMessage('')
-        } else if (auth3){
+        } else if (auth3) {
             navigate('/staff-admin')
             setErrorMessage('')
         } else {
@@ -58,7 +65,10 @@ export default function LoginAluno() {
                                 <span className='body-normal text-color-5 margin-bottom-10'>Usuário</span>
                                 <input placeholder='Matrícula' className='form-1' value={username} onChange={(e) => setUsername(e.target.value)} />
                                 <span className='body-normal text-color-5 margin-bottom-10 margin-top-20'>Senha</span>
-                                <input placeholder='Senha' className='form-1' value={pwd} onChange={(e) => setPwd(e.target.value)} />
+                                <div className='iconPasswordContainer'>
+                                    <input style= {{width: "100%"}} placeholder='Senha' className='form-1' value={pwd} onChange={(e) => setPwd(e.target.value)} type={isPasswordVisible ? 'text' : 'password'}/>
+                                    <img src={isPasswordVisible ? eyeOn : eyeOff} className="eyePassword" onClick={togglePasswordVisibility}/>
+                                </div>
                                 <div className='errorContainer' style={{ position: 'relative', zIndex: 1, marginTop: '10px' }}>
                                     {error && (
                                         <p className="error-message-login" style={{ position: 'absolute', top: 0, left: 0 }}>

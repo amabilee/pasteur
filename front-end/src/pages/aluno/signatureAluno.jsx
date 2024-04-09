@@ -189,6 +189,7 @@ function ExitAluno() {
                     </div>
                 </div>
             )}
+            <div className="blockerMobile"></div>
         </>
     );
 }

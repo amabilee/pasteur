@@ -116,6 +116,15 @@
     background-color: #000000;
 }
 
+.blockerMobile {
+    width: 100vw;
+    height: 100vh;
+    z-index: 99;
+    background-color: #000000;
+    position: absolute;
+    top: 0;
+}
+
 /* Images Styles */
 
 .logo-uni {
@@ -161,6 +170,15 @@
 }
 
 @media (max-width: 767px) {
+
+    .blockerMobile {
+        width: 0;
+        height: 0;
+        z-index: 99;
+        position: absolute;
+        background-color: #000000;
+    }
+
     .body {
         height: 100vh;
         width: 100vw;
@@ -340,8 +358,7 @@
     background-color: #FFBABA;
 }
 
-.button-2:hover,
-.button-8:hover {
+.button-2:hover {
     color: #ffffff;
     background-color: #E43E3E;
 }
@@ -360,8 +377,7 @@
 }
 
 .button-3:hover,
-.button-4:hover,
-.button-9:hover {
+.button-4:hover {
     color: #ffffff;
     background-color: #36982E;
 }
@@ -477,8 +493,8 @@
     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
     font-size: 15px;
     font-weight: 400;
-    color: #C50202;
-    background-color: #FFBABA;
+    color: #fff;
+    background-color: #276375;
 }
 
 .button-9 {
@@ -490,8 +506,8 @@
     box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
     font-size: 15px;
     font-weight: 400;
-    color: #0D9D00;
-    background-color: #B1DBAD;
+    color: #fff;
+    background-color: #003B50;
     margin: 0 20px 0 30px;
 }
 
@@ -525,7 +541,7 @@
     box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 
-.button-11:hover {
+.button-11:hover, .button-9:hover, .button-8:hover {
     background-color: #006c94;
 }
 
@@ -542,7 +558,26 @@
 .button-13:hover {
     width: 37px;
     height: 37px;
-    background-color: #E8ECF7;
+    background-color: #FFEDED;
+    border: none;
+    border-radius: 10px;
+    margin: 4px;
+}
+
+.button-14 {
+    transition: all .5s ease;
+    width: 37px;
+    height: 37px;
+    background-color: #ffffff;
+    border: none;
+    border-radius: 10px;
+    margin: 4px;
+}
+
+.button-14:hover {
+    width: 37px;
+    height: 37px;
+    background-color: #FFF1CE;
     border: none;
     border-radius: 10px;
     margin: 4px;
