@@ -17,7 +17,7 @@ import ExitAdmin from '../pages/administrador/exitAdmin';
 
 const PrivateRoute = ({ component: Component, authKey, ...rest }) => {
   const { [authKey]: isAuthenticated } = UseAuth();
-  return isAuthenticated ? <Component {...rest} /> : <Navigate to="/login" />;
+  return isAuthenticated ? <Component {...rest} /> : <Navigate to="/" />;
 };
 
 // Aluno

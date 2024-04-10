@@ -35,7 +35,7 @@ function HomeAluno() {
       })
       pedidos = response.data
       let matricula = Number(infoUsers.matricula)
-      let pedidoFiltrados = response.data.filter(pedido => pedido.matricula === matricula && !pedido.assinatura)
+      let pedidoFiltrados = response.data.filter(pedido => pedido.matricula === matricula && !pedido.assinatura && pedido.status !== 'Pendente')
       setQuantidadeAssinaturasPendentes(pedidoFiltrados.length)
     } catch (e) {
       console.error(e)

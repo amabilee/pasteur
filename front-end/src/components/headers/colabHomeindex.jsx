@@ -3,13 +3,14 @@ import { Container } from 'react-bootstrap';
 import './style.css'
 import leaveIcon from '../../assets/leaveIconColab.svg'
 import menuIcon from '../../assets/menuIconColab.svg'
-import entryIcon from '../../assets/entryIcon.svg'
-import exitIcon from '../../assets/exitIcon.svg'
-import historyIcon from '../../assets/historyIcon.svg'
+import entryIcon from '../../assets/addBlackIcon.svg'
+import exitIcon from '../../assets/minusBlack.svg'
+import historyIcon from '../../assets/historyIconAdmin.svg'
 import { useNavigate } from 'react-router-dom';
 import { UseAuth } from '../../hooks/index';
 import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 import { styled } from '@mui/material/styles';
+import configOptionsIcon from '../../assets/configOptionsIcon.svg'
 
 
 export default function HeaderHomeColab() {
@@ -19,10 +20,11 @@ export default function HeaderHomeColab() {
     const [buttonEntryStyle, setbuttonEntryStyle] = useState('button-16-enable');
     const [buttonExitStyle, setbuttonExitStyle] = useState('button-16-disable');
     const [buttonHistoryStyle, setbuttonHistoryStyle] = useState('button-16-disable');
-    const {signOut} = UseAuth()
+    const [showMenuUser, setShowMenuUser] = useState(false);
+    const { signOut } = UseAuth()
 
     function returnLogin() {
-        navigate('/login')
+        navigate('/')
         signOut()
         console.log('deslogar')
     }
@@ -86,6 +88,18 @@ export default function HeaderHomeColab() {
         },
     }));
 
+    function buttonConfigClicked() {
+        if (showMenuUser) {
+            setShowMenuUser(false)
+        } else {
+            setShowMenuUser(true)
+        }
+    }
+
+    function spaceOutClicked() {
+        setShowMenuUser(false)
+    }
+
     return (
         <Container>
             <div className="headerHomeColab">
@@ -95,8 +109,8 @@ export default function HeaderHomeColab() {
                     </button>
                     <div className="logoHomeColab"></div>
                 </div>
-                <LightTooltip title="Sair" placement="bottom" >
-                    <button className='button-17' onClick={returnLogin}><img src={leaveIcon} /></button>
+                <LightTooltip title="Opções" placement="bottom" >
+                    <button className='button-17' onClick={buttonConfigClicked}><img src={configOptionsIcon} /></button>
                 </LightTooltip>
             </div>
             {showMenu && (
@@ -110,6 +124,17 @@ export default function HeaderHomeColab() {
                     <LightTooltip title="Histórico" placement="right" >
                         <button className={buttonHistoryStyle} onClick={buttonHistoryClicked}><img src={historyIcon} /></button>
                     </LightTooltip>
+                </div>
+            )}
+            {showMenuUser && (
+                <div className="showMenuContainer" onClick={spaceOutClicked}>
+                    <div className="showMenuStyleModal">
+                        <ul>
+                            <li>Nível: Colaborador</li>
+                            <li><button>Mudar senha</button></li>
+                            <li><button onClick={returnLogin}>Sair</button></li>
+                        </ul>
+                    </div>
                 </div>
             )}
         </Container>

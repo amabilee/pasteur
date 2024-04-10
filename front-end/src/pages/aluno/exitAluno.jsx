@@ -22,18 +22,18 @@ function ExitAluno() {
     const finalDataMoviment = {};
     var infoUsers = {}
     const [familiasMov, setFamiliasMov] = useState([])
-    const [familias, setFamilias] = useState([])
+    const [pedidos, setPedidos] = useState([])
 
     useEffect(() => {
-        getFamilias();
         infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
         console.log(infoUsers)
         setNomeAluno(infoUsers.NomeUser.split(' ')[0])
         setMatriculaAluno(infoUsers.matricula)
+        getPedidos();
     }, []);
 
     function navigateToHomeAluno() {
-        if (showPop) {
+        if (showPop){
             setShowPop(false);
             navigate('/home-aluno')
             setTableData([]);
@@ -51,7 +51,7 @@ function ExitAluno() {
         } else if (periodo == '') {
             setErrorMessage('Todos os campos devem ser preenchidos.');
         } else {
-            setErrorMessage(' ');
+            setErrorMessage('');
             setShowConfirmExit(true);
             formatMovimentData()
             console.log(finalDataMoviment);
@@ -69,7 +69,7 @@ function ExitAluno() {
                 }
             });
             console.log(response);
-        } catch (e) {
+        } catch (e) { 
             console.error(e);
         }
     }
@@ -128,18 +128,19 @@ function ExitAluno() {
         finalDataMoviment.quantidadeItens = ''
     }
 
-    async function getFamilias() {
+    async function getPedidos() {
         var token = localStorage.getItem("loggedUserToken")
+        let userInfo = JSON.parse(localStorage.getItem("loggedUserData"));
         try {
-            const response = await server.get('/familia', {
+            const response = await server.get('/pedido', {
                 method: 'GET',
                 headers: {
                     "Authorization": `${token}`,
                     "Content-Type": "application/json"
                 }
             })
-            setFamilias(response.data)
-            console.log(response.data)
+            let filteredPedidos = response.data.filter(pedido => Number(pedido.matricula) === Number(userInfo.matricula) && pedido.assinatura == true && pedido.status == "Aprovado") 
+            setPedidos(filteredPedidos)
         } catch (e) {
             console.error(e)
         }
@@ -151,14 +152,11 @@ function ExitAluno() {
         } else {
             navigateToHomeAluno()
         }
-
     }
 
     function onChangeTagInput(e) {
         setBox(e.target.value.replace(/[^0-9]/g, ""));
     }
-
-
 
     return (
         <>
@@ -166,7 +164,7 @@ function ExitAluno() {
             <Container className='containerMobileExit'>
                 <div className="inputFormsExit">
                     <h1 className='title-1 margin-bottom-30'>Registrar pedido de saída</h1>
-                    <input placeholder='Box de armazenamento' className='form-4' value={box} onChange={(e) => onChangeTagInput(e)} type='text' maxlength="3" />
+                    <input placeholder='Box de armazenamento' className='form-4' value={box} onChange={(e) => onChangeTagInput(e)} type='text' maxLength="3" />
                     <select className='form-4' value={periodo} onChange={(e) => setPeriodo(e.target.value)}>
                         <option value='' disabled>Selecionar um periodo</option>
                         <option>1</option>
@@ -182,9 +180,9 @@ function ExitAluno() {
                     </select>
                     <select className='form-4' value={family} onChange={detectEntryFamily} >
                         <option disabled={true} value='0'>Selecione a família</option>
-                        {familias.map((option, index) => (
-                            <option key={index} value={option.nome}>
-                                {option.nome}
+                        {pedidos.map((option, index) => (
+                            <option key={index} value={option.familias}>
+                                {option.familias}
                             </option>
                         ))}
                     </select>

@@ -7,7 +7,7 @@ import eyeOn from '../../assets/eyeOn.svg'
 import eyeOff from '../../assets/eyeOff.svg'
 
 
-export default function LoginDesktop() {
+export default function LoginMobile() {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [username, setUsername] = useState('');
     const [pwd, setPwd] = useState('');
@@ -33,16 +33,13 @@ export default function LoginDesktop() {
     }, []);
 
     useEffect(() => {
-        if (auth2) {
-            navigate('/entry-colaborador')
-            setErrorMessage('')
-        } else if (auth3) {
-            navigate('/staff-admin')
+        if (auth1) {
+            navigate('/home-aluno')
             setErrorMessage('')
         } else {
             setErrorMessage('')
         }
-    }, [auth2, auth3, error])
+    }, [auth1, error])
 
     return (
         <div className="body">
@@ -81,7 +78,7 @@ export default function LoginDesktop() {
                     <div className="logo-uni"></div>
                 </div>
             )}
-            <div className="blocker"></div>
+            <div className="blockerMobile"></div>
         </div>
     );
 }

@@ -4,8 +4,9 @@
     display: flex;
     flex-direction: column;
     animation: opacityUp 0.3s;
-    background-color: #F7F7F7;
+    /* background-color: #F7F7F7; */
     padding-top: 95px;
+    background: linear-gradient(#F7F7F7, #CAE8F0);
 }
 
 .containerMobileEntry{

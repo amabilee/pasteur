@@ -30,7 +30,7 @@ function ExitAluno() {
             const pedidos = response.data;
             const infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
             const matricula = Number(infoUsers.matricula);
-            const pedidoFiltrados = pedidos.filter(pedido => pedido.matricula === matricula && !pedido.assinatura);
+            const pedidoFiltrados = pedidos.filter(pedido => pedido.matricula === matricula && !pedido.assinatura && pedido.status !== 'Pendente');
             const pedidosCronologicos = pedidoFiltrados.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             setOrganizedPedidos(pedidosCronologicos);
         } catch (error) {

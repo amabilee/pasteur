@@ -26,12 +26,12 @@ export default function HeaderHomeColab() {
     const [buttonExitStyle, setbuttonExitStyle] = useState('button-16-disable');
     const [buttonHistoryStyle, setbuttonHistoryStyle] = useState('button-16-disable');
     const [showMenuUser, setShowMenuUser] = useState(false);
-    
-    
+
+
     const { signOut } = UseAuth()
 
     function returnLogin() {
-        navigate('/login')
+        navigate('/')
         signOut()
         console.log('deslogar')
     }
@@ -50,15 +50,15 @@ export default function HeaderHomeColab() {
 
     useEffect(() => {
         const path = location.pathname;
-        if (path === '/staff-admin'){
-        setButtonStyles('button-16-enable', 'button-16-disable', 'button-16-disable', 'button-16-disable', 'button-16-disable')
-        } else if (path === '/familia-admin'){
+        if (path === '/staff-admin') {
+            setButtonStyles('button-16-enable', 'button-16-disable', 'button-16-disable', 'button-16-disable', 'button-16-disable')
+        } else if (path === '/familia-admin') {
             setButtonStyles('button-16-disable', 'button-16-enable', 'button-16-disable', 'button-16-disable', 'button-16-disable');
-        } else if (path === '/entry-admin'){
+        } else if (path === '/entry-admin') {
             setButtonStyles('button-16-disable', 'button-16-disable', 'button-16-enable', 'button-16-disable', 'button-16-disable');
-        } else if (path === '/exit-admin'){
+        } else if (path === '/exit-admin') {
             setButtonStyles('button-16-disable', 'button-16-disable', 'button-16-disable', 'button-16-enable', 'button-16-disable');
-        } else if (path === '/history-admin'){
+        } else if (path === '/history-admin') {
             setButtonStyles('button-16-disable', 'button-16-disable', 'button-16-disable', 'button-16-disable', 'button-16-enable');
         }
     }, [location.pathname]);
@@ -111,7 +111,6 @@ export default function HeaderHomeColab() {
             setShowMenuUser(false)
         } else {
             setShowMenuUser(true)
-            console.log('mostrando')
         }
     }
 
@@ -144,7 +143,7 @@ export default function HeaderHomeColab() {
                         <button className={buttonEntryStyle} onClick={buttonEntryClicked}><img src={addIcon} /></button>
                     </LightTooltip>
                     <LightTooltip title="Saída" placement="right" >
-                        <button className={buttonExitStyle} onClick={buttonExitClicked}><img src={minusIcon}/></button>
+                        <button className={buttonExitStyle} onClick={buttonExitClicked}><img src={minusIcon} /></button>
                     </LightTooltip>
                     <LightTooltip title="Histórico" placement="right" >
                         <button className={buttonHistoryStyle} onClick={buttonHistoryClicked}><img src={historyIcon} /></button>
@@ -152,16 +151,16 @@ export default function HeaderHomeColab() {
                 </div>
             )}
             {showMenuUser && (
-                        <div className="showMenuContainer" onClick={spaceOutClicked}>
-                            <div className="showMenuStyleModal">
-                                <ul>
-                                    <li>Nível: Administrador</li>
-                                    <li><button>Mudar senha</button></li>
-                                    <li><button onClick={returnLogin}>Sair</button></li>
-                                </ul>
-                            </div>
-                        </div>
-                    )}
+                <div className="showMenuContainer" onClick={spaceOutClicked}>
+                    <div className="showMenuStyleModal">
+                        <ul>
+                            <li>Nível: Administrador</li>
+                            <li><button>Mudar senha</button></li>
+                            <li><button onClick={returnLogin}>Sair</button></li>
+                        </ul>
+                    </div>
+                </div>
+            )}
         </Container>
     );
 }

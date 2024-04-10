@@ -237,7 +237,7 @@ function EntryAluno() {
             <HeaderPagesAluno />
             <Container className='containerMobileEntry'>
                 <h1 className='title-1 margin-bottom-30'>Registrar pedido de entrada</h1>
-                <input placeholder='Box de armazenamento' className='form-4' value={box} onChange={(e) => onChangeTagInput(e)} type='text' maxlength="3" />
+                <input placeholder='Box de armazenamento' className='form-4' value={box} onChange={(e) => onChangeTagInput(e)} type='text' maxLength="3" />
                 <select className='form-4' value={periodo} onChange={(e) => setPeriodo(e.target.value)}>
                     <option value='' disabled>Selecionar um periodo</option>
                     <option>1</option>

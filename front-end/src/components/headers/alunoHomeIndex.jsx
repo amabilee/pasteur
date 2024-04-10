@@ -10,7 +10,7 @@ export default function HeaderHomeAluno() {
     const {signOut} = UseAuth()
     
     function returnLogin(){
-        navigate('/login')
+        navigate('/entrar')
         signOut()
         console.log('deslogar')
     }
