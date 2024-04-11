@@ -1,32 +1,36 @@
-import pedido from '../models/Pedido.js'; // Certifique-se de que este caminho está correto para o seu modelo de pedido
+import Pedido from '../models/Pedido.js';
 
 const pedidoSeed = async () => {
   try {
-    // Verifica se já existe algum pedido
-    const existingPedido = await pedido.findOne();
-    if (existingPedido) {
-      console.log('Já existe pelo menos um pedido no banco de dados.');
+    const existingPedidos = await Pedido.findAll();
+    if (existingPedidos.length > 0) {
+      console.log('Já existem pedidos no banco de dados.');
       return;
     }
 
-    // Crie um novo pedido
-    const novoPedido = {
-      matricula: 'admin', // Substitua pelo valor correto
-      quantidadeItens: '10', // Substitua pelo valor correto
-      box: 123, // Substitua pelo valor correto
-      tipo: 'Tipo do pedido', // Substitua pelo valor correto
-      status: 1, // Substitua pelo valor correto
-      colaborador: 'Nome do colaborador', // Substitua pelo valor correto
-      assinatura: false, // Substitua pelo valor correto
-      data: new Date(), // Substitua pelo valor correto
-      hora: new Date(), // Substitua pelo valor correto
-    };
+    const pedidosToCreate = [];
 
-    // Crie o novo pedido no banco de dados
-    const createdPedido = await pedido.create(novoPedido);
-    console.log('Pedido inicial criado com sucesso:', createdPedido);
+    for (let i = 0; i < 20; i++) {
+      const novoPedido = {
+        matricula: 123456 + i,
+        nomeAluno: `Aluno ${i + 1}`,
+        periodoAluno: (i % 4) + 1,
+        quantidadeItens: `${i + 1}`,
+        familias: `Família ${i + 1}`,
+        box: 123 + i,
+        tipo: 'Tipo do pedido',
+        status: 'Pendente',
+        colaborador: 'Nome do Colaborador',
+        assinatura: false,
+      };
+
+      pedidosToCreate.push(novoPedido);
+    }
+
+    const createdPedidos = await Pedido.bulkCreate(pedidosToCreate);
+    console.log(`Foram criados 20 pedidos com sucesso.`);
   } catch (error) {
-    console.error('Erro ao criar pedido inicial:', error);
+    console.error('Erro ao criar pedidos:', error);
   }
 };
 

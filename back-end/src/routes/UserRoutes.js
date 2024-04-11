@@ -1,13 +1,15 @@
 import express from 'express';
 import UsuarioController from '../controllers/UserController.js';
 import authorizationMiddleware from '../middlewares/authorizationMiddleware.js';
+import authenticationMiddleware from '../middlewares/authenticationMiddleware.js';
 
 const router = express.Router();
 
-router.get('/usuario', authorizationMiddleware, UsuarioController.getAllEntities);
-router.get('/usuario/:matricula', authorizationMiddleware, UsuarioController.getEntity);
-router.post('/usuario', authorizationMiddleware, UsuarioController.createEntity);
-router.put('/usuario/:matricula', authorizationMiddleware, UsuarioController.updateEntity);
-router.delete('/usuario/:matricula', authorizationMiddleware, UsuarioController.deleteEntity);
+/* #swagger.tags = ['Usuario'] */
+router.get('/usuario', authorizationMiddleware, authenticationMiddleware({ cargo: [1] }), UsuarioController.getAllEntities);
+router.get('/usuario/:matricula', authorizationMiddleware, authenticationMiddleware({ cargo: [1, 2, 3] }), UsuarioController.getEntity);
+router.post('/usuario', authorizationMiddleware, authenticationMiddleware({ cargo: [1] }), UsuarioController.createEntity);
+router.put('/usuario/:matricula', authorizationMiddleware, authenticationMiddleware({ cargo: [1, 2, 3] }), UsuarioController.updateEntity);
+router.delete('/usuario/:matricula', authorizationMiddleware, authenticationMiddleware({ cargo: [1] }), UsuarioController.deleteEntity);
 
 export default router;

@@ -1,13 +1,17 @@
-function authenticationMiddleware({ requiredRole }) {
-  return (req, res, next) => {
-      const userRole = req.user && req.user.cargo;
+function authenticationMiddleware({ cargo }) {
+    return (req, res, next) => {
+        const userAccessLevel = parseInt(req.header('access-level')); // Convertendo para número
 
-      if (userRole !== undefined && userRole === requiredRole) {
-          next();
-      } else {
-          return res.status(403).json({ message: 'Acesso negado. Cargo insuficiente.' });
-      }
-  };
+        console.log('Nível de acesso do usuário:', userAccessLevel);
+        console.log('Cargos permitidos para acesso:', cargo);
+
+        if (cargo.includes(userAccessLevel)) {
+            next();
+        } else {
+            console.log('Acesso negado!');
+            return res.status(401).json({ message: 'Acesso negado!' });
+        }
+    };
 }
 
 export default authenticationMiddleware;

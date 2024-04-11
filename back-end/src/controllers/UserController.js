@@ -3,15 +3,39 @@ import bcrypt from 'bcrypt';
 
 class UserController {
   static async getAllEntities(req, res) {
+    const { page = 1, limit = 10, cargo, matricula } = req.query;
+
     try {
-      const users = await User.findAll();
-      res.json(users);
+      const offset = (page - 1) * limit;
+
+      let whereClause = {};
+      if (cargo) {
+        whereClause.cargo = cargo;
+      }
+      if (matricula) {
+        whereClause.matricula = matricula;
+      }
+
+      const { count, rows: users } = await User.findAndCountAll({
+        where: whereClause,
+        offset,
+        limit: parseInt(limit),
+      });
+
+      const totalPages = Math.ceil(count / limit);
+
+      const pagination = {
+        currentPage: parseInt(page),
+        totalPages,
+        totalItems: count,
+      };
+
+      res.json({ users, pagination });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Erro ao buscar usuários.' });
     }
   }
-
   static async getEntity(req, res) {
     try {
       const { matricula } = req.params;
