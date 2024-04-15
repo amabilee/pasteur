@@ -69,16 +69,27 @@ function EntryAluno() {
 
     const sendPedidoRequest = async () => {
         var token = localStorage.getItem("loggedUserToken");
-        try {
-            const response = await server.post("/pedido", finalDataMoviment, {
-                headers: {
-                    "Authorization": `${token}`,
-                    "Content-Type": "application/json"
-                }
-            });
-            console.log(response);
-        } catch (e) {
-            console.error(e);
+        if (token.length <= 1) {
+            localStorage.removeItem('loggedUserToken');
+            localStorage.removeItem('loggedUserData');
+            localStorage.removeItem('auth1');
+            localStorage.removeItem('auth2');
+            localStorage.removeItem('auth3');
+        } else {
+            var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+            var userCargo = infoUsers.cargo
+            try {
+                const response = await server.post("/pedido", finalDataMoviment, {
+                    headers: {
+                        "Authorization": `${token}`,
+                        "Content-Type": "application/json",
+                        "access-level": `${userCargo}`
+                    }
+                });
+                console.log(response);
+            } catch (e) {
+                console.error(e);
+            }
         }
     }
 
@@ -204,18 +215,29 @@ function EntryAluno() {
 
     async function getFamilias() {
         var token = localStorage.getItem("loggedUserToken")
-        try {
-            const response = await server.get('/familia', {
-                method: 'GET',
-                headers: {
-                    "Authorization": `${token}`,
-                    "Content-Type": "application/json"
-                }
-            })
-            setFamilias(response.data)
-            console.log(response.data)
-        } catch (e) {
-            console.error(e)
+        if (token.length <= 1) {
+            localStorage.removeItem('loggedUserToken');
+            localStorage.removeItem('loggedUserData');
+            localStorage.removeItem('auth1');
+            localStorage.removeItem('auth2');
+            localStorage.removeItem('auth3');
+        } else {
+            var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+            var userCargo = infoUsers.cargo
+            try {
+                const response = await server.get('/familia', {
+                    method: 'GET',
+                    headers: {
+                        "Authorization": `${token}`,
+                        "Content-Type": "application/json",
+                        "access-level": `${userCargo}`
+                    }
+                })
+                setFamilias(response.data.familias)
+                console.log(response.data)
+            } catch (e) {
+                console.error(e)
+            }
         }
     }
 

@@ -12,6 +12,7 @@ import './style.css';
 //Component
 import PopupCreate from '../../components/popCreate'
 import PopUpEdit from '../../components/popEdit'
+import Paginator from '../../components/paginator/paginator';
 
 const FamilyTable = ({ data, onEdit, onDelete }) => (
   <table className='table table-sm tableFamilies'>
@@ -24,7 +25,7 @@ const FamilyTable = ({ data, onEdit, onDelete }) => (
       </tr>
     </thead>
     <tbody>
-      {data.map((objetos, index) => (
+      {data && Array.isArray(data) && data.map((objetos, index) => (
         <tr key={index}>
           <td>{objetos.nome}</td>
           <td>{objetos.quantidadeMAX}</td>
@@ -39,6 +40,10 @@ const FamilyTable = ({ data, onEdit, onDelete }) => (
 )
 
 function FamilyAdmin() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1)
+
+
   const [showPopCreate, setShowPopCreate] = useState(false);
   const [showPopEdit, setShowPopEdit] = useState(false);
   const [showPopDelete, setShowPopDelete] = useState(false);
@@ -51,7 +56,7 @@ function FamilyAdmin() {
   const [familyDataEdit, setFamilyDataEdit] = useState({ id: 0, nome: '', quantidadeMAX: '', quantidadeMIN: '' });
   const [familyDataEditBefore, setFamilyDataEditBefore] = useState({ id: 0, nome: '', quantidadeMAX: '', quantidadeMIN: '' });
   const [familyDataDelete, setFamilyDataDelete] = useState({ id: 0, nome: '', quantidadeMAX: '', quantidadeMIN: '' });
-  var matrixFamilia = {nome: '', quantidadeMIN: '', quantidadeMAX: '' }
+  var matrixFamilia = { nome: '', quantidadeMIN: '', quantidadeMAX: '' }
   const [open, setOpen] = React.useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('');
   const [snackBarStyle, setSnackBarStyle] = useState({
@@ -59,18 +64,32 @@ function FamilyAdmin() {
   });
   const [familias, setFamilias] = useState([])
 
-  async function getFamilia() {
+  async function getFamilia(pagina) {
     var token = localStorage.getItem("loggedUserToken")
+    var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+    var userCargo = infoUsers.cargo
+    if (pagina == undefined) {
+      pagina == 1
+    }
     try {
-      const response = await server.get('/familia', {
-        method: 'GET',
-        headers: {
-          "Authorization": `${token}`,
-          "Content-Type": "application/json"
-        }
-      })
-      setTableData(response.data)
-
+      if (token.length <= 1) {
+        localStorage.removeItem('loggedUserToken');
+        localStorage.removeItem('loggedUserData');
+        localStorage.removeItem('auth1');
+        localStorage.removeItem('auth2');
+        localStorage.removeItem('auth3');
+      } else {
+        const response = await server.get(`/familia?page=${pagina}`, {
+          method: 'GET',
+          headers: {
+            "Authorization": `${token}`,
+            "Content-Type": "application/json",
+            "access-level": `${userCargo}`
+          }
+        })
+        setTableData(response.data.familias)
+        setTotalPages(response.data.pagination.totalPages)
+      }
     } catch (e) {
       console.error(e)
     }
@@ -112,7 +131,7 @@ function FamilyAdmin() {
   };
 
   useEffect(() => {
-    getFamilia()
+    getFamilia(1)
   }, []);
 
   const returnSearch = () => {
@@ -154,18 +173,29 @@ function FamilyAdmin() {
       setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
       console.log('Novas informações da família editada:', familyDataEdit);
       var token = localStorage.getItem("loggedUserToken");
-      try {
-        const response = await server.put(`/familia/${familyDataEdit.id}`, familyDataEdit, {
-          headers: {
-            "Authorization": `${token}`,
-            "Content-Type": "application/json"
-          }
-        });
-        console.log(response);
-        returnSearch();
-        getFamilia()
-      } catch (e) {
-        console.error(e);
+      if (token.length <= 1) {
+        localStorage.removeItem('loggedUserToken');
+        localStorage.removeItem('loggedUserData');
+        localStorage.removeItem('auth1');
+        localStorage.removeItem('auth2');
+        localStorage.removeItem('auth3');
+      } else {
+        var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+        var userCargo = infoUsers.cargo
+        try {
+          const response = await server.put(`/familia/${familyDataEdit.id}`, familyDataEdit, {
+            headers: {
+              "Authorization": `${token}`,
+              "Content-Type": "application/json",
+              "access-level": `${userCargo}`
+            }
+          });
+          console.log(response);
+          returnSearch();
+          getFamilia(1)
+        } catch (e) {
+          console.error(e);
+        }
       }
     }
   };
@@ -186,20 +216,31 @@ function FamilyAdmin() {
     setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
     console.log('Informações da família deletada:', familyDataDelete);  //Envio para a api da familia deletada
     var token = localStorage.getItem("loggedUserToken");
-    try {
-      const response = await server.delete(`/familia/${familyDataDelete.id}`, {
-        headers: {
-          "Authorization": `${token}`,
-          "Content-Type": "application/json"
-        }
-      });
-      console.log(response);
+    if (token.length <= 1) {
+      localStorage.removeItem('loggedUserToken');
+      localStorage.removeItem('loggedUserData');
+      localStorage.removeItem('auth1');
+      localStorage.removeItem('auth2');
+      localStorage.removeItem('auth3');
+    } else {
+      var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+      var userCargo = infoUsers.cargo
+      try {
+        const response = await server.delete(`/familia/${familyDataDelete.id}`, {
+          headers: {
+            "Authorization": `${token}`,
+            "Content-Type": "application/json",
+            "access-level": `${userCargo}`
+          }
+        });
+        console.log(response);
+        returnSearch();
+        getFamilia(1)
+      } catch (e) {
+        console.error(e);
+      }
       returnSearch();
-      getFamilia()
-    } catch (e) {
-      console.error(e);
     }
-    returnSearch();
   };
 
   //Criar Familia
@@ -217,20 +258,31 @@ function FamilyAdmin() {
       setSnackBarMessage('Família criada com sucesso');
       setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
       var token = localStorage.getItem("loggedUserToken");
-      try {
-        const response = await server.post("/familia", matrixFamilia, {
-          headers: {
-            "Authorization": `${token}`,
-            "Content-Type": "application/json"
-          }
-        });
-        console.log(response);
+      if (token.length <= 1) {
+        localStorage.removeItem('loggedUserToken');
+        localStorage.removeItem('loggedUserData');
+        localStorage.removeItem('auth1');
+        localStorage.removeItem('auth2');
+        localStorage.removeItem('auth3');
+      } else {
+        var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+        var userCargo = infoUsers.cargo
+        try {
+          const response = await server.post("/familia", matrixFamilia, {
+            headers: {
+              "Authorization": `${token}`,
+              "Content-Type": "application/json",
+              "access-level": `${userCargo}`
+            }
+          });
+          console.log(response);
+          returnSearch();
+          getFamilia(1)
+        } catch (e) {
+          console.error(e);
+        }
         returnSearch();
-        getFamilia()
-      } catch (e) {
-        console.error(e);
       }
-      returnSearch();
     }
   };
 
@@ -238,6 +290,13 @@ function FamilyAdmin() {
     const familiaFields = ['nome', 'quantidadeMAX', 'quantidadeMIN']
     familiaFields.forEach(field => matrixFamilia[field] = eval(`${field}_fam`))
   }
+
+  //Paginação
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    console.log(page)
+    getFamilia(page)
+  };
 
   return (
     <>
@@ -264,6 +323,9 @@ function FamilyAdmin() {
               <FamilyTable data={resultadosPesquisa} onEdit={openEditPop} onDelete={openDeletePopup} />
             </div>
           </div>
+        </div>
+        <div className="paginator-component">
+          <Paginator currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
         </div>
         <Snackbar open={open} autoHideDuration={4000} onClose={closeSnackBarMessage} message={snackBarMessage} action={alertBox} ContentProps={snackBarStyle} />
       </Container>

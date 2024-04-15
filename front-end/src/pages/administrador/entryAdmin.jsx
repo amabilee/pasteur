@@ -6,9 +6,13 @@ import { server } from "../../services/server";
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
+import Paginator from '../../components/paginator/paginator';
 
 
 function EntryAdmin() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1)
+
   const [showPopView, setShowPopView] = useState(false);
   const [selectedAluno, setSelectedAluno] = useState({});
   const [errorMessage, setErrorMessage] = useState(' ');
@@ -23,24 +27,39 @@ function EntryAdmin() {
 
 
   useEffect(() => {
-    getPedidos();
+    getPedidos(1);
     infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
     setNome(infoUsers.NomeUser)
     console.log(infoUsers)
   }, []);
 
-  async function getPedidos() {
+  async function getPedidos(pagina) {
     var token = localStorage.getItem("loggedUserToken")
+    var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+    var userCargo = infoUsers.cargo
+    if (pagina == undefined) {
+      pagina == 1
+    }
     try {
-      const response = await server.get('/pedido', {
-        method: 'GET',
-        headers: {
-          "Authorization": `${token}`,
-          "Content-Type": "application/json"
-        }
-      })
-      setPedidos(response.data)
-      console.log(response.data)
+      if (token.length <= 1) {
+        localStorage.removeItem('loggedUserToken');
+        localStorage.removeItem('loggedUserData');
+        localStorage.removeItem('auth1');
+        localStorage.removeItem('auth2');
+        localStorage.removeItem('auth3');
+      } else {
+        const response = await server.get(`/pedido?page=${pagina}&tipo=Entrada&status=Pendente`, {
+          method: 'GET',
+          headers: {
+            "Authorization": `${token}`,
+            "Content-Type": "application/json",
+            "access-level": `${userCargo}`
+          }
+        })
+        setPedidos(response.data.pedidos)
+        setTotalPages(response.data.pagination.totalPages)
+        console.log(response.data.pedidos)
+      }
     } catch (e) {
       console.error(e)
     }
@@ -97,18 +116,29 @@ function EntryAdmin() {
 
   async function postPedidoAvaliado(idPedido, pedido) {
     var token = localStorage.getItem("loggedUserToken");
+    var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+    var userCargo = infoUsers.cargo
     try {
+      if (token.length <= 1) {
+        localStorage.removeItem('loggedUserToken');
+        localStorage.removeItem('loggedUserData');
+        localStorage.removeItem('auth1');
+        localStorage.removeItem('auth2');
+        localStorage.removeItem('auth3');
+      } else {
         const response = await server.put(`/pedido/${idPedido}`, pedido, {
-            headers: {
-                "Authorization": `${token}`,
-                "Content-Type": "application/json"
-            }
+          headers: {
+            "Authorization": `${token}`,
+            "Content-Type": "application/json",
+            "access-level": `${userCargo}`
+          }
         });
         console.log(response);
+      }
     } catch (e) {
-        console.error(e);
+      console.error(e);
     }
-}
+  }
 
   function validateBox() {
     let formatedPedido = selectedAluno
@@ -148,11 +178,12 @@ function EntryAdmin() {
 
   };
 
-  useEffect(() => {
-    pedidosEntrada = pedidos.filter(pedido => pedido.tipo === 'Entrada' && pedido.status == 'Pendente');
-    console.log(pedidosEntrada)
-  }, [])
-  
+  //Paginação;
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    console.log(page)
+    getPedidos(page)
+  };
 
   return (
     <>
@@ -170,6 +201,9 @@ function EntryAdmin() {
               </table>
             </div>
           </div>
+        </div>
+        <div className="paginator-component">
+          <Paginator currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
         </div>
         <Snackbar open={open} autoHideDuration={4000} onClose={closeSnackBarMessage} message={snackBarMessage} action={alertBox} ContentProps={snackBarStyle} />
       </Container>

@@ -20,36 +20,58 @@ function ExitAluno() {
     }, []);
 
     async function fetchData() {
-        try {
-            const response = await server.get('/pedido', {
-                headers: {
-                    "Authorization": localStorage.getItem("loggedUserToken"),
-                    "Content-Type": "application/json"
-                }
-            });
-            const pedidos = response.data;
-            const infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+        var token = localStorage.getItem("loggedUserToken");
+        if (token.length <= 1) {
+            localStorage.removeItem('loggedUserToken');
+            localStorage.removeItem('loggedUserData');
+            localStorage.removeItem('auth1');
+            localStorage.removeItem('auth2');
+            localStorage.removeItem('auth3');
+        } else {
+            var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+            var userCargo = infoUsers.cargo
             const matricula = Number(infoUsers.matricula);
-            const pedidoFiltrados = pedidos.filter(pedido => pedido.matricula === matricula && !pedido.assinatura && pedido.status !== 'Pendente');
-            const pedidosCronologicos = pedidoFiltrados.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-            setOrganizedPedidos(pedidosCronologicos);
-        } catch (error) {
-            console.error(error);
+            try {
+                const response = await server.get(`/pedido?matricula=${matricula}&assinatura=false&status=Aprovado`, {
+                    headers: {
+                        "Authorization": `${token}`,
+                        "Content-Type": "application/json",
+                        "access-level": `${userCargo}`
+                    }
+                });
+                const pedidos = response.data.pedidos;
+                // const pedidoFiltrados = pedidos.filter(pedido => pedido.matricula === matricula && !pedido.assinatura && pedido.status === 'Aprovado');
+                const pedidosCronologicos = pedidos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                setOrganizedPedidos(pedidosCronologicos);
+            } catch (error) {
+                console.error(error);
+            }
         }
     }
 
     async function postPedidoAssinado(idPedido, pedido) {
         var token = localStorage.getItem("loggedUserToken");
-        try {
-            const response = await server.put(`/pedido/${idPedido}`, pedido, {
-                headers: {
-                    "Authorization": `${token}`,
-                    "Content-Type": "application/json"
-                }
-            });
-            console.log(response);
-        } catch (e) {
-            console.error(e);
+        if (token.length <= 1) {
+            localStorage.removeItem('loggedUserToken');
+            localStorage.removeItem('loggedUserData');
+            localStorage.removeItem('auth1');
+            localStorage.removeItem('auth2');
+            localStorage.removeItem('auth3');
+        } else {
+            var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+            var userCargo = infoUsers.cargo
+            try {
+                const response = await server.put(`/pedido/${idPedido}`, pedido, {
+                    headers: {
+                        "Authorization": `${token}`,
+                        "Content-Type": "application/json",
+                        "access-level": `${userCargo}`
+                    }
+                });
+                console.log(response);
+            } catch (e) {
+                console.error(e);
+            }
         }
     }
 

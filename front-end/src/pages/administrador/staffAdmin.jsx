@@ -6,14 +6,15 @@ import CloseIcon from '@mui/icons-material/Close';
 import HeaderHomeAdmin from '../../components/headers/adminHomeindex';
 import viewIcon from '../../assets/viewIcon.svg';
 import deleteIcon from '../../assets/deleteIcon.svg';
-import { server } from "../../services/server";
 import eyeOn from '../../assets/eyeOn.svg'
 import eyeOff from '../../assets/eyeOff.svg'
-import './style.css';
 
-//Component
+import { server } from "../../services/server";
+import './style.css';
 import PopupCreate from '../../components/popCreate'
 import PopUpEdit from '../../components/popEdit'
+
+import Paginator from '../../components/paginator/paginator';
 
 const UsuarioTable = ({ data, onEdit, onDelete }) => (
   <table className='table table-sm tableStaff'>
@@ -27,7 +28,7 @@ const UsuarioTable = ({ data, onEdit, onDelete }) => (
       </tr>
     </thead>
     <tbody>
-      {data && data.map((usuario, index) => (
+      {data && Array.isArray(data) && data.map((usuario, index) => (
         <tr key={index}>
           <td>{usuario.nomeUser}</td>
           <td>{usuario.matricula}</td>
@@ -48,6 +49,7 @@ const UsuarioTable = ({ data, onEdit, onDelete }) => (
                 ''}
           </td>
           <td>
+            <button className='button-14' onClick={() => onEdit(usuario)}><img src={viewIcon} /></button>
             <button className='button-13' onClick={() => onDelete(usuario)}><img src={deleteIcon} /></button></td>
         </tr>
       ))}
@@ -56,109 +58,97 @@ const UsuarioTable = ({ data, onEdit, onDelete }) => (
 );
 
 
-function StaffAdmin() {
-  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [isPasswordVisible2, setIsPasswordVisible2] = useState(false);
 
-  const [searchTerm, setSearchTerm] = useState('');
-  const [searchCategory, setSearchCategory] = useState('Selecione');
+function StaffAdmin() {
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1)
+
+
+  const [searchData, setSearchData] = useState({ term: '', category: 'Selecione' })
   const [resultadosPesquisa, setResultadosPesquisa] = useState([]);
   const [errorMessage, setErrorMessage] = useState('');
+
   const [showPopCreate, setShowPopCreate] = useState(false);
   const [showPopEdit, setShowPopEdit] = useState(false);
   const [showPopDelete, setShowPopDelete] = useState(false);
+
   const [nomeUser_colab, setColabName] = useState('');
   const [matricula_colab, setColabMatricula] = useState('');
   const [cargo_colab, setColabCargo] = useState('');
   const [senha_colab, setColabSenha] = useState('');
   const [senhaConfirm_colab, setColabSenhaConfirm] = useState('');
+
   const [colaboradorDataEdit, setColaboradorDataEdit] = useState({ nomeUser: '', matricula: '', cargo: '', senha: '', status: true });
-  const [colaboradorDataEditBefore, setColaboradorDataEditBefore] = useState({ nomeUser: '', matricula: '', cargo: '', senha: '', status: true });
   const [colaboradorDataDelete, setColaboradorDataDelete] = useState({ nomeUser: '', matricula: '', cargo: '', senha: '', status: true });
   const [colaboradorDataDeleteOption, setColaboradorDataDeleteOption] = useState(false);
+
   var matrixColab = { nomeUser: '', matricula: '', cargo: '', senha: '', status: true }
+
   const [open, setOpen] = React.useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('');
   const [snackBarStyle, setSnackBarStyle] = useState({ sx: { background: 'white', color: 'black', borderRadius: '10px' } });
+
   const [users, setUsers] = useState([])
 
+
+  //Alterar Visibilidade de senha
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isPasswordVisible2, setIsPasswordVisible2] = useState(false);
   const togglePasswordVisibility = () => {
     setIsPasswordVisible((prev) => !prev);
   };
-
   const togglePasswordVisibility2 = () => {
     setIsPasswordVisible2((prev) => !prev);
   };
 
-  async function getUsers() {
-    var token = localStorage.getItem("loggedUserToken");
-    try {
-      const response = await server.get('/usuario', {
-        headers: {
-          "Authorization": `${token}`,
-          "Content-Type": "application/json"
-        }
-      });
-      setUsers(response.data);
-      console.log(users)
-      setResultadosPesquisa(response.data);
-    } catch (e) {
-      console.error(e);
-    }
-  }
+  //Requisição GET usuarios
 
+  useEffect(() => {
+    getUsers(1)
+  }, []);
+
+  //Snackbar settings
   const openSnackBarMessage = () => setOpen(true);
-
   const closeSnackBarMessage = (event, reason) => {
     if (reason === 'clickaway') return;
     setOpen(false);
   };
-
   const alertBox = (
     <IconButton size="small" aria-label="close" color="inherit" onClick={closeSnackBarMessage}>
       <CloseIcon fontSize="small" />
     </IconButton>
   );
 
-  useEffect(() => {
-    getUsers()
-  }, []);
-
   //Pesquisar Usuário
-
-  const handleSearchTermChange = (e) => setSearchTerm(e.target.value);
-
-  const handleSearchCategoryChange = (e) => setSearchCategory(e.target.value);
-
   function handleSearchSimple() {
     const resultadosFiltrados = users.filter(usuario => {
-      if (searchCategory === 'Selecione' || searchTerm === '') {
+      if (searchData.category === 'Selecione' || searchData.term === '') {
         return true;
       } else {
-        const normalizedSearchTerm = searchTerm.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const normalizedSearchTerm = searchData.term.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-        switch (searchCategory) {
+        switch (searchData.category) {
           case 'Nome':
             return usuario.nomeUser.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(normalizedSearchTerm);
           case 'Matrícula':
-            // return String.usuario.matricula.includes(searchTerm);
             const matriculaString = String(usuario.matricula);
-            return matriculaString.includes(searchTerm);
+            return matriculaString.includes(searchData.term);
           default:
             return true;
         }
       }
     });
-    setSearchTerm('');
-    setSearchCategory('Selecione')
+    setSearchData(({ term: '', category: 'Selecione' }))
     setResultadosPesquisa(resultadosFiltrados);
   }
 
+  //Reset campos
   const returnSearch = () => {
     setShowPopCreate(false);
     setShowPopEdit(false);
     setShowPopDelete(false);
-    setSearchTerm('');
+    setSearchData(({ term: '', category: 'Selecione' }))
     setColabName('');
     setColabMatricula('');
     setColabCargo('');
@@ -166,12 +156,10 @@ function StaffAdmin() {
     setColabSenhaConfirm('');
     setColaboradorDataEdit({ nomeUser: '', matricula: '', cargo: '', senha: '', status: true });
     setColaboradorDataDelete({ nomeUser: '', matricula: '', cargo: '', senha: '', status: true });
-    setColaboradorDataEditBefore({ nomeUser: '', matricula: '', cargo: '', senha: '', status: true });
     setErrorMessage('');
   };
 
   // Criar Usuário
-
   const handleCreateStaff = async () => {
     const requiredFields = ['nomeUser', 'matricula', 'cargo', 'senha', 'senhaConfirm']
     const existingColab = users.find(usuario => {
@@ -194,109 +182,190 @@ function StaffAdmin() {
       setSnackBarMessage('Usuário criado com sucesso');
       setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
       var token = localStorage.getItem("loggedUserToken");
-      try {
-        const response = await server.post("/usuario", matrixColab, {
-          headers: {
-            "Authorization": `${token}`,
-            "Content-Type": "application/json"
-          }
-        });
-        console.log(response);
+      if (token.length <= 1) {
+        localStorage.removeItem('loggedUserToken');
+        localStorage.removeItem('loggedUserData');
+        localStorage.removeItem('auth1');
+        localStorage.removeItem('auth2');
+        localStorage.removeItem('auth3');
+      } else {
+        var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+        var userCargo = infoUsers.cargo
+        try {
+          const response = await server.post("/usuario", matrixColab, {
+            headers: {
+              "Authorization": `${token}`,
+              "Content-Type": "application/json",
+              "access-level": `${userCargo}`
+            }
+          });
+          console.log(response);
+          returnSearch();
+          getUsers(1)
+        } catch (e) {
+          console.error(e);
+        }
         returnSearch();
-        getUsers()
-      } catch (e) {
-        console.error(e);
       }
-      returnSearch();
     }
   };
-
   function formatColabData() {
     const colabFields = ['nomeUser', 'matricula', 'cargo', 'senha']
     colabFields.forEach(field => matrixColab[field] = eval(`${field}_colab`))
   }
 
   // Editar Usuário
-
   const openEditPop = (originalData) => {
     setColaboradorDataEdit((prevData) => {
-      setColaboradorDataEditBefore(prevData);
       return { ...originalData };
     });
     setShowPopEdit(true);
     setShowPopCreate(false);
-    setColaboradorDataEditBefore(colaboradorDataEdit);
   };
-
-  const handleEditColaborador = () => {
-    const requiredFields = ['nomeUser', 'matricula', 'cargo', 'senha']
+  const handleEditColaborador = async () => {
+    const requiredFields = ['nomeUser', 'cargo', 'senha']
     if (requiredFields.some(field => !colaboradorDataEdit[field])) {
       setErrorMessage('Preencha todos os campos antes de adicionar.');
     } else {
       openSnackBarMessage();
       setSnackBarMessage('Usuário editado com sucesso');
       setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
-      // console.log('Informações antigas do colaborador editado:', colaboradorDataEditBefore);
-      console.log('Novas informações do usuário editado:', colaboradorDataEdit); //Envio para a API do usuario editado
-      returnSearch();
+
+      console.log('Novas informações do usuário editado:', colaboradorDataEdit);
+      var token = localStorage.getItem("loggedUserToken");
+      if (token.length <= 1) {
+        localStorage.removeItem('loggedUserToken');
+        localStorage.removeItem('loggedUserData');
+        localStorage.removeItem('auth1');
+        localStorage.removeItem('auth2');
+        localStorage.removeItem('auth3');
+      } else {
+        var matriculaID = Number(colaboradorDataEdit.matricula)
+        var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+        var userCargo = infoUsers.cargo
+        try {
+          const response = await server.put(`/usuario/${matriculaID}`, colaboradorDataEdit, {
+            headers: {
+              "Authorization": `${token}`,
+              "Content-Type": "application/json",
+              "access-level": `${userCargo}`
+            }
+          });
+          console.log(response);
+          returnSearch();
+          getUsers(1)
+        } catch (e) {
+          console.error(e);
+        }
+      }
     }
   };
 
   // Deletar Colaborador
-
   const openDeletePopup = (originalData) => {
     setColaboradorDataDelete({ ...originalData });
     setShowPopEdit(false);
     setShowPopCreate(false);
     setShowPopDelete(true);
   };
-
   const handleDeleteStaff = async () => {
     var token = localStorage.getItem("loggedUserToken");
-    if (colaboradorDataDeleteOption === true) {
-      try {
-        const response = await server.delete(`/usuario/${colaboradorDataDelete.matricula}`, {
-          headers: {
-            "Authorization": `${token}`,
-            "Content-Type": "application/json"
-          }
-        });
-        console.log(response);
-        openSnackBarMessage();
-        setSnackBarMessage(response.data.message);
-        setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
-        getUsers()
-      } catch (e) {
-        openSnackBarMessage();
-        setSnackBarMessage(e);
-        setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
-        // console.error(e);
-      }
+    if (token.length <= 1) {
+      localStorage.removeItem('loggedUserToken');
+      localStorage.removeItem('loggedUserData');
+      localStorage.removeItem('auth1');
+      localStorage.removeItem('auth2');
+      localStorage.removeItem('auth3');
     } else {
-      console.log('desativar')
-      colaboradorDataDelete.status = false
-      console.log(colaboradorDataDelete)
+      var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+      var userCargo = infoUsers.cargo
+      if (colaboradorDataDeleteOption === true) {
+        try {
+          const response = await server.delete(`/usuario/${colaboradorDataDelete.matricula}`, {
+            headers: {
+              "Authorization": `${token}`,
+              "Content-Type": "application/json",
+              "access-level": `${userCargo}`
+            }
+          });
+          console.log(response);
+          openSnackBarMessage();
+          setSnackBarMessage(response.data.message);
+          setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
+          getUsers(1)
+        } catch (e) {
+          openSnackBarMessage();
+          setSnackBarMessage(e);
+          setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
+        }
+      } else {
+        console.log('desativar')
+        colaboradorDataDelete.status = false
+        console.log(colaboradorDataDelete)
+        var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+        var userCargo = infoUsers.cargo
+        try {
+          const response = await server.put(`/usuario/${colaboradorDataDelete.matricula}`, colaboradorDataDelete, {
+            headers: {
+              "Authorization": `${token}`,
+              "Content-Type": "application/json",
+              "access-level": `${userCargo}`
+            }
+          });
+          console.log(response);
+          openSnackBarMessage();
+          setSnackBarMessage(response.data.message);
+          setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
+          getUsers(1)
+        } catch (e) {
+          openSnackBarMessage();
+          setSnackBarMessage(e);
+          setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
+          // console.error(e);
+        }
+      }
+      returnSearch();
+    }
+  };
+
+  //Paginação;
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    console.log(page)
+    getUsers(page)
+  };
+
+  async function getUsers(pagina) {
+    var token = localStorage.getItem("loggedUserToken");
+    if (token.length <= 1) {
+      localStorage.removeItem('loggedUserToken');
+      localStorage.removeItem('loggedUserData');
+      localStorage.removeItem('auth1');
+      localStorage.removeItem('auth2');
+      localStorage.removeItem('auth3');
+    } else {
+      var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+      var userCargo = infoUsers.cargo
+      if (pagina == undefined) {
+        pagina == 1
+      }
       try {
-        const response = await server.put(`/usuario/${colaboradorDataDelete.matricula}`, colaboradorDataDelete,  {
+        const response = await server.get(`/usuario?page=${pagina}`, {
           headers: {
             "Authorization": `${token}`,
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            "access-level": `${userCargo}`
+
           }
         });
-        console.log(response);
-        openSnackBarMessage();
-        setSnackBarMessage(response.data.message);
-        setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
-        getUsers()
+        setUsers(response.data.users);
+        setTotalPages(response.data.pagination.totalPages)
+        setResultadosPesquisa(response.data.users);
       } catch (e) {
-        openSnackBarMessage();
-        setSnackBarMessage(e);
-        setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
-        // console.error(e);
+        console.error(e);
       }
     }
-    returnSearch();
-  };
+  }
 
   return (
     <>
@@ -314,14 +383,10 @@ function StaffAdmin() {
             <div className="staffContainer">
               <div className="searchBoxFamily">
                 <div className="searchBoxInputs">
-                  <input
-                    type='text'
-                    placeholder="Pesquisar por nome, matrícula ..."
-                    className='form-3'
-                    value={searchTerm}
-                    onChange={handleSearchTermChange}
+                  <input type='text' placeholder="Pesquisar por nome, matrícula ..." className='form-3' value={searchData.term}
+                    onChange={(e) => setSearchData({ ...searchData, term: e.target.value })}
                   />
-                  <select value={searchCategory} onChange={handleSearchCategoryChange} className='searchBoxSelect'>
+                  <select value={searchData.category} onChange={(e) => setSearchData({ ...searchData, category: e.target.value })} className='searchBoxSelect'>
                     <option value='Selecione'>Selecione uma categoria</option>
                     <option>Nome</option>
                     <option>Matrícula</option>
@@ -334,6 +399,9 @@ function StaffAdmin() {
               <UsuarioTable data={resultadosPesquisa} onEdit={openEditPop} onDelete={openDeletePopup} />
             </div>
           </div>
+        </div>
+        <div className="paginator-component">
+          <Paginator currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
         </div>
         <Snackbar open={open} autoHideDuration={4000} onClose={closeSnackBarMessage} message={snackBarMessage} action={alertBox} ContentProps={snackBarStyle} />
       </Container>
@@ -394,27 +462,24 @@ function StaffAdmin() {
             <div className="editCardTopBox">
               <div className='searchForms'>
                 <span className='body-normal margin-bottom-5'>Nome do usuário</span>
-                <input placeholder='Digite o nome...' type="text" className='form-1' value={colaboradorDataEdit.nomeUser} onChange={(e) => setColaboradorDataEdit({ ...colaboradorDataEdit, nome: e.target.value })} />
-              </div>
-              <div className='searchForms'>
-                <span className='body-normal margin-bottom-5'>Matrícula</span>
-                <input placeholder='Digite a matrícula...' className='form-1' value={colaboradorDataEdit.matricula} onChange={(e) => setColaboradorDataEdit({ ...colaboradorDataEdit, matricula: e.target.value })} />
+                <input placeholder='Digite o nome...' type="text" className='form-1' value={colaboradorDataEdit.nomeUser} onChange={(e) => setColaboradorDataEdit({ ...colaboradorDataEdit, nomeUser: e.target.value })} />
               </div>
               <div className='searchForms'>
                 <span className='body-normal margin-bottom-5'>Cargo</span>
                 <select className='form-1' value={colaboradorDataEdit.cargo} onChange={(e) => setColaboradorDataEdit({ ...colaboradorDataEdit, cargo: e.target.value })}>
                   <option value='' disabled>Selecionar um cargo</option>
-                  <option value='3'>Aluno</option>
-                  <option value='2'>Colaborador</option>
+                  <option value='2'>Aluno</option>
+                  <option value='3'>Colaborador</option>
                   <option value='1'>Administrador</option>
                 </select>
               </div>
               <div className='searchForms'>
-                <span className='body-normal margin-bottom-5'>Senha</span>
-                <div className="iconPasswordContainer">
-                  <input placeholder='Digite a senha...' className='form-1' value={colaboradorDataEdit.senha} onChange={(e) => setColaboradorDataEdit({ ...colaboradorDataEdit, senha: e.target.value })} type={isPasswordVisible ? 'text' : 'password'} />
-                  <span className="lnr lnr-eye" onClick={togglePasswordVisibility} />
-                </div>
+                <span className='body-normal margin-bottom-5'>Status</span>
+                <select className='form-1' value={colaboradorDataEdit.status} onChange={(e) => setColaboradorDataEdit({ ...colaboradorDataEdit, status: e.target.value })}>
+                  <option value='' disabled>Selecionar um cargo</option>
+                  <option value={true}>Ativo</option>
+                  <option value={false}>Inativo</option>
+                </select>
               </div>
             </div>
           </>
@@ -427,32 +492,16 @@ function StaffAdmin() {
           <div className="popUpDeleteCard2" style={{ height: "350px" }}>
             <div className="popUpDelete">
               <div className="deleteCardTop">
-                <p className='heading-4 text-align-left margin-bottom-10'>Deletar {colaboradorDataDelete.nomeUser} - Confirmação necessária<br></br><br></br><span className='body-normal'>Escolha uma das opções:</span></p>
+                <p className='heading-4 text-align-left margin-bottom-10'>Deletar {colaboradorDataDelete.nomeUser} - Confirmação necessária<br></br><br></br><span className='body-normal'>Selecione a opção:</span></p>
                 <div>
                   <input
-                    type='checkbox'
-                    id='desativar-checkbox'
-                    onChange={(e) => {
-                      if (e.target.checked) {
-                        setColaboradorDataDeleteOption(false);
-                      }
-                    }}
-                    checked={!colaboradorDataDeleteOption}
-                  />
-                  <label htmlFor='desativar-checkbox'>
-                    <p>Desativar usuário</p>
-                  </label>
-                </div>
-                <div>
-                  <input
-                    type='checkbox'
-                    id='deletar-checkbox'
-                    onChange={(e) => {
+                    type='checkbox' id='deletar-checkbox' onChange={(e) => {
                       if (e.target.checked) {
                         setColaboradorDataDeleteOption(true);
+                      } else {
+                        setColaboradorDataDeleteOption(false);
                       }
-                    }}
-                    checked={colaboradorDataDeleteOption}
+                    }} checked={colaboradorDataDeleteOption}
                   />
                   <label htmlFor='deletar-checkbox'>
                     <p>Deletar usuário</p>

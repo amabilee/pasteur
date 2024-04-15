@@ -6,8 +6,12 @@ import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { server } from "../../services/server";
+import Paginator from '../../components/paginator/paginator';
 
 function ExitAdmin() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1)
+
   const [showPopView, setShowPopView] = useState(false);
   const [selectedAluno, setSelectedAluno] = useState(null);
   const [errorMessage, setErrorMessage] = useState(' ');
@@ -21,7 +25,7 @@ function ExitAdmin() {
   const [movimentacoesArray, setMovimentacoesArray] = useState([]);
 
   useEffect(() => {
-    getPedidos();
+    getPedidos(1);
     infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
     setNome(infoUsers.NomeUser)
     console.log(infoUsers)
@@ -31,18 +35,33 @@ function ExitAdmin() {
     setOpen(true);
   };
 
-  async function getPedidos() {
+  async function getPedidos(pagina) {
     var token = localStorage.getItem("loggedUserToken")
+    var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+    var userCargo = infoUsers.cargo
+    if (pagina == undefined) {
+      pagina == 1
+    }
     try {
-      const response = await server.get('/pedido', {
-        method: 'GET',
-        headers: {
-          "Authorization": `${token}`,
-          "Content-Type": "application/json"
-        }
-      })
-      setPedidos(response.data)
-      console.log(response.data)
+      if (token.length <= 1) {
+        localStorage.removeItem('loggedUserToken');
+        localStorage.removeItem('loggedUserData');
+        localStorage.removeItem('auth1');
+        localStorage.removeItem('auth2');
+        localStorage.removeItem('auth3');
+      } else {
+        const response = await server.get(`/pedido?page=${pagina}&tipo=Saída&status=Pendente`, {
+          method: 'GET',
+          headers: {
+            "Authorization": `${token}`,
+            "Content-Type": "application/json",
+            "access-level": `${userCargo}`
+          }
+        })
+        setPedidos(response.data.pedidos)
+        setTotalPages(response.data.pagination.totalPages)
+        console.log(response.data.pedidos)
+      }
     } catch (e) {
       console.error(e)
     }
@@ -102,21 +121,32 @@ function ExitAdmin() {
     setSnackBarStyle({ sx: { background: "#79B874", color: "white", borderRadius: '15px' } })
     handleReturn()
   }
-  
+
   async function postPedidoAvaliado(idPedido, pedido) {
     var token = localStorage.getItem("loggedUserToken");
+    var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+    var userCargo = infoUsers.cargo
     try {
+      if (token.length <= 1) {
+        localStorage.removeItem('loggedUserToken');
+        localStorage.removeItem('loggedUserData');
+        localStorage.removeItem('auth1');
+        localStorage.removeItem('auth2');
+        localStorage.removeItem('auth3');
+      } else {
         const response = await server.put(`/pedido/${idPedido}`, pedido, {
-            headers: {
-                "Authorization": `${token}`,
-                "Content-Type": "application/json"
-            }
+          headers: {
+            "Authorization": `${token}`,
+            "Content-Type": "application/json",
+            "access-level": `${userCargo}`
+          }
         });
         console.log(response);
+      }
     } catch (e) {
-        console.error(e);
+      console.error(e);
     }
-}
+  }
 
   function handleReturn() {
     setShowPopView(false)
@@ -141,13 +171,15 @@ function ExitAdmin() {
         </tr>
       </tbody>
     ));
-
   };
 
-  useEffect(() => {
-    pedidosSaida = pedidos.filter(pedido => pedido.tipo === 'Entrada' && pedido.status == 'Pendente');
-    console.log(pedidosSaida)
-  }, [])
+  //Paginação;
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    console.log(page)
+    getPedidos(page)
+  };
+
 
   return (
     <>
@@ -165,6 +197,9 @@ function ExitAdmin() {
               </table>
             </div>
           </div>
+        </div>
+        <div className="paginator-component">
+          <Paginator currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
         </div>
         <Snackbar open={open} autoHideDuration={4000} onClose={closeSnackBarMessage} message={snackBarMessage} action={alertBox} ContentProps={snackBarStyle} />
       </Container>
@@ -194,7 +229,7 @@ function ExitAdmin() {
                 <div className="viewCardRightBox">
                   <div className="tableRequestInfo">
                     <table>
-                    <tbody>
+                      <tbody>
                         {movimentacoesArray.map((option, index) => (
                           <tr key={index}>
                             <td>

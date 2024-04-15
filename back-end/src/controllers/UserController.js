@@ -1,11 +1,41 @@
+import Sequelize from 'sequelize'; // Importa o Sequelize
 import User from '../models/User.js';
 import bcrypt from 'bcrypt';
 
 class UserController {
   static async getAllEntities(req, res) {
+    const { page = 1, limit = 7, cargo, matricula, nomeUser } = req.query;
+
     try {
-      const users = await User.findAll();
-      res.json(users);
+      const offset = (page - 1) * limit;
+
+      let whereClause = {};
+
+      if (cargo) {
+        whereClause.cargo = { [Sequelize.Op.like]: `%${cargo}%` };
+      }
+      if (matricula) {
+        whereClause.matricula = { [Sequelize.Op.like]: `%${matricula}%` };
+      }
+      if (nomeUser) {
+        whereClause.nomeUser = { [Sequelize.Op.like]: `%${nomeUser}%` };
+      }
+
+      const { count, rows: users } = await User.findAndCountAll({
+        where: whereClause,
+        offset,
+        limit: parseInt(limit),
+      });
+
+      const totalPages = Math.ceil(count / limit);
+
+      const pagination = {
+        currentPage: parseInt(page),
+        totalPages,
+        totalItems: count,
+      };
+
+      res.json({ users, pagination });
     } catch (error) {
       console.error(error);
       res.status(500).json({ error: 'Erro ao buscar usuários.' });

@@ -7,11 +7,15 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import './headers/style.css';
 import { server } from "../services/server";
+import Paginator from '../components/paginator/paginator';
 
 //Import Components
 import PopUpSearch from '../components/popSearch';
 
 function History() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1)
+
   const [showPopSearch, setShowPopSearch] = useState(false);
   const [searchCategory, setSearchCategory] = useState('Cronológico');
   const [errorMessage, setErrorMessage] = useState('');
@@ -60,7 +64,7 @@ function History() {
         </tr>
       </thead>
       <tbody>
-        {data.map((movimentacao, index) => (
+        {data && Array.isArray(data) && data.map((movimentacao, index) => (
           <tr key={index}>
             <td>{movimentacao.nomeAluno}</td>
             <td>{movimentacao.matricula}</td>
@@ -86,7 +90,7 @@ function History() {
   );
 
   useEffect(() => {
-    getPedidos();
+    getPedidos(1);
     handleCronologicalResult()
     const addToStaff = () => {
       setStaff(users);
@@ -116,17 +120,32 @@ function History() {
 
 
 
-  async function getPedidos() {
+  async function getPedidos(pagina) {
     var token = localStorage.getItem("loggedUserToken")
+    var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+    var userCargo = infoUsers.cargo
+    if (pagina == undefined) {
+      pagina == 1
+    }
     try {
-      const response = await server.get('/pedido', {
-        method: 'GET',
-        headers: {
-          "Authorization": `${token}`,
-          "Content-Type": "application/json"
-        }
-      })
-      setPedidos(response.data)
+      if (token.length <= 1) {
+        localStorage.removeItem('loggedUserToken');
+        localStorage.removeItem('loggedUserData');
+        localStorage.removeItem('auth1');
+        localStorage.removeItem('auth2');
+        localStorage.removeItem('auth3');
+      } else {
+        const response = await server.get(`/pedido?page=${pagina}`, {
+          method: 'GET',
+          headers: {
+            "Authorization": `${token}`,
+            "Content-Type": "application/json",
+            "access-level": `${userCargo}`
+          }
+        })
+        setPedidos(response.data.pedidos)
+        setTotalPages(response.data.pagination.totalPages)
+      }
     } catch (e) {
       console.error(e)
     }
@@ -220,14 +239,14 @@ function History() {
 
     if (colabName_his && colabName_his.value !== undefined) {
       keys.push('colaborador');
-      values.push(colabName_his.value.toLowerCase()); // Lowercase the value for consistent comparison
+      values.push(colabName_his.value.toLowerCase()); 
       setColaboradorName(colabName_his.value);
     }
 
     if (filteredConditions.some(({ key }) => key === 'createdAt')) {
       const [start, end] = date_his.split('-').map(d => d.trim());
       search = pedidos.filter(e => isDateInRange(e['createdAt'], start, end));
-      keys.splice(keys.indexOf('createdAt'), 1); // Corrected the key here
+      keys.splice(keys.indexOf('createdAt'), 1);
       result = search.filter(e => keys.every(key => {
         const value = String(e[key]).toLowerCase();
         return values.some(val => value.includes(val));
@@ -272,7 +291,7 @@ function History() {
     const pedidosCronologicos = result.sort((a, b) => {
       const dateTimeA = `${a.data} ${a.hora}`;
       const dateTimeB = `${b.data} ${b.hora}`;
-      const dateObjectA = new Date(dateTimeA.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1')); // Convert to 'YYYY-MM-DD'
+      const dateObjectA = new Date(dateTimeA.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1'));
       const dateObjectB = new Date(dateTimeB.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1'));
       return dateObjectB - dateObjectA;
     });
@@ -303,7 +322,6 @@ function History() {
   }
 
   // Components
-
   $(function () {
     const dateFilterInput = $('input[name="datefilter"]');
     dateFilterInput.daterangepicker({
@@ -334,6 +352,12 @@ function History() {
     value: e,
   }));
 
+  //Paginação
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    console.log(page)
+    getPedidos(page)
+  };
 
   return (
     <>
@@ -367,6 +391,9 @@ function History() {
               <HistoryTable data={resultadosPesquisa} />
             </div>
           </div>
+        </div>
+        <div className="paginator-component">
+          <Paginator currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
         </div>
         <Snackbar open={open} autoHideDuration={4000} onClose={closeSnackBarMessage} message={snackBarMessage} action={alertBox} ContentProps={snackBarStyle}
         />

@@ -7,12 +7,10 @@
 
 .boxContainerDesktop {
     border-radius: 20px;
-    height: 100%;
     display: flex;
     flex-direction: column;
     background-color: white;
-    min-height: 610px;
-    height: 610px;
+    min-height: 550px;
 }
 
 .headContainerDesktop {
@@ -25,14 +23,12 @@
 .bodyContainerDesktop {
     display: flex;
     flex-direction: column;
+    height: 50vh;
 }
 
 .tableRequests {
     border-radius: 10px;
-    height: 500px;
-    min-height: 70px;
-    overflow-y: scroll;
-    margin-bottom: 20px;
+    max-height: 550px;
 }
 
 .tableRequests table {
@@ -261,7 +257,7 @@
 
 
 .tableHistory tbody {
-    height: 370px;
+    height: 320px;
     display: block;
     overflow: auto;
     width: 100%;
@@ -404,3 +400,60 @@
     border-radius: 15px;
 }
 
+.paginator-component {
+    display: flex;
+    justify-content: flex-end;
+    padding: 15px 0 0 0;
+}
+
+/* .paginator button {
+    height: 25px;
+    width: 70px;
+    border: 2px solid #027fcc;
+    background-color: #eaeaea;
+    border-radius: 15px;
+    margin: 0 20px;
+} */
+
+.paginator button {
+    background-color: #518FA7;
+    /* Green */
+    border: none;
+    color: white;
+    padding: 5px 13px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 13px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.paginator button:hover{
+    background-color: #2f6378;
+}
+
+.paginator button:disabled {
+    background-color: #cccccc;
+}
+
+.paginator span {
+    margin: 0 20px;
+    font-size: 14px;
+}
+
+.paginator input[type="text"] {
+    padding: 5px;
+    width: 50px;
+}
+
+.paginator button.go {
+    background-color: #007bff;
+    /* Blue */
+}
+
+.paginator button.go:hover {
+    background-color: #0056b3;
+    /* Darker Blue */
+}

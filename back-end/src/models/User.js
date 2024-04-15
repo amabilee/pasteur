@@ -21,7 +21,7 @@ const User = db.define(
             type: DataTypes.INTEGER,
             allowNull: false,
             validate: {
-                isIn: [[1, 2, 3]] // Aceita apenas os valores 1, 2 e 3
+                isIn: [[0, 1, 2, 3]] // Aceita apenas os valores 1, 2 e 3
             }
         },
         status: {

@@ -9,20 +9,19 @@ function ExitAluno() {
     const [box, setBox] = useState('');
     const [nomeAluno, setNomeAluno] = useState('');
     const [matriculaAluno, setMatriculaAluno] = useState('');
-    const [family, setFamily] = useState('0');
-    const [periodo, setPeriodo] = useState('')
     const [showPop, setShowPop] = useState(false);
     const [showConfirmExit, setShowConfirmExit] = useState(false);
     const navigate = useNavigate();
     const [addButtonStyle, changeAddButtonStyle] = useState('button-6-disable');
     const [addButtonState, changeAddButtonState] = useState(true);
     const [tableData, setTableData] = useState([]);
-    const [errorMessage, setErrorMessage] = useState(' ');
-    const newMovement = { family: family };
+    const [errorMessage, setErrorMessage] = useState('');
+
+    const [pedidoPossivelMovimentar, setPedidoPossivelMovimentar] = useState([])
     const finalDataMoviment = {};
     var infoUsers = {}
-    const [familiasMov, setFamiliasMov] = useState([])
     const [pedidos, setPedidos] = useState([])
+    const [selectedItems, setSelectedItems] = useState([]);
 
     useEffect(() => {
         infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
@@ -33,7 +32,7 @@ function ExitAluno() {
     }, []);
 
     function navigateToHomeAluno() {
-        if (showPop){
+        if (showPop) {
             setShowPop(false);
             navigate('/home-aluno')
             setTableData([]);
@@ -46,10 +45,8 @@ function ExitAluno() {
     }
 
     function navigateToConfirmExit() {
-        if (box.trim() === '' || /^0+$/.test(box) || (box.length > 0 && box[0] === '0') || (tableData.length === 0)) {
-            setErrorMessage('Todos os campos devem ser preenchidos corretamente.');
-        } else if (periodo == '') {
-            setErrorMessage('Todos os campos devem ser preenchidos.');
+        if ((selectedItems.length === 0)) {
+            setErrorMessage('Pelo menos uma caixa deve ser selecionada.');
         } else {
             setErrorMessage('');
             setShowConfirmExit(true);
@@ -61,50 +58,87 @@ function ExitAluno() {
 
     const sendPedidoRequest = async () => {
         var token = localStorage.getItem("loggedUserToken");
-        try {
-            const response = await server.post("/pedido", finalDataMoviment, {
-                headers: {
-                    "Authorization": `${token}`,
-                    "Content-Type": "application/json"
-                }
-            });
-            console.log(response);
-        } catch (e) { 
-            console.error(e);
+        if (token.length <= 1) {
+            localStorage.removeItem('loggedUserToken');
+            localStorage.removeItem('loggedUserData');
+            localStorage.removeItem('auth1');
+            localStorage.removeItem('auth2');
+            localStorage.removeItem('auth3');
+        } else {
+            var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+            var userCargo = infoUsers.cargo
+            try {
+                const response = await server.post("/pedido", finalDataMoviment, {
+                    headers: {
+                        "Authorization": `${token}`,
+                        "Content-Type": "application/json",
+                        "access-level": `${userCargo}`
+                    }
+                });
+                console.log(response);
+            } catch (e) {
+                console.error(e);
+            }
         }
     }
 
-    function detectEntryFamily(e) {
-        const selectedFamily = e.target.value
-        setFamily(selectedFamily)
-        changeAddButtonStyle('button-6')
-        changeAddButtonState(false)
-    }
+    const handleCardClick = (item) => {
+        const isItemSelected = selectedItems.includes(item);
+        if (isItemSelected) {
+            setSelectedItems(selectedItems.filter(selectedItem => selectedItem !== item));
+        } else {
+            setSelectedItems([...selectedItems, item]);
+        }
+        console.log(selectedItems)
+    };
 
     function tableReportContent() {
-        return tableData.map((item, index) => (
-            <tbody key={index}>
-                <tr>
-                    <td><p className='body-normal'>{item.family}</p><p className='body-normal'>{item.quantity}</p></td>
-                </tr>
-            </tbody>
-        ));
+        if (pedidoPossivelMovimentar.length > 0) {
+            return (
+                <table>
+                    <tbody>
+                        {pedidoPossivelMovimentar.map((item, index) => (
+                            <tr key={index}>
+                                <td
+                                    onClick={() => handleCardClick(item)}
+                                    style={{
+                                        border: selectedItems.includes(item) ? '2px solid #5BC9F4' : '2px solid #E1E1E1',
+                                    }}
+                                    className="pedido"
+                                >
+                                    <p className='body-normal'>{item.familias}</p>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            );
+        } else {
+            return null;
+        }
     };
 
-    function addMovement() {
-        const existingIndex = tableData.findIndex((item) => item.family === family);
-        if (existingIndex !== -1) {
-            const updatedTableData = [...tableData];
-            setTableData(updatedTableData);
+
+
+    function searchPedidosBasedBox() {
+        let boxDesejado = box;
+        let matriculaDesejada = matriculaAluno;
+        let pedidosEncontrados = pedidos.filter(pedido =>
+            Number(pedido.box) === Number(boxDesejado) &&
+            Number(pedido.matricula) === Number(matriculaDesejada)
+        );
+        changeAddButtonStyle('button-6-disable');
+        changeAddButtonState(true);
+        if (pedidosEncontrados.length > 0) {
+            setPedidoPossivelMovimentar(pedidosEncontrados);
         } else {
-            setTableData((prevData) => [...prevData, newMovement]);
-            setFamiliasMov((prevData) => [...prevData, newMovement.family]);
+            setPedidoPossivelMovimentar([]);
         }
-        stagesReturn()
-    };
+        setBox('');
+    }
+
 
     function stagesReturn() {
-        setFamily('0');
         changeAddButtonStyle('button-6-disable');
         changeAddButtonState(true);
     }
@@ -118,45 +152,122 @@ function ExitAluno() {
     function formatMovimentData() {
         finalDataMoviment.matricula = Number(matriculaAluno);
         finalDataMoviment.nomeAluno = nomeAluno;
-        finalDataMoviment.periodoAluno = Number(periodo);
-        finalDataMoviment.box = Number(box);
+        finalDataMoviment.periodoAluno = Number(selectedItems[0].periodoAluno);
+        finalDataMoviment.box = Number(selectedItems[0].box);
         finalDataMoviment.tipo = 'Saída';
         finalDataMoviment.status = 'Pendente';
         finalDataMoviment.colaborador = '';
         finalDataMoviment.assinatura = false;
-        finalDataMoviment.familias = String(familiasMov)
-        finalDataMoviment.quantidadeItens = ''
+        finalDataMoviment.familias = String(selectedItems.map(item => item.familias)),
+            finalDataMoviment.quantidadeItens = ''
     }
 
     async function getPedidos() {
         var token = localStorage.getItem("loggedUserToken")
-        let userInfo = JSON.parse(localStorage.getItem("loggedUserData"));
-        try {
-            const response = await server.get('/pedido', {
-                method: 'GET',
-                headers: {
-                    "Authorization": `${token}`,
-                    "Content-Type": "application/json"
-                }
-            })
-            let filteredPedidos = response.data.filter(pedido => Number(pedido.matricula) === Number(userInfo.matricula) && pedido.assinatura == true && pedido.status == "Aprovado") 
-            setPedidos(filteredPedidos)
-        } catch (e) {
-            console.error(e)
+        if (token.length <= 1) {
+            localStorage.removeItem('loggedUserToken');
+            localStorage.removeItem('loggedUserData');
+            localStorage.removeItem('auth1');
+            localStorage.removeItem('auth2');
+            localStorage.removeItem('auth3');
+        } else {
+            var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+            var userCargo = infoUsers.cargo
+            let formatedMatricula = Number(infoUsers.matricula)
+            try {
+                const response = await server.get(`/pedido?matricula=${formatedMatricula}&status=Aprovado`, {
+                    method: 'GET',
+                    headers: {
+                        "Authorization": `${token}`,
+                        "Content-Type": "application/json",
+                        "access-level": `${userCargo}`
+                    }
+                })
+                console.log(response.data.pedidos);
+                const pedidosDisponiveisSaida = searchPedidosBasedMatricula(formatedMatricula, response.data.pedidos);
+                console.log("Pedidos disponíveis para saída:", pedidosDisponiveisSaida);
+                console.log("Pedidos no sistema:", pedidos);
+            } catch (e) {
+                console.error(e)
+            }
         }
     }
 
+    function searchPedidosBasedMatricula(matriculaDesejada, pedidos) {
+        const pedidosDisponiveisSaida = [];
+        const pedidosFiltrados = pedidos
+        console.log("Pedidos geral filtrados:", pedidosFiltrados);
+        const familiasQuantidadeEntrada = [];
+        const familiasQuantidadeSaida = [];
+        pedidosFiltrados.forEach(pedido => {
+            if (pedido.tipo === "Entrada") {
+                const familias = pedido.familias.split(',');
+                const quantidades = pedido.quantidadeItens.split(',');
+                for (let i = 0; i < familias.length; i++) {
+                    const novoPedido = {
+                        ...pedido,
+                        familias: familias[i].trim(),
+                        quantidadeItens: quantidades[i].trim()
+                    };
+                    familiasQuantidadeEntrada.push(novoPedido);
+                }
+                console.log("Pedidos para de entrada 1:", familiasQuantidadeEntrada);
+            } else if (pedido.tipo === "Saída") {
+                const familias = pedido.familias.split(',');
+                for (let i = 0; i < familias.length; i++) {
+                    const novoPedido = {
+                        ...pedido,
+                        familias: familias[i].trim(),
+                    };
+                    familiasQuantidadeSaida.push(novoPedido);
+                }
+                console.log("Pedidos para de saída 1:", familiasQuantidadeSaida);
+            }
+        });
+
+        familiasQuantidadeEntrada.forEach(quantidadeEntrada => {
+            const familia = quantidadeEntrada.familias;
+            const quantidadeSaida = familiasQuantidadeSaida.filter(pedido => pedido.familias === familia)
+                .reduce((total, pedido) => total + parseInt(pedido.quantidadeItens), 0);
+            if (parseInt(quantidadeEntrada.quantidadeItens) > parseInt(quantidadeSaida)) {
+                familiasQuantidadeEntrada.forEach(pedido => {
+                    if (pedido.familias.includes(familia)) {
+                        pedidosDisponiveisSaida.push(pedido);
+                    }
+                });
+            }
+        });
+
+        console.log("Pedidos para de entrada:", familiasQuantidadeEntrada);
+        console.log("Pedidos para de saída:", familiasQuantidadeSaida);
+        console.log("Pedidos disponíveis para saída:", pedidosDisponiveisSaida);
+        setPedidos(pedidosDisponiveisSaida)
+        return pedidosDisponiveisSaida;
+    }
+
     function navigateToConfirmHome() {
-        if (box !== '' || periodo !== '' || (tableData.length !== 0)) {
+        if (tableData.length !== 0) {
             setShowPop(true)
         } else {
             navigateToHomeAluno()
         }
     }
 
-    function onChangeTagInput(e) {
-        setBox(e.target.value.replace(/[^0-9]/g, ""));
+    function detectBoxEntry(e) {
+        setBox(e.target.value.replace(/[^0-9]/g, ''));
+        if (box.length <= 2) {
+            setPedidoPossivelMovimentar([]);
+            setSelectedItems([])
+        }
     }
+
+    useEffect(() => {
+        console.log("Box atual:", box);
+        if (box.length >= 3) {
+            changeAddButtonStyle('button-6');
+            changeAddButtonState(false);
+        }
+    }, [box]);
 
     return (
         <>
@@ -164,35 +275,12 @@ function ExitAluno() {
             <Container className='containerMobileExit'>
                 <div className="inputFormsExit">
                     <h1 className='title-1 margin-bottom-30'>Registrar pedido de saída</h1>
-                    <input placeholder='Box de armazenamento' className='form-4' value={box} onChange={(e) => onChangeTagInput(e)} type='text' maxLength="3" />
-                    <select className='form-4' value={periodo} onChange={(e) => setPeriodo(e.target.value)}>
-                        <option value='' disabled>Selecionar um periodo</option>
-                        <option>1</option>
-                        <option>2</option>
-                        <option>3</option>
-                        <option>4</option>
-                        <option>5</option>
-                        <option>6</option>
-                        <option>7</option>
-                        <option>8</option>
-                        <option>9</option>
-                        <option>10</option>
-                    </select>
-                    <select className='form-4' value={family} onChange={detectEntryFamily} >
-                        <option disabled={true} value='0'>Selecione a família</option>
-                        {pedidos.map((option, index) => (
-                            <option key={index} value={option.familias}>
-                                {option.familias}
-                            </option>
-                        ))}
-                    </select>
-                    <button className={addButtonStyle} onClick={addMovement} disabled={addButtonState} >
-                        Adicionar
+                    <input placeholder='Box de armazenamento' className='form-4' value={box} onChange={(e) => detectBoxEntry(e)} type='text' maxLength="3" />
+                    <button className={addButtonStyle} onClick={searchPedidosBasedBox} disabled={addButtonState} >
+                        Pesquisar caixas
                     </button>
                     <div className="tableReport">
-                        <table>
-                            {tableReportContent()}
-                        </table>
+                        {tableReportContent()}
                     </div>
                 </div>
                 {errorMessage && <p className="error-message-mobile">{errorMessage}</p>}
@@ -200,7 +288,7 @@ function ExitAluno() {
                     <button className='button-2' disabled={false} onClick={navigateToConfirmHome} >
                         Cancelar
                     </button>
-                    <button className='button-3' disabled={false} onClick={navigateToConfirmExit} > Confimar
+                    <button className='button-3' disabled={false} onClick={navigateToConfirmExit} >Confimar
                     </button>
                 </div>
             </Container>

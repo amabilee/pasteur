@@ -33,18 +33,29 @@ function HomeColaborador() {
 
   async function getPedidos() {
     var token = localStorage.getItem("loggedUserToken")
-    try {
-      const response = await server.get('/pedido', {
-        method: 'GET',
-        headers: {
-          "Authorization": `${token}`,
-          "Content-Type": "application/json"
-        }
-      })
-      setPedidos(response.data)
-      console.log(response.data)
-    } catch (e) {
-      console.error(e)
+    if (token.length <= 1) {
+      localStorage.removeItem('loggedUserToken');
+      localStorage.removeItem('loggedUserData');
+      localStorage.removeItem('auth1');
+      localStorage.removeItem('auth2');
+      localStorage.removeItem('auth3');
+    } else {
+      var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+      var userCargo = infoUsers.cargo
+      try {
+        const response = await server.get('/pedido', {
+          method: 'GET',
+          headers: {
+            "Authorization": `${token}`,
+            "Content-Type": "application/json",
+            "access-level": `${userCargo}`
+          }
+        })
+        setPedidos(response.data)
+        console.log(response.data)
+      } catch (e) {
+        console.error(e)
+      }
     }
   }
 
@@ -102,21 +113,32 @@ function HomeColaborador() {
     setSnackBarStyle({ sx: { background: "#79B874", color: "white", borderRadius: '15px' } })
     handleReturn()
   }
-  
+
   async function postPedidoAvaliado(idPedido, pedido) {
     var token = localStorage.getItem("loggedUserToken");
-    try {
+    if (token.length <= 1) {
+      localStorage.removeItem('loggedUserToken');
+      localStorage.removeItem('loggedUserData');
+      localStorage.removeItem('auth1');
+      localStorage.removeItem('auth2');
+      localStorage.removeItem('auth3');
+    } else {
+      var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+      var userCargo = infoUsers.cargo
+      try {
         const response = await server.put(`/pedido/${idPedido}`, pedido, {
-            headers: {
-                "Authorization": `${token}`,
-                "Content-Type": "application/json"
-            }
+          headers: {
+            "Authorization": `${token}`,
+            "Content-Type": "application/json",
+            "access-level": `${userCargo}`
+          }
         });
         console.log(response);
-    } catch (e) {
+      } catch (e) {
         console.error(e);
+      }
     }
-}
+  }
 
   function handleReturn() {
     setShowPopView(false)
@@ -194,7 +216,7 @@ function HomeColaborador() {
                 <div className="viewCardRightBox">
                   <div className="tableRequestInfo">
                     <table>
-                    <tbody>
+                      <tbody>
                         {movimentacoesArray.map((option, index) => (
                           <tr key={index}>
                             <td>

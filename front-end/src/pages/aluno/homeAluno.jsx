@@ -25,20 +25,32 @@ function HomeAluno() {
 
   async function getPedidos() {
     var token = localStorage.getItem("loggedUserToken")
-    try {
-      const response = await server.get('/pedido', {
-        method: 'GET',
-        headers: {
-          "Authorization": `${token}`,
-          "Content-Type": "application/json"
-        }
-      })
-      pedidos = response.data
-      let matricula = Number(infoUsers.matricula)
-      let pedidoFiltrados = response.data.filter(pedido => pedido.matricula === matricula && !pedido.assinatura && pedido.status !== 'Pendente')
-      setQuantidadeAssinaturasPendentes(pedidoFiltrados.length)
-    } catch (e) {
-      console.error(e)
+    if (token.length <= 1) {
+      localStorage.removeItem('loggedUserToken');
+      localStorage.removeItem('loggedUserData');
+      localStorage.removeItem('auth1');
+      localStorage.removeItem('auth2');
+      localStorage.removeItem('auth3');
+    } else {
+      var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+      var userCargo = infoUsers.cargo
+      try {
+        const response = await server.get('/pedido', {
+          method: 'GET',
+          headers: {
+            "Authorization": `${token}`,
+            "Content-Type": "application/json",
+            "access-level": `${userCargo}`
+          }
+        })
+        pedidos = response.data
+        let matricula = Number(infoUsers.matricula)
+        let resposeData = []
+        let pedidoFiltrados = resposeData.filter(pedido => pedido.matricula === matricula && !pedido.assinatura && pedido.status === 'Aprovado')
+        setQuantidadeAssinaturasPendentes(pedidoFiltrados.length)
+      } catch (e) {
+        console.error(e)
+      }
     }
   }
 
