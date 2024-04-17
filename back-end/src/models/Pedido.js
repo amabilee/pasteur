@@ -31,7 +31,7 @@ const Pedido = db.define(
       allowNull: false,
     },
     box: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       allowNull: false,
     },
     tipo: {

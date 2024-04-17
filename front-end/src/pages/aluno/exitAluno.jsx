@@ -131,8 +131,10 @@ function ExitAluno() {
         changeAddButtonState(true);
         if (pedidosEncontrados.length > 0) {
             setPedidoPossivelMovimentar(pedidosEncontrados);
+            setErrorMessage('');
         } else {
             setPedidoPossivelMovimentar([]);
+            setErrorMessage('Não foram encontradas caixas neste box.');
         }
         setBox('');
     }
@@ -158,8 +160,8 @@ function ExitAluno() {
         finalDataMoviment.status = 'Pendente';
         finalDataMoviment.colaborador = '';
         finalDataMoviment.assinatura = false;
-        finalDataMoviment.familias = String(selectedItems.map(item => item.familias)),
-            finalDataMoviment.quantidadeItens = ''
+        finalDataMoviment.familias = String(selectedItems.map(item => item.familias));
+        finalDataMoviment.quantidadeItens = ''
     }
 
     async function getPedidos() {
@@ -261,14 +263,6 @@ function ExitAluno() {
         }
     }
 
-    useEffect(() => {
-        console.log("Box atual:", box);
-        if (box.length >= 3) {
-            changeAddButtonStyle('button-6');
-            changeAddButtonState(false);
-        }
-    }, [box]);
-
     return (
         <>
             <HeaderPagesAluno />
@@ -276,14 +270,14 @@ function ExitAluno() {
                 <div className="inputFormsExit">
                     <h1 className='title-1 margin-bottom-30'>Registrar pedido de saída</h1>
                     <input placeholder='Box de armazenamento' className='form-4' value={box} onChange={(e) => detectBoxEntry(e)} type='text' maxLength="3" />
-                    <button className={addButtonStyle} onClick={searchPedidosBasedBox} disabled={addButtonState} >
+                    <button className={addButtonStyle} onClick={searchPedidosBasedBox} disabled={addButtonState} style={{marginBottom: '25px'}}>
                         Pesquisar caixas
                     </button>
+                    {errorMessage && <p className="error-message-mobile">{errorMessage}</p>}
                     <div className="tableReport">
                         {tableReportContent()}
                     </div>
                 </div>
-                {errorMessage && <p className="error-message-mobile">{errorMessage}</p>}
                 <div className='sendButtonsEntry'>
                     <button className='button-2' disabled={false} onClick={navigateToConfirmHome} >
                         Cancelar

@@ -19,6 +19,10 @@ class AuthController {
                 return res.status(401).json({ error: 'Senha incorreta.' });
             }
 
+            if (foundUser.status == 0){
+                return res.status(404).json({ error: 'Usuário desativado.' });
+            }
+
             // Gere o token JWT com expiração em uma hora
             const token = jwt.sign({ id: foundUser.id }, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
 

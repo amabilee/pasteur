@@ -8,7 +8,7 @@ import viewIcon from '../../assets/viewIcon.svg';
 import deleteIcon from '../../assets/deleteIcon.svg';
 import eyeOn from '../../assets/eyeOn.svg'
 import eyeOff from '../../assets/eyeOff.svg'
-
+import ordenarIcon from '../../assets/ordenarIcon.svg/'
 import { server } from "../../services/server";
 import './style.css';
 import PopupCreate from '../../components/popCreate'
@@ -16,14 +16,14 @@ import PopUpEdit from '../../components/popEdit'
 
 import Paginator from '../../components/paginator/paginator';
 
-const UsuarioTable = ({ data, onEdit, onDelete }) => (
+const UsuarioTable = ({ data, onEdit, onDelete, onOrdenar }) => (
   <table className='table table-sm tableStaff'>
     <thead>
       <tr>
         <th scope="col">NOME</th>
         <th scope="col">MATRÍCULA</th>
         <th scope="col">CARGO</th>
-        <th scope="col">STATUS</th>
+        <th scope="col"  onClick={() => onOrdenar()}>STATUS<img className='ordenarIcon' src={ordenarIcon}/></th>
         <th scope="col">AÇÕES</th>
       </tr>
     </thead>
@@ -33,8 +33,8 @@ const UsuarioTable = ({ data, onEdit, onDelete }) => (
           <td>{usuario.nomeUser}</td>
           <td>{usuario.matricula}</td>
           <td>
-            {usuario.cargo == '2' ? 'Aluno' :
-              usuario.cargo == '3' ? 'Colaborador' :
+            {usuario.cargo == '3' ? 'Aluno' :
+              usuario.cargo == '2' ? 'Colaborador' :
                 usuario.cargo == '1' ? 'Administrador' :
                   ''}
           </td>
@@ -175,6 +175,8 @@ function StaffAdmin() {
       console.log('Já existe um usuário com essa matrícula.');
     } else if (senha_colab !== senhaConfirm_colab) {
       setErrorMessage(`A senha deve ser igual nos campos 'Senha' e 'Confirmar senha'.`);
+    } else if (parseInt(matricula_colab <= 0)) {
+      setErrorMessage('A matrícula deve ser maior que zero.');
     } else {
       formatColabData()
       console.log('Informações do usuário:', matrixColab); //Envio para a API do usuario criado
@@ -226,6 +228,8 @@ function StaffAdmin() {
     const requiredFields = ['nomeUser', 'cargo', 'senha']
     if (requiredFields.some(field => !colaboradorDataEdit[field])) {
       setErrorMessage('Preencha todos os campos antes de adicionar.');
+    } else if (parseInt(matricula_colab <= 0)) {
+      setErrorMessage('A matrícula deve ser maior que zero.');
     } else {
       openSnackBarMessage();
       setSnackBarMessage('Usuário editado com sucesso');
@@ -276,6 +280,7 @@ function StaffAdmin() {
       localStorage.removeItem('auth1');
       localStorage.removeItem('auth2');
       localStorage.removeItem('auth3');
+      window.location.reload();
     } else {
       var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
       var userCargo = infoUsers.cargo
@@ -321,7 +326,6 @@ function StaffAdmin() {
           openSnackBarMessage();
           setSnackBarMessage(e);
           setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
-          // console.error(e);
         }
       }
       returnSearch();
@@ -343,6 +347,7 @@ function StaffAdmin() {
       localStorage.removeItem('auth1');
       localStorage.removeItem('auth2');
       localStorage.removeItem('auth3');
+      window.location.reload();
     } else {
       var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
       var userCargo = infoUsers.cargo
@@ -365,6 +370,30 @@ function StaffAdmin() {
         console.error(e);
       }
     }
+  }
+
+  const ordenarUsers = async () => {
+    // var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+    //   var userCargo = infoUsers.cargo
+    //   if (pagina == undefined) {
+    //     pagina == 1
+    //   }
+    //   try {
+    //     const response = await server.get(`/usuario?page=${pagina}`, {
+    //       headers: {
+    //         "Authorization": `${token}`,
+    //         "Content-Type": "application/json",
+    //         "access-level": `${userCargo}`
+
+    //       }
+    //     });
+    //     setUsers(response.data.users);
+    //     setTotalPages(response.data.pagination.totalPages)
+    //     setResultadosPesquisa(response.data.users);
+    //   } catch (e) {
+    //     console.error(e);
+    //   }
+    console.log('ordenar')
   }
 
   return (
@@ -396,7 +425,7 @@ function StaffAdmin() {
                   <button className='button-10' onClick={handleSearchSimple}>Pesquisar</button>
                 </div>
               </div>
-              <UsuarioTable data={resultadosPesquisa} onEdit={openEditPop} onDelete={openDeletePopup} />
+              <UsuarioTable data={resultadosPesquisa} onEdit={openEditPop} onDelete={openDeletePopup} onOrdenar={ordenarUsers}/>
             </div>
           </div>
         </div>
@@ -425,8 +454,8 @@ function StaffAdmin() {
                 <span className='body-normal margin-bottom-5'>Cargo</span>
                 <select className='form-1' value={cargo_colab} onChange={(e) => setColabCargo(e.target.value)}>
                   <option value='' disabled>Selecionar um cargo</option>
-                  <option value='2'>Aluno</option>
-                  <option value='3'>Colaborador</option>
+                  <option value='3'>Aluno</option>
+                  <option value='2'>Colaborador</option>
                   <option value='1'>Administrador</option>
                 </select>
               </div>
@@ -468,15 +497,15 @@ function StaffAdmin() {
                 <span className='body-normal margin-bottom-5'>Cargo</span>
                 <select className='form-1' value={colaboradorDataEdit.cargo} onChange={(e) => setColaboradorDataEdit({ ...colaboradorDataEdit, cargo: e.target.value })}>
                   <option value='' disabled>Selecionar um cargo</option>
-                  <option value='2'>Aluno</option>
-                  <option value='3'>Colaborador</option>
+                  <option value='3'>Aluno</option>
+                  <option value='2'>Colaborador</option>
                   <option value='1'>Administrador</option>
                 </select>
               </div>
               <div className='searchForms'>
                 <span className='body-normal margin-bottom-5'>Status</span>
                 <select className='form-1' value={colaboradorDataEdit.status} onChange={(e) => setColaboradorDataEdit({ ...colaboradorDataEdit, status: e.target.value })}>
-                  <option value='' disabled>Selecionar um cargo</option>
+                  <option value='' disabled>Selecionar um status</option>
                   <option value={true}>Ativo</option>
                   <option value={false}>Inativo</option>
                 </select>

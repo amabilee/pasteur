@@ -118,12 +118,14 @@
 
 .blockerMobile {
     width: 100vw;
-    height: 100vh;
+    height: 100%;
     z-index: 99;
     background-color: #000000;
-    position: absolute;
+    position: fixed;
     top: 0;
+    left: 0;
 }
+
 
 /* Images Styles */
 
@@ -156,7 +158,7 @@
     margin: 30px auto 0;
 }
 
-.buttonEsqueceuSenha{
+.buttonEsqueceuSenha {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -174,7 +176,7 @@
     margin-bottom: 10px;
 }
 
-.deleteCardTopChangeSenha{
+.deleteCardTopChangeSenha {
     width: 100%;
     height: 50%;
     display: flex;
@@ -183,7 +185,7 @@
     margin-bottom: 10px;
 }
 
-.deleteCardTopChange div p{
+.deleteCardTopChange div p {
     padding: 0 0 0 10px;
     font-size: 15px;
     font-weight: 300;
@@ -204,9 +206,10 @@
 
 @media (max-width: 767px) {
 
-    .buttonEsqueceuSenha{
+    .buttonEsqueceuSenha {
         display: none;
     }
+
     .blockerMobile {
         width: 0;
         height: 0;
@@ -577,7 +580,9 @@
     box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 
-.button-11:hover, .button-9:hover, .button-8:hover {
+.button-11:hover,
+.button-9:hover,
+.button-8:hover {
     background-color: #006c94;
 }
 

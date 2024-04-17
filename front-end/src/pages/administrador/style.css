@@ -33,6 +33,12 @@
     background-color: #F2F2F2;
 }
 
+.ordenarIcon{
+    height: 13px;
+    width: 13px;
+    margin: 0 0 0 10px;
+}
+
 .tableFamilies thead tr {
     width: 100%;
     display: flex;

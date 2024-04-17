@@ -239,7 +239,7 @@ function History() {
 
     if (colabName_his && colabName_his.value !== undefined) {
       keys.push('colaborador');
-      values.push(colabName_his.value.toLowerCase()); 
+      values.push(colabName_his.value.toLowerCase());
       setColaboradorName(colabName_his.value);
     }
 
@@ -359,6 +359,14 @@ function History() {
     getPedidos(page)
   };
 
+  function detectBoxEntry(e) {
+    setAlunoBox(e.target.value.replace(/[^0-9]/g, ''));
+  }
+
+  function detectMatriculaEntry(e) {
+    setAlunoMatricula(e.target.value.replace(/[^0-9]/g, ''));
+  }
+
   return (
     <>
       <Container className='containerDesktop'>
@@ -443,7 +451,7 @@ function History() {
                 </div>
                 <div className='searchForms'>
                   <span className='body-normal margin-bottom-5'>Matrícula</span>
-                  <input placeholder='Matrícula do aluno...' className='form-1' value={alunoMatricula_his} onChange={(e) => setAlunoMatricula(e.target.value)} type='number' style={{ width: '220px', marginRight: '20px' }} />
+                  <input placeholder='Matrícula do aluno...' className='form-1' value={alunoMatricula_his} onChange={(e) => detectMatriculaEntry(e)} type='text' style={{ width: '220px', marginRight: '20px' }} />
                 </div>
                 <div className='searchForms'>
                   <span className='body-normal margin-bottom-5'>Período</span>
@@ -463,7 +471,7 @@ function History() {
                 </div>
                 <div className='searchForms'>
                   <span className='body-normal margin-bottom-5'>Box de armazenamento</span>
-                  <input placeholder='Box do aluno...' className='form-1' value={alunoBox_his} onChange={(e) => setAlunoBox(e.target.value)} type='number' />
+                  <input placeholder='Box do aluno...' className='form-1' value={alunoBox_his} onChange={(e) => detectBoxEntry(e)} type='text' />
                 </div>
               </div>
             </div>
