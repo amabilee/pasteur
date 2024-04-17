@@ -167,6 +167,8 @@ function FamilyAdmin() {
       setErrorMessage('Preencha todos os campos antes de adicionar.');
     } else if (parseInt(familyDataEdit.quantidadeMAX) <= parseInt(familyDataEdit.quantidadeMIN)) {
       setErrorMessage('Quantidade máxima deve ser maior que a quantidade mínima.');
+    } else if (parseInt(quantidadeMAX_fam) <= 0 || parseInt(quantidadeMIN_fam <= 0)) {
+      setErrorMessage('Quantidade máxima/quantidade mínima devem ser maiores que zero.');
     } else {
       openSnackBarMessage();
       setSnackBarMessage('Família editada com sucesso');
@@ -222,6 +224,7 @@ function FamilyAdmin() {
       localStorage.removeItem('auth1');
       localStorage.removeItem('auth2');
       localStorage.removeItem('auth3');
+      window.location.reload();
     } else {
       var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
       var userCargo = infoUsers.cargo
@@ -251,6 +254,8 @@ function FamilyAdmin() {
       setErrorMessage('Preencha todos os campos antes de adicionar.');
     } else if (parseInt(quantidadeMAX_fam) <= parseInt(quantidadeMIN_fam)) {
       setErrorMessage('Quantidade máxima deve ser maior que a quantidade mínima.');
+    } else if (parseInt(quantidadeMAX_fam) <= 0 || parseInt(quantidadeMIN_fam <= 0)) {
+      setErrorMessage('Quantidade máxima/quantidade mínima devem ser maiores que zero.');
     } else {
       formatFamiliaData()
       console.log('Informações da família:', matrixFamilia); //Envio para a api da familia criada

@@ -54,8 +54,10 @@ function EntryAluno() {
     }
 
     function navigateToConfirmEntry() {
-        if (box.trim() === '' || /^0+$/.test(box) || (box.length > 0 && box[0] === '0') || (tableData.length === 0)) {
-            setErrorMessage('Todos os campos devem ser preenchidos corretamente.');
+        if (box.length <= 2 || (tableData.length === 0)) {
+            setErrorMessage('O box deve ter três números.');
+        } else if (tableData.length === 0){
+            setErrorMessage('Pelo menos uma movimentação deve ser adicionada.');
         } else if (periodo == '') {
             setErrorMessage('Todos os campos devem ser preenchidos.');
         } else {
@@ -98,7 +100,7 @@ function EntryAluno() {
         finalDataMoviment.matricula = matriculaAluno;
         finalDataMoviment.nomeAluno = nomeAluno;
         finalDataMoviment.periodoAluno = Number(periodo);
-        finalDataMoviment.box = Number(box);
+        finalDataMoviment.box = box;
         finalDataMoviment.tipo = 'Entrada';
         finalDataMoviment.status = 'Pendente';
         finalDataMoviment.colaborador = '';

@@ -6,9 +6,12 @@ import { server } from "../../services/server";
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
-
+import Paginator from '../../components/paginator/paginator';
 
 function HomeColaborador() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1)
+
   const [showPopView, setShowPopView] = useState(false);
   const [selectedAluno, setSelectedAluno] = useState({});
   const [errorMessage, setErrorMessage] = useState(' ');
@@ -23,13 +26,13 @@ function HomeColaborador() {
 
 
   useEffect(() => {
-    getPedidos();
+    getPedidos(1);
     infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
     setNome(infoUsers.NomeUser)
     console.log(infoUsers)
   }, []);
 
-  async function getPedidos() {
+  async function getPedidos(pagina) {
     var token = localStorage.getItem("loggedUserToken")
     if (token.length <= 1) {
       localStorage.removeItem('loggedUserToken');
@@ -37,11 +40,15 @@ function HomeColaborador() {
       localStorage.removeItem('auth1');
       localStorage.removeItem('auth2');
       localStorage.removeItem('auth3');
+      window.location.reload();
     } else {
       var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
       var userCargo = infoUsers.cargo
+      if (pagina == undefined) {
+        pagina == 1
+      }
       try {
-        const response = await server.get('/pedido', {
+        const response = await server.get(`/pedido?page=${pagina}&tipo=Entrada&status=Pendente`, {
           method: 'GET',
           headers: {
             "Authorization": `${token}`,
@@ -49,8 +56,9 @@ function HomeColaborador() {
             "access-level": `${userCargo}`
           }
         })
-        setPedidos(response.data)
-        console.log(response.data)
+        setPedidos(response.data.pedidos)
+        setTotalPages(response.data.pagination.totalPages)
+        console.log(response.data.pedidos)
       } catch (e) {
         console.error(e)
       }
@@ -84,6 +92,8 @@ function HomeColaborador() {
   function buttonView(aluno) {
     setShowPopView(true);
     setSelectedAluno(aluno);
+    console.log(selectedAluno)
+    console.log(aluno)
     var familiasArray = aluno.familias.split(',');
     var quantidadesArray = aluno.quantidadeItens.split(',');
     for (let i = 0; i < quantidadesArray.length; i++) {
@@ -114,6 +124,7 @@ function HomeColaborador() {
       localStorage.removeItem('auth1');
       localStorage.removeItem('auth2');
       localStorage.removeItem('auth3');
+      window.location.reload();
     } else {
       var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
       var userCargo = infoUsers.cargo
@@ -170,11 +181,12 @@ function HomeColaborador() {
 
   };
 
-  useEffect(() => {
-    pedidosEntrada = pedidos.filter(pedido => pedido.tipo === 'Entrada' && pedido.status == 'Pendente');
-    console.log(pedidosEntrada)
-  }, [])
-
+  //Paginação;
+  const handlePageChange = (page) => {
+    setCurrentPage(page);
+    console.log(page)
+    getPedidos(page)
+  };
 
   return (
     <>
@@ -192,6 +204,9 @@ function HomeColaborador() {
               </table>
             </div>
           </div>
+        </div>
+        <div className="paginator-component">
+          <Paginator currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
         </div>
         <Snackbar open={open} autoHideDuration={4000} onClose={closeSnackBarMessage} message={snackBarMessage} action={alertBox} ContentProps={snackBarStyle} />
       </Container>

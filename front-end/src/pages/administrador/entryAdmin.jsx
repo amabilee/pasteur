@@ -58,7 +58,6 @@ function EntryAdmin() {
         })
         setPedidos(response.data.pedidos)
         setTotalPages(response.data.pagination.totalPages)
-        console.log(response.data.pedidos)
       }
     } catch (e) {
       console.error(e)

@@ -86,7 +86,7 @@ export const AuthProvider = ({ children }) => {
     useEffect(() => {
         setTimeout(() => {
             var token = localStorage.getItem("loggedUserToken");
-            if (token.length <= 1) {
+            if (!token || token.length <= 1) {
                 console.log('deslogar')
                 signOut()
             } else {
@@ -94,6 +94,7 @@ export const AuthProvider = ({ children }) => {
             }
         }, 100);
     }, [localStorage.getItem("loggedUserToken")]);
+
 
     function signOut() {
         setUser("");

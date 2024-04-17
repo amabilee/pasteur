@@ -3,7 +3,7 @@
 .headerHomeAluno {
     padding: 10px 20px;
     height: 55px;
-    background-color: #F7F7F7;
+    background-color: transparent;
     display: flex;
     align-items: center;
     justify-content: flex-end;

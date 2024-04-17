@@ -32,7 +32,7 @@ function ExitAluno() {
             var userCargo = infoUsers.cargo
             const matricula = Number(infoUsers.matricula);
             try {
-                const response = await server.get(`/pedido?matricula=${matricula}&assinatura=false&status=Aprovado`, {
+                const response = await server.get(`/pedido?matricula=${matricula}&assinatura=0&status=Aprovado`, {
                     headers: {
                         "Authorization": `${token}`,
                         "Content-Type": "application/json",
