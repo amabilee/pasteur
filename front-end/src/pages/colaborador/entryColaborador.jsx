@@ -34,33 +34,32 @@ function HomeColaborador() {
 
   async function getPedidos(pagina) {
     var token = localStorage.getItem("loggedUserToken")
-    if (token.length <= 1) {
-      localStorage.removeItem('loggedUserToken');
-      localStorage.removeItem('loggedUserData');
-      localStorage.removeItem('auth1');
-      localStorage.removeItem('auth2');
-      localStorage.removeItem('auth3');
-      window.location.reload();
-    } else {
-      var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-      var userCargo = infoUsers.cargo
-      if (pagina == undefined) {
-        pagina == 1
-      }
-      try {
-        const response = await server.get(`/pedido?page=${pagina}&tipo=Entrada&status=Pendente`, {
-          method: 'GET',
-          headers: {
-            "Authorization": `${token}`,
-            "Content-Type": "application/json",
-            "access-level": `${userCargo}`
-          }
-        })
-        setPedidos(response.data.pedidos)
-        setTotalPages(response.data.pagination.totalPages)
-        console.log(response.data.pedidos)
-      } catch (e) {
-        console.error(e)
+    var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+    var userCargo = infoUsers.cargo
+    if (pagina == undefined) {
+      pagina == 1
+    }
+    try {
+      const response = await server.get(`/pedido?page=${pagina}&tipo=Entrada&status=Pendente`, {
+        method: 'GET',
+        headers: {
+          "Authorization": `${token}`,
+          "Content-Type": "application/json",
+          "access-level": `${userCargo}`
+        }
+      })
+      setPedidos(response.data.pedidos)
+      setTotalPages(response.data.pagination.totalPages)
+      console.log(response.data.pedidos)
+    } catch (e) {
+      console.error(e)
+      if (e.response.status == 401) {
+        localStorage.removeItem('loggedUserToken');
+        localStorage.removeItem('loggedUserData');
+        localStorage.removeItem('auth1');
+        localStorage.removeItem('auth2');
+        localStorage.removeItem('auth3');
+        window.location.reload();
       }
     }
   }
@@ -118,27 +117,26 @@ function HomeColaborador() {
 
   async function postPedidoAvaliado(idPedido, pedido) {
     var token = localStorage.getItem("loggedUserToken");
-    if (token.length <= 1) {
-      localStorage.removeItem('loggedUserToken');
-      localStorage.removeItem('loggedUserData');
-      localStorage.removeItem('auth1');
-      localStorage.removeItem('auth2');
-      localStorage.removeItem('auth3');
-      window.location.reload();
-    } else {
-      var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-      var userCargo = infoUsers.cargo
-      try {
-        const response = await server.put(`/pedido/${idPedido}`, pedido, {
-          headers: {
-            "Authorization": `${token}`,
-            "Content-Type": "application/json",
-            "access-level": `${userCargo}`
-          }
-        });
-        console.log(response);
-      } catch (e) {
-        console.error(e);
+    var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+    var userCargo = infoUsers.cargo
+    try {
+      const response = await server.put(`/pedido/${idPedido}`, pedido, {
+        headers: {
+          "Authorization": `${token}`,
+          "Content-Type": "application/json",
+          "access-level": `${userCargo}`
+        }
+      });
+      console.log(response);
+    } catch (e) {
+      console.error(e);
+      if (e.response.status == 401) {
+        localStorage.removeItem('loggedUserToken');
+        localStorage.removeItem('loggedUserData');
+        localStorage.removeItem('auth1');
+        localStorage.removeItem('auth2');
+        localStorage.removeItem('auth3');
+        window.location.reload();
       }
     }
   }

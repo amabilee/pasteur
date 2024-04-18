@@ -25,32 +25,31 @@ function HomeAluno() {
 
   async function getPedidos() {
     var token = localStorage.getItem("loggedUserToken")
-    if (token.length <= 1) {
-      localStorage.removeItem('loggedUserToken');
-      localStorage.removeItem('loggedUserData');
-      localStorage.removeItem('auth1');
-      localStorage.removeItem('auth2');
-      localStorage.removeItem('auth3');
-      window.location.reload();
-    } else {
-      var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-      var userCargo = infoUsers.cargo
-      let matricula = Number(infoUsers.matricula)
-      try {
-        const response = await server.get(`/pedido?matricula=${matricula}&assinatura=0&status=Aprovado`, {
-          method: 'GET',
-          headers: {
-            "Authorization": `${token}`,
-            "Content-Type": "application/json",
-            "access-level": `${userCargo}`
-          }
-        })
-        pedidos = response.data.pedidos
-        let resposeData = response.data.pedidos
-        // let pedidoFiltrados = resposeData.filter(pedido => pedido.matricula === matricula && !pedido.assinatura && pedido.status === 'Aprovado')
-        setQuantidadeAssinaturasPendentes(resposeData.length)
-      } catch (e) {
-        console.error(e)
+    var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+    var userCargo = infoUsers.cargo
+    let matricula = Number(infoUsers.matricula)
+    try {
+      const response = await server.get(`/pedido?matricula=${matricula}&assinatura=0&status=Aprovado`, {
+        method: 'GET',
+        headers: {
+          "Authorization": `${token}`,
+          "Content-Type": "application/json",
+          "access-level": `${userCargo}`
+        }
+      })
+      pedidos = response.data.pedidos
+      let resposeData = response.data.pedidos
+      // let pedidoFiltrados = resposeData.filter(pedido => pedido.matricula === matricula && !pedido.assinatura && pedido.status === 'Aprovado')
+      setQuantidadeAssinaturasPendentes(resposeData.length)
+    } catch (e) {
+      console.error(e)
+      if (e.response.status == 401) {
+        localStorage.removeItem('loggedUserToken');
+        localStorage.removeItem('loggedUserData');
+        localStorage.removeItem('auth1');
+        localStorage.removeItem('auth2');
+        localStorage.removeItem('auth3');
+        window.location.reload();
       }
     }
   }

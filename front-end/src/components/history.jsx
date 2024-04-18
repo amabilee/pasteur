@@ -117,9 +117,6 @@ function History() {
     handleCronologicalResult();
   }, [pedidos]);
 
-
-
-
   async function getPedidos(pagina) {
     var token = localStorage.getItem("loggedUserToken")
     var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
@@ -128,26 +125,26 @@ function History() {
       pagina == 1
     }
     try {
-      if (token.length <= 1) {
+      const response = await server.get(`/pedido?page=${pagina}`, {
+        method: 'GET',
+        headers: {
+          "Authorization": `${token}`,
+          "Content-Type": "application/json",
+          "access-level": `${userCargo}`
+        }
+      })
+      setPedidos(response.data.pedidos)
+      setTotalPages(response.data.pagination.totalPages)
+    } catch (e) {
+      console.error(e)
+      if (e.response.status == 401) {
         localStorage.removeItem('loggedUserToken');
         localStorage.removeItem('loggedUserData');
         localStorage.removeItem('auth1');
         localStorage.removeItem('auth2');
         localStorage.removeItem('auth3');
-      } else {
-        const response = await server.get(`/pedido?page=${pagina}`, {
-          method: 'GET',
-          headers: {
-            "Authorization": `${token}`,
-            "Content-Type": "application/json",
-            "access-level": `${userCargo}`
-          }
-        })
-        setPedidos(response.data.pedidos)
-        setTotalPages(response.data.pagination.totalPages)
+        window.location.reload();
       }
-    } catch (e) {
-      console.error(e)
     }
   }
 
@@ -194,6 +191,7 @@ function History() {
       }
       switch (searchCategory) {
         case 'Nome':
+          console.log('nome')
           return movimentacao.nomeAluno.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(normalizedSearchTerm);
         case 'Matrícula':
           return String(movimentacao.matricula).includes(searchTerm);
@@ -344,7 +342,7 @@ function History() {
   });
 
   const handleDateChange = (e) => {
-    setDate(e.target.value);
+    console.log(1)
   };
 
   const optionsColaborador = staff.map(e => ({
@@ -366,6 +364,10 @@ function History() {
   function detectMatriculaEntry(e) {
     setAlunoMatricula(e.target.value.replace(/[^0-9]/g, ''));
   }
+
+  useEffect(() => {
+    console.log(date_his)
+  }, [date_his]);
 
   return (
     <>
@@ -417,7 +419,7 @@ function History() {
               <div className="searchCardTopBox">
                 <div className='searchForms'>
                   <span className='body-normal margin-bottom-5'>Intervalo temporal</span>
-                  <input placeholder='Intervalo de tempo' type="text" className='form-1' name="datefilter" value={date_his} onChange={handleDateChange} style={{ width: '220px', marginRight: '20px' }} />
+                  <input placeholder='Intervalo de tempo' type="text" className='form-1' name="datefilter" value={date_his} onChange={(e) => setDate(e.target.value)} style={{ width: '220px', marginRight: '20px' }} />
                 </div>
                 <div className='searchForms'>
                   <span className='body-normal margin-bottom-5'>Colaborador</span>

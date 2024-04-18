@@ -60,29 +60,29 @@ export default function HeaderHomeColab() {
             let novaSenhaDados = { matricula: Number(matriculaID), senha: dataSenhaChange.senha }
             var token = localStorage.getItem("loggedUserToken");
             try {
-                if (token.length <= 1) {
+                var userCargo = infoUsers.cargo
+                const response = await server.put(`/usuario/${novaSenhaDados.matricula}`, novaSenhaDados, {
+                    headers: {
+                        "Authorization": `${token}`,
+                        "Content-Type": "application/json",
+                        "access-level": `${userCargo}`
+                    }
+                });
+                setShowPopSenha(false)
+                setDataSenhaChange({ senha: '', senhaConfirm: '' })
+                setErrorMessage('')
+                console.log(response);
+            }
+            catch (e) {
+                console.log(e)
+                if (e.response.status == 401) {
                     localStorage.removeItem('loggedUserToken');
                     localStorage.removeItem('loggedUserData');
                     localStorage.removeItem('auth1');
                     localStorage.removeItem('auth2');
                     localStorage.removeItem('auth3');
-                } else {
-                    var userCargo = infoUsers.cargo
-                    const response = await server.put(`/usuario/${novaSenhaDados.matricula}`, novaSenhaDados, {
-                        headers: {
-                            "Authorization": `${token}`,
-                            "Content-Type": "application/json",
-                            "access-level": `${userCargo}`
-                        }
-                    });
-                    setShowPopSenha(false)
-                    setDataSenhaChange({ senha: '', senhaConfirm: '' })
-                    setErrorMessage('')
-                    console.log(response);
+                    window.location.reload();
                 }
-            } catch (e) {
-                console.log(e)
-                console.log(response)
             }
         }
     }

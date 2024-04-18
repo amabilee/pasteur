@@ -58,26 +58,26 @@ function ExitAluno() {
 
     const sendPedidoRequest = async () => {
         var token = localStorage.getItem("loggedUserToken");
-        if (token.length <= 1) {
-            localStorage.removeItem('loggedUserToken');
-            localStorage.removeItem('loggedUserData');
-            localStorage.removeItem('auth1');
-            localStorage.removeItem('auth2');
-            localStorage.removeItem('auth3');
-        } else {
-            var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-            var userCargo = infoUsers.cargo
-            try {
-                const response = await server.post("/pedido", finalDataMoviment, {
-                    headers: {
-                        "Authorization": `${token}`,
-                        "Content-Type": "application/json",
-                        "access-level": `${userCargo}`
-                    }
-                });
-                console.log(response);
-            } catch (e) {
-                console.error(e);
+        var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+        var userCargo = infoUsers.cargo
+        try {
+            const response = await server.post("/pedido", finalDataMoviment, {
+                headers: {
+                    "Authorization": `${token}`,
+                    "Content-Type": "application/json",
+                    "access-level": `${userCargo}`
+                }
+            });
+            console.log(response);
+        } catch (e) {
+            console.error(e);
+            if (e.response.status == 401) {
+                localStorage.removeItem('loggedUserToken');
+                localStorage.removeItem('loggedUserData');
+                localStorage.removeItem('auth1');
+                localStorage.removeItem('auth2');
+                localStorage.removeItem('auth3');
+                window.location.reload();
             }
         }
     }
@@ -166,31 +166,31 @@ function ExitAluno() {
 
     async function getPedidos() {
         var token = localStorage.getItem("loggedUserToken")
-        if (token.length <= 1) {
-            localStorage.removeItem('loggedUserToken');
-            localStorage.removeItem('loggedUserData');
-            localStorage.removeItem('auth1');
-            localStorage.removeItem('auth2');
-            localStorage.removeItem('auth3');
-        } else {
-            var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-            var userCargo = infoUsers.cargo
-            let formatedMatricula = Number(infoUsers.matricula)
-            try {
-                const response = await server.get(`/pedido?matricula=${formatedMatricula}&status=Aprovado`, {
-                    method: 'GET',
-                    headers: {
-                        "Authorization": `${token}`,
-                        "Content-Type": "application/json",
-                        "access-level": `${userCargo}`
-                    }
-                })
-                console.log(response.data.pedidos);
-                const pedidosDisponiveisSaida = searchPedidosBasedMatricula(formatedMatricula, response.data.pedidos);
-                console.log("Pedidos disponíveis para saída:", pedidosDisponiveisSaida);
-                console.log("Pedidos no sistema:", pedidos);
-            } catch (e) {
-                console.error(e)
+        var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+        var userCargo = infoUsers.cargo
+        let formatedMatricula = Number(infoUsers.matricula)
+        try {
+            const response = await server.get(`/pedido?matricula=${formatedMatricula}&status=Aprovado`, {
+                method: 'GET',
+                headers: {
+                    "Authorization": `${token}`,
+                    "Content-Type": "application/json",
+                    "access-level": `${userCargo}`
+                }
+            })
+            console.log(response.data.pedidos);
+            const pedidosDisponiveisSaida = searchPedidosBasedMatricula(formatedMatricula, response.data.pedidos);
+            console.log("Pedidos disponíveis para saída:", pedidosDisponiveisSaida);
+            console.log("Pedidos no sistema:", pedidos);
+        } catch (e) {
+            console.error(e)
+            if (e.response.status == 401) {
+                localStorage.removeItem('loggedUserToken');
+                localStorage.removeItem('loggedUserData');
+                localStorage.removeItem('auth1');
+                localStorage.removeItem('auth2');
+                localStorage.removeItem('auth3');
+                window.location.reload();
             }
         }
     }
@@ -270,7 +270,7 @@ function ExitAluno() {
                 <div className="inputFormsExit">
                     <h1 className='title-1 margin-bottom-30'>Registrar pedido de saída</h1>
                     <input placeholder='Box de armazenamento' className='form-4' value={box} onChange={(e) => detectBoxEntry(e)} type='text' maxLength="3" />
-                    <button className={addButtonStyle} onClick={searchPedidosBasedBox} disabled={addButtonState} style={{marginBottom: '25px'}}>
+                    <button className={addButtonStyle} onClick={searchPedidosBasedBox} disabled={addButtonState} style={{ marginBottom: '25px' }}>
                         Pesquisar caixas
                     </button>
                     {errorMessage && <p className="error-message-mobile">{errorMessage}</p>}

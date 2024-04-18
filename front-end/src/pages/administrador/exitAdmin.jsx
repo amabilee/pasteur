@@ -43,27 +43,28 @@ function ExitAdmin() {
       pagina == 1
     }
     try {
-      if (token.length <= 1) {
+      const response = await server.get(`/pedido?page=${pagina}&tipo=Saída&status=Pendente`, {
+        method: 'GET',
+        headers: {
+          "Authorization": `${token}`,
+          "Content-Type": "application/json",
+          "access-level": `${userCargo}`
+        }
+      })
+      setPedidos(response.data.pedidos)
+      setTotalPages(response.data.pagination.totalPages)
+      console.log(response.data.pedidos)
+    }
+    catch (e) {
+      console.error(e)
+      if (e.response.status == 401) {
         localStorage.removeItem('loggedUserToken');
         localStorage.removeItem('loggedUserData');
         localStorage.removeItem('auth1');
         localStorage.removeItem('auth2');
         localStorage.removeItem('auth3');
-      } else {
-        const response = await server.get(`/pedido?page=${pagina}&tipo=Saída&status=Pendente`, {
-          method: 'GET',
-          headers: {
-            "Authorization": `${token}`,
-            "Content-Type": "application/json",
-            "access-level": `${userCargo}`
-          }
-        })
-        setPedidos(response.data.pedidos)
-        setTotalPages(response.data.pagination.totalPages)
-        console.log(response.data.pedidos)
+        window.location.reload();
       }
-    } catch (e) {
-      console.error(e)
     }
   }
 
@@ -127,24 +128,25 @@ function ExitAdmin() {
     var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
     var userCargo = infoUsers.cargo
     try {
-      if (token.length <= 1) {
+      const response = await server.put(`/pedido/${idPedido}`, pedido, {
+        headers: {
+          "Authorization": `${token}`,
+          "Content-Type": "application/json",
+          "access-level": `${userCargo}`
+        }
+      });
+      console.log(response);
+    }
+    catch (e) {
+      console.error(e);
+      if (e.response.status == 401) {
         localStorage.removeItem('loggedUserToken');
         localStorage.removeItem('loggedUserData');
         localStorage.removeItem('auth1');
         localStorage.removeItem('auth2');
         localStorage.removeItem('auth3');
-      } else {
-        const response = await server.put(`/pedido/${idPedido}`, pedido, {
-          headers: {
-            "Authorization": `${token}`,
-            "Content-Type": "application/json",
-            "access-level": `${userCargo}`
-          }
-        });
-        console.log(response);
+        window.location.reload();
       }
-    } catch (e) {
-      console.error(e);
     }
   }
 

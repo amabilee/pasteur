@@ -23,7 +23,7 @@ const UsuarioTable = ({ data, onEdit, onDelete, onOrdenar }) => (
         <th scope="col">NOME</th>
         <th scope="col">MATRÍCULA</th>
         <th scope="col">CARGO</th>
-        <th scope="col"  onClick={() => onOrdenar()}>STATUS<img className='ordenarIcon' src={ordenarIcon}/></th>
+        <th scope="col" onClick={() => onOrdenar()}>STATUS<img className='ordenarIcon' src={ordenarIcon} /></th>
         <th scope="col">AÇÕES</th>
       </tr>
     </thead>
@@ -49,8 +49,17 @@ const UsuarioTable = ({ data, onEdit, onDelete, onOrdenar }) => (
                 ''}
           </td>
           <td>
-            <button className='button-14' onClick={() => onEdit(usuario)}><img src={viewIcon} /></button>
-            <button className='button-13' onClick={() => onDelete(usuario)}><img src={deleteIcon} /></button></td>
+            {
+              usuario.cargo == '3'
+                ?
+                <button className='button-14' onClick={() => onEdit(usuario)} style={{ marginRight: '50px' }}><img src={viewIcon} /></button>
+                :
+                <>
+                  <button className='button-14' onClick={() => onEdit(usuario)}><img src={viewIcon} /></button>
+                  <button className='button-13' onClick={() => onDelete(usuario)} ><img src={deleteIcon} /></button>
+                </>
+            }
+          </td>
         </tr>
       ))}
     </tbody>
@@ -184,31 +193,32 @@ function StaffAdmin() {
       setSnackBarMessage('Usuário criado com sucesso');
       setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
       var token = localStorage.getItem("loggedUserToken");
-      if (token.length <= 1) {
-        localStorage.removeItem('loggedUserToken');
-        localStorage.removeItem('loggedUserData');
-        localStorage.removeItem('auth1');
-        localStorage.removeItem('auth2');
-        localStorage.removeItem('auth3');
-      } else {
-        var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-        var userCargo = infoUsers.cargo
-        try {
-          const response = await server.post("/usuario", matrixColab, {
-            headers: {
-              "Authorization": `${token}`,
-              "Content-Type": "application/json",
-              "access-level": `${userCargo}`
-            }
-          });
-          console.log(response);
-          returnSearch();
-          getUsers(1)
-        } catch (e) {
-          console.error(e);
-        }
+      var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+      var userCargo = infoUsers.cargo
+      try {
+        const response = await server.post("/usuario", matrixColab, {
+          headers: {
+            "Authorization": `${token}`,
+            "Content-Type": "application/json",
+            "access-level": `${userCargo}`
+          }
+        });
+        console.log(response);
         returnSearch();
+        getUsers(1)
+      } catch (e) {
+        console.error(e);
+        if (e.response.status == 401) {
+          localStorage.removeItem('loggedUserToken');
+          localStorage.removeItem('loggedUserData');
+          localStorage.removeItem('auth1');
+          localStorage.removeItem('auth2');
+          localStorage.removeItem('auth3');
+          window.location.reload();
+        }
       }
+      returnSearch();
+
     }
   };
   function formatColabData() {
@@ -237,30 +247,28 @@ function StaffAdmin() {
 
       console.log('Novas informações do usuário editado:', colaboradorDataEdit);
       var token = localStorage.getItem("loggedUserToken");
-      if (token.length <= 1) {
+      var matriculaID = Number(colaboradorDataEdit.matricula)
+      var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+      var userCargo = infoUsers.cargo
+      try {
+        const response = await server.put(`/usuario/${matriculaID}`, colaboradorDataEdit, {
+          headers: {
+            "Authorization": `${token}`,
+            "Content-Type": "application/json",
+            "access-level": `${userCargo}`
+          }
+        });
+        console.log(response);
+        returnSearch();
+        getUsers(1)
+      } catch (e) {
+        console.error(e);
         localStorage.removeItem('loggedUserToken');
         localStorage.removeItem('loggedUserData');
         localStorage.removeItem('auth1');
         localStorage.removeItem('auth2');
         localStorage.removeItem('auth3');
-      } else {
-        var matriculaID = Number(colaboradorDataEdit.matricula)
-        var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-        var userCargo = infoUsers.cargo
-        try {
-          const response = await server.put(`/usuario/${matriculaID}`, colaboradorDataEdit, {
-            headers: {
-              "Authorization": `${token}`,
-              "Content-Type": "application/json",
-              "access-level": `${userCargo}`
-            }
-          });
-          console.log(response);
-          returnSearch();
-          getUsers(1)
-        } catch (e) {
-          console.error(e);
-        }
+        window.location.reload();
       }
     }
   };
@@ -274,60 +282,60 @@ function StaffAdmin() {
   };
   const handleDeleteStaff = async () => {
     var token = localStorage.getItem("loggedUserToken");
-    if (token.length <= 1) {
-      localStorage.removeItem('loggedUserToken');
-      localStorage.removeItem('loggedUserData');
-      localStorage.removeItem('auth1');
-      localStorage.removeItem('auth2');
-      localStorage.removeItem('auth3');
-      window.location.reload();
-    } else {
-      var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-      var userCargo = infoUsers.cargo
-      if (colaboradorDataDeleteOption === true) {
-        try {
-          const response = await server.delete(`/usuario/${colaboradorDataDelete.matricula}`, {
-            headers: {
-              "Authorization": `${token}`,
-              "Content-Type": "application/json",
-              "access-level": `${userCargo}`
-            }
-          });
-          console.log(response);
-          openSnackBarMessage();
-          setSnackBarMessage(response.data.message);
-          setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
-          getUsers(1)
-        } catch (e) {
-          openSnackBarMessage();
-          setSnackBarMessage(e);
-          setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
-        }
-      } else {
-        console.log('desativar')
-        colaboradorDataDelete.status = false
-        console.log(colaboradorDataDelete)
-        var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-        var userCargo = infoUsers.cargo
-        try {
-          const response = await server.put(`/usuario/${colaboradorDataDelete.matricula}`, colaboradorDataDelete, {
-            headers: {
-              "Authorization": `${token}`,
-              "Content-Type": "application/json",
-              "access-level": `${userCargo}`
-            }
-          });
-          console.log(response);
-          openSnackBarMessage();
-          setSnackBarMessage(response.data.message);
-          setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
-          getUsers(1)
-        } catch (e) {
-          openSnackBarMessage();
-          setSnackBarMessage(e);
-          setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
+    var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+    var userCargo = infoUsers.cargo
+    if (colaboradorDataDeleteOption === true) {
+      try {
+        const response = await server.delete(`/usuario/${colaboradorDataDelete.matricula}`, {
+          headers: {
+            "Authorization": `${token}`,
+            "Content-Type": "application/json",
+            "access-level": `${userCargo}`
+          }
+        });
+        console.log(response);
+        openSnackBarMessage();
+        setSnackBarMessage(response.data.message);
+        setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
+        getUsers(1)
+      } catch (e) {
+        openSnackBarMessage();
+        setSnackBarMessage(e);
+        setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
+        if (e.resposnte.status == 401) {
+          localStorage.removeItem('loggedUserToken');
+          localStorage.removeItem('loggedUserData');
+          localStorage.removeItem('auth1');
+          localStorage.removeItem('auth2');
+          localStorage.removeItem('auth3');
+          window.location.reload();
         }
       }
+      //  else {
+      //   console.log('desativar')
+      //   colaboradorDataDelete.status = false
+      //   console.log(colaboradorDataDelete)
+      //   var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+      //   var userCargo = infoUsers.cargo
+      //   try {
+      //     const response = await server.put(`/usuario/${colaboradorDataDelete.matricula}`, colaboradorDataDelete, {
+      //       headers: {
+      //         "Authorization": `${token}`,
+      //         "Content-Type": "application/json",
+      //         "access-level": `${userCargo}`
+      //       }
+      //     });
+      //     console.log(response);
+      //     openSnackBarMessage();
+      //     setSnackBarMessage(response.data.message);
+      //     setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
+      //     getUsers(1)
+      //   } catch (e) {
+      //     openSnackBarMessage();
+      //     setSnackBarMessage(e);
+      //     setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
+      //   }
+      // }
       returnSearch();
     }
   };
@@ -341,58 +349,39 @@ function StaffAdmin() {
 
   async function getUsers(pagina) {
     var token = localStorage.getItem("loggedUserToken");
-    if (token.length <= 1) {
-      localStorage.removeItem('loggedUserToken');
-      localStorage.removeItem('loggedUserData');
-      localStorage.removeItem('auth1');
-      localStorage.removeItem('auth2');
-      localStorage.removeItem('auth3');
-      window.location.reload();
-    } else {
-      var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-      var userCargo = infoUsers.cargo
-      if (pagina == undefined) {
-        pagina == 1
-      }
-      try {
-        const response = await server.get(`/usuario?page=${pagina}`, {
-          headers: {
-            "Authorization": `${token}`,
-            "Content-Type": "application/json",
-            "access-level": `${userCargo}`
+    var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+    var userCargo = infoUsers.cargo
+    if (pagina == undefined) {
+      pagina == 1
+    }
+    try {
+      const response = await server.get(`/usuario?page=${pagina}`, {
+        headers: {
+          "Authorization": `${token}`,
+          "Content-Type": "application/json",
+          "access-level": `${userCargo}`
 
-          }
-        });
-        setUsers(response.data.users);
-        setTotalPages(response.data.pagination.totalPages)
-        setResultadosPesquisa(response.data.users);
-      } catch (e) {
-        console.error(e);
+        }
+      });
+      setUsers(response.data.users);
+      setTotalPages(response.data.pagination.totalPages)
+      setResultadosPesquisa(response.data.users);
+    } catch (e) {
+      console.error(e);
+      if (e.response.status == 401) {
+        localStorage.removeItem('loggedUserToken');
+        localStorage.removeItem('loggedUserData');
+        localStorage.removeItem('auth1');
+        localStorage.removeItem('auth2');
+        localStorage.removeItem('auth3');
+        window.location.reload();
       }
+
     }
   }
 
   const ordenarUsers = async () => {
-    // var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-    //   var userCargo = infoUsers.cargo
-    //   if (pagina == undefined) {
-    //     pagina == 1
-    //   }
-    //   try {
-    //     const response = await server.get(`/usuario?page=${pagina}`, {
-    //       headers: {
-    //         "Authorization": `${token}`,
-    //         "Content-Type": "application/json",
-    //         "access-level": `${userCargo}`
 
-    //       }
-    //     });
-    //     setUsers(response.data.users);
-    //     setTotalPages(response.data.pagination.totalPages)
-    //     setResultadosPesquisa(response.data.users);
-    //   } catch (e) {
-    //     console.error(e);
-    //   }
     console.log('ordenar')
   }
 
@@ -425,7 +414,7 @@ function StaffAdmin() {
                   <button className='button-10' onClick={handleSearchSimple}>Pesquisar</button>
                 </div>
               </div>
-              <UsuarioTable data={resultadosPesquisa} onEdit={openEditPop} onDelete={openDeletePopup} onOrdenar={ordenarUsers}/>
+              <UsuarioTable data={resultadosPesquisa} onEdit={openEditPop} onDelete={openDeletePopup} onOrdenar={ordenarUsers} />
             </div>
           </div>
         </div>
@@ -488,29 +477,42 @@ function StaffAdmin() {
         sectionOneContent={
           <>
             <p className='body-medium margin-bottom-20'>Informações do usuário</p>
-            <div className="editCardTopBox">
-              <div className='searchForms'>
-                <span className='body-normal margin-bottom-5'>Nome do usuário</span>
-                <input placeholder='Digite o nome...' type="text" className='form-1' value={colaboradorDataEdit.nomeUser} onChange={(e) => setColaboradorDataEdit({ ...colaboradorDataEdit, nomeUser: e.target.value })} />
+            {colaboradorDataEdit.cargo == '3' ?
+              <div className="editCardTopBox">
+                <div className='searchForms'>
+                  <span className='body-normal margin-bottom-5'>Status</span>
+                  <select className='form-1' value={colaboradorDataEdit.status} onChange={(e) => setColaboradorDataEdit({ ...colaboradorDataEdit, status: e.target.value })}>
+                    <option value='' disabled>Selecionar um status</option>
+                    <option value={true}>Ativo</option>
+                    <option value={false}>Inativo</option>
+                  </select>
+                </div>
               </div>
-              <div className='searchForms'>
-                <span className='body-normal margin-bottom-5'>Cargo</span>
-                <select className='form-1' value={colaboradorDataEdit.cargo} onChange={(e) => setColaboradorDataEdit({ ...colaboradorDataEdit, cargo: e.target.value })}>
-                  <option value='' disabled>Selecionar um cargo</option>
-                  <option value='3'>Aluno</option>
-                  <option value='2'>Colaborador</option>
-                  <option value='1'>Administrador</option>
-                </select>
+              :
+              <div className="editCardTopBox">
+                <div className='searchForms'>
+                  <span className='body-normal margin-bottom-5'>Nome do usuário</span>
+                  <input placeholder='Digite o nome...' type="text" className='form-1' value={colaboradorDataEdit.nomeUser} onChange={(e) => setColaboradorDataEdit({ ...colaboradorDataEdit, nomeUser: e.target.value })} />
+                </div>
+                <div className='searchForms'>
+                  <span className='body-normal margin-bottom-5'>Cargo</span>
+                  <select className='form-1' value={colaboradorDataEdit.cargo} onChange={(e) => setColaboradorDataEdit({ ...colaboradorDataEdit, cargo: e.target.value })}>
+                    <option value='' disabled>Selecionar um cargo</option>
+                    <option value='3'>Aluno</option>
+                    <option value='2'>Colaborador</option>
+                    <option value='1'>Administrador</option>
+                  </select>
+                </div>
+                <div className='searchForms'>
+                  <span className='body-normal margin-bottom-5'>Status</span>
+                  <select className='form-1' value={colaboradorDataEdit.status} onChange={(e) => setColaboradorDataEdit({ ...colaboradorDataEdit, status: e.target.value })}>
+                    <option value='' disabled>Selecionar um status</option>
+                    <option value={true}>Ativo</option>
+                    <option value={false}>Inativo</option>
+                  </select>
+                </div>
               </div>
-              <div className='searchForms'>
-                <span className='body-normal margin-bottom-5'>Status</span>
-                <select className='form-1' value={colaboradorDataEdit.status} onChange={(e) => setColaboradorDataEdit({ ...colaboradorDataEdit, status: e.target.value })}>
-                  <option value='' disabled>Selecionar um status</option>
-                  <option value={true}>Ativo</option>
-                  <option value={false}>Inativo</option>
-                </select>
-              </div>
-            </div>
+            }
           </>
         }
         onSubmit={handleEditColaborador}
