@@ -56,7 +56,7 @@ function EntryAluno() {
     function navigateToConfirmEntry() {
         if (box.length <= 2 || (tableData.length === 0)) {
             setErrorMessage('O box deve ter três números.');
-        } else if (tableData.length === 0){
+        } else if (tableData.length === 0) {
             setErrorMessage('Pelo menos uma movimentação deve ser adicionada.');
         } else if (periodo == '') {
             setErrorMessage('Todos os campos devem ser preenchidos.');
@@ -71,26 +71,26 @@ function EntryAluno() {
 
     const sendPedidoRequest = async () => {
         var token = localStorage.getItem("loggedUserToken");
-        if (token.length <= 1) {
-            localStorage.removeItem('loggedUserToken');
-            localStorage.removeItem('loggedUserData');
-            localStorage.removeItem('auth1');
-            localStorage.removeItem('auth2');
-            localStorage.removeItem('auth3');
-        } else {
-            var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-            var userCargo = infoUsers.cargo
-            try {
-                const response = await server.post("/pedido", finalDataMoviment, {
-                    headers: {
-                        "Authorization": `${token}`,
-                        "Content-Type": "application/json",
-                        "access-level": `${userCargo}`
-                    }
-                });
-                console.log(response);
-            } catch (e) {
-                console.error(e);
+        var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+        var userCargo = infoUsers.cargo
+        try {
+            const response = await server.post("/pedido", finalDataMoviment, {
+                headers: {
+                    "Authorization": `${token}`,
+                    "Content-Type": "application/json",
+                    "access-level": `${userCargo}`
+                }
+            });
+            console.log(response);
+        } catch (e) {
+            console.error(e);
+            if (e.response.status == 401) {
+                localStorage.removeItem('loggedUserToken');
+                localStorage.removeItem('loggedUserData');
+                localStorage.removeItem('auth1');
+                localStorage.removeItem('auth2');
+                localStorage.removeItem('auth3');
+                window.location.reload();
             }
         }
     }
@@ -217,28 +217,28 @@ function EntryAluno() {
 
     async function getFamilias() {
         var token = localStorage.getItem("loggedUserToken")
-        if (token.length <= 1) {
-            localStorage.removeItem('loggedUserToken');
-            localStorage.removeItem('loggedUserData');
-            localStorage.removeItem('auth1');
-            localStorage.removeItem('auth2');
-            localStorage.removeItem('auth3');
-        } else {
-            var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-            var userCargo = infoUsers.cargo
-            try {
-                const response = await server.get('/familia', {
-                    method: 'GET',
-                    headers: {
-                        "Authorization": `${token}`,
-                        "Content-Type": "application/json",
-                        "access-level": `${userCargo}`
-                    }
-                })
-                setFamilias(response.data.familias)
-                console.log(response.data)
-            } catch (e) {
-                console.error(e)
+        var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+        var userCargo = infoUsers.cargo
+        try {
+            const response = await server.get('/familia', {
+                method: 'GET',
+                headers: {
+                    "Authorization": `${token}`,
+                    "Content-Type": "application/json",
+                    "access-level": `${userCargo}`
+                }
+            })
+            setFamilias(response.data.familias)
+            console.log(response.data)
+        } catch (e) {
+            console.error(e)
+            if (e.response.status == 401) {
+                localStorage.removeItem('loggedUserToken');
+                localStorage.removeItem('loggedUserData');
+                localStorage.removeItem('auth1');
+                localStorage.removeItem('auth2');
+                localStorage.removeItem('auth3');
+                window.location.reload();
             }
         }
     }

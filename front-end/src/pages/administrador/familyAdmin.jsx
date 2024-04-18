@@ -42,7 +42,7 @@ const FamilyTable = ({ data, onEdit, onDelete }) => (
 function FamilyAdmin() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1)
-
+  const [paginatorStatus, setPaginatorStatus] = useState(false)
 
   const [showPopCreate, setShowPopCreate] = useState(false);
   const [showPopEdit, setShowPopEdit] = useState(false);
@@ -64,36 +64,38 @@ function FamilyAdmin() {
   });
   const [familias, setFamilias] = useState([])
 
-  async function getFamilia(pagina) {
-    var token = localStorage.getItem("loggedUserToken")
+  async function getFamilia(pagina, filtro = '') {
+    var token = localStorage.getItem("loggedUserToken");
     var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-    var userCargo = infoUsers.cargo
+    var userCargo = infoUsers.cargo;
     if (pagina == undefined) {
-      pagina == 1
+      pagina = 1;
     }
     try {
-      if (token.length <= 1) {
+      const response = await server.get(`/familia?page=${pagina}${filtro}`, {
+        method: 'GET',
+        headers: {
+          "Authorization": `${token}`,
+          "Content-Type": "application/json",
+          "access-level": `${userCargo}`
+        }
+      });
+      setTableData(response.data.familias);
+      setTotalPages(response.data.pagination.totalPages);
+
+    } catch (e) {
+      console.error(e);
+      if (e.response.status == 401) {
         localStorage.removeItem('loggedUserToken');
         localStorage.removeItem('loggedUserData');
         localStorage.removeItem('auth1');
         localStorage.removeItem('auth2');
         localStorage.removeItem('auth3');
-      } else {
-        const response = await server.get(`/familia?page=${pagina}`, {
-          method: 'GET',
-          headers: {
-            "Authorization": `${token}`,
-            "Content-Type": "application/json",
-            "access-level": `${userCargo}`
-          }
-        })
-        setTableData(response.data.familias)
-        setTotalPages(response.data.pagination.totalPages)
+        window.location.reload();
       }
-    } catch (e) {
-      console.error(e)
     }
   }
+
 
   const setTableData = (data) => {
     setFamilias(data)
@@ -120,19 +122,27 @@ function FamilyAdmin() {
 
   // Pesquisa Familia
 
-  const handleSearchTermChange = (e) => setSearchTerm(e.target.value);
+  const handleSearchTermChange = (e) => {
+    setSearchTerm(e.target.value);
+    returnSearch()
+  }
 
   const handleSearchSimple = () => {
-    const resultadosFiltrados = familias.filter(obj => {
-      if (searchTerm === '') return true;
-      return obj.nome.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(searchTerm.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''));
-    });
-    setResultadosPesquisa(resultadosFiltrados);
+    const filtro = searchTerm ? `&nome=${searchTerm}` : '';
+    getFamilia(1, filtro);
   };
 
   useEffect(() => {
     getFamilia(1)
   }, []);
+
+  useEffect(() => {
+    if (searchTerm.length >= 1) {
+      setPaginatorStatus(true)
+    } else {
+      setPaginatorStatus(false)
+    }
+  }, [searchTerm]);
 
   const returnSearch = () => {
     setShowPopCreate(false);
@@ -175,28 +185,28 @@ function FamilyAdmin() {
       setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
       console.log('Novas informações da família editada:', familyDataEdit);
       var token = localStorage.getItem("loggedUserToken");
-      if (token.length <= 1) {
-        localStorage.removeItem('loggedUserToken');
-        localStorage.removeItem('loggedUserData');
-        localStorage.removeItem('auth1');
-        localStorage.removeItem('auth2');
-        localStorage.removeItem('auth3');
-      } else {
-        var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-        var userCargo = infoUsers.cargo
-        try {
-          const response = await server.put(`/familia/${familyDataEdit.id}`, familyDataEdit, {
-            headers: {
-              "Authorization": `${token}`,
-              "Content-Type": "application/json",
-              "access-level": `${userCargo}`
-            }
-          });
-          console.log(response);
-          returnSearch();
-          getFamilia(1)
-        } catch (e) {
-          console.error(e);
+      var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+      var userCargo = infoUsers.cargo
+      try {
+        const response = await server.put(`/familia/${familyDataEdit.id}`, familyDataEdit, {
+          headers: {
+            "Authorization": `${token}`,
+            "Content-Type": "application/json",
+            "access-level": `${userCargo}`
+          }
+        });
+        console.log(response);
+        returnSearch();
+        getFamilia(1)
+      } catch (e) {
+        console.error(e);
+        if (e.response.status == 401) {
+          localStorage.removeItem('loggedUserToken');
+          localStorage.removeItem('loggedUserData');
+          localStorage.removeItem('auth1');
+          localStorage.removeItem('auth2');
+          localStorage.removeItem('auth3');
+          window.location.reload();
         }
       }
     }
@@ -216,34 +226,34 @@ function FamilyAdmin() {
     openSnackBarMessage();
     setSnackBarMessage('Família deletada com sucesso');
     setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
-    console.log('Informações da família deletada:', familyDataDelete);  //Envio para a api da familia deletada
+    console.log('Informações da família deletada:', familyDataDelete);
     var token = localStorage.getItem("loggedUserToken");
-    if (token.length <= 1) {
-      localStorage.removeItem('loggedUserToken');
-      localStorage.removeItem('loggedUserData');
-      localStorage.removeItem('auth1');
-      localStorage.removeItem('auth2');
-      localStorage.removeItem('auth3');
-      window.location.reload();
-    } else {
-      var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-      var userCargo = infoUsers.cargo
-      try {
-        const response = await server.delete(`/familia/${familyDataDelete.id}`, {
-          headers: {
-            "Authorization": `${token}`,
-            "Content-Type": "application/json",
-            "access-level": `${userCargo}`
-          }
-        });
-        console.log(response);
-        returnSearch();
-        getFamilia(1)
-      } catch (e) {
-        console.error(e);
-      }
+
+    var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+    var userCargo = infoUsers.cargo
+    try {
+      const response = await server.delete(`/familia/${familyDataDelete.id}`, {
+        headers: {
+          "Authorization": `${token}`,
+          "Content-Type": "application/json",
+          "access-level": `${userCargo}`
+        }
+      });
+      console.log(response);
       returnSearch();
+      getFamilia(1)
+    } catch (e) {
+      console.error(e);
+      if (e.resposnte.status == 401) {
+        localStorage.removeItem('loggedUserToken');
+        localStorage.removeItem('loggedUserData');
+        localStorage.removeItem('auth1');
+        localStorage.removeItem('auth2');
+        localStorage.removeItem('auth3');
+        window.location.reload();
+      }
     }
+    returnSearch();
   };
 
   //Criar Familia
@@ -258,33 +268,33 @@ function FamilyAdmin() {
       setErrorMessage('Quantidade máxima/quantidade mínima devem ser maiores que zero.');
     } else {
       formatFamiliaData()
-      console.log('Informações da família:', matrixFamilia); //Envio para a api da familia criada
+      console.log('Informações da família:', matrixFamilia);
       openSnackBarMessage();
       setSnackBarMessage('Família criada com sucesso');
       setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
       var token = localStorage.getItem("loggedUserToken");
-      if (token.length <= 1) {
-        localStorage.removeItem('loggedUserToken');
-        localStorage.removeItem('loggedUserData');
-        localStorage.removeItem('auth1');
-        localStorage.removeItem('auth2');
-        localStorage.removeItem('auth3');
-      } else {
-        var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-        var userCargo = infoUsers.cargo
-        try {
-          const response = await server.post("/familia", matrixFamilia, {
-            headers: {
-              "Authorization": `${token}`,
-              "Content-Type": "application/json",
-              "access-level": `${userCargo}`
-            }
-          });
-          console.log(response);
-          returnSearch();
-          getFamilia(1)
-        } catch (e) {
-          console.error(e);
+      var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+      var userCargo = infoUsers.cargo
+      try {
+        const response = await server.post("/familia", matrixFamilia, {
+          headers: {
+            "Authorization": `${token}`,
+            "Content-Type": "application/json",
+            "access-level": `${userCargo}`
+          }
+        });
+        console.log(response);
+        returnSearch();
+        getFamilia(1)
+      } catch (e) {
+        console.error(e);
+        if (e.response.status == 401) {
+          localStorage.removeItem('loggedUserToken');
+          localStorage.removeItem('loggedUserData');
+          localStorage.removeItem('auth1');
+          localStorage.removeItem('auth2');
+          localStorage.removeItem('auth3');
+          window.location.reload();
         }
         returnSearch();
       }
@@ -299,8 +309,8 @@ function FamilyAdmin() {
   //Paginação
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    console.log(page)
-    getFamilia(page)
+    const filtro = searchTerm ? `&nome=${searchTerm}` : '';
+    getFamilia(page, filtro);
   };
 
   return (
@@ -330,7 +340,7 @@ function FamilyAdmin() {
           </div>
         </div>
         <div className="paginator-component">
-          <Paginator currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+          <Paginator currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} disabledStatus={paginatorStatus} />
         </div>
         <Snackbar open={open} autoHideDuration={4000} onClose={closeSnackBarMessage} message={snackBarMessage} action={alertBox} ContentProps={snackBarStyle} />
       </Container>
