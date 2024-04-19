@@ -330,7 +330,8 @@ function History() {
     });
     const updateDateValue = (newValue) => {
       dateFilterInput.val(newValue);
-      handleDateChange({ target: { value: newValue } });
+      setDate(newValue);
+      console.log(date_his)
     };
     dateFilterInput.on('apply.daterangepicker', function (ev, picker) {
       const newDateValue = `${picker.startDate.format('DD/MM/YYYY')} - ${picker.endDate.format('DD/MM/YYYY')}`;
@@ -341,9 +342,6 @@ function History() {
     });
   });
 
-  const handleDateChange = (e) => {
-    console.log(1)
-  };
 
   const optionsColaborador = staff.map(e => ({
     label: e,

@@ -72,7 +72,7 @@ function FamilyAdmin() {
       pagina = 1;
     }
     try {
-      const response = await server.get(`/familia?page=${pagina}${filtro}`, {
+      const response = await server.get(`/familia?page=${pagina}${filtro}`,{
         method: 'GET',
         headers: {
           "Authorization": `${token}`,
@@ -81,8 +81,13 @@ function FamilyAdmin() {
         }
       });
       setTableData(response.data.familias);
-      setTotalPages(response.data.pagination.totalPages);
-
+      let pagesTotal = response.data.pagination.totalPages
+      if (pagesTotal <= 0){
+        setTotalPages(1);
+      } else {
+        setTotalPages(pagesTotal);
+      }
+      setSearchTerm('')
     } catch (e) {
       console.error(e);
       if (e.response.status == 401) {
@@ -124,7 +129,6 @@ function FamilyAdmin() {
 
   const handleSearchTermChange = (e) => {
     setSearchTerm(e.target.value);
-    returnSearch()
   }
 
   const handleSearchSimple = () => {
