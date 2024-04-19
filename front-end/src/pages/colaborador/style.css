@@ -334,6 +334,7 @@
 
 .popUpSearchCard {
     width: 80%;
+    min-width: 1056px;
     height: 65%;
     padding: 10px;
     border-radius: 20px;

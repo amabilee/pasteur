@@ -72,6 +72,7 @@ function StaffAdmin() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1)
+  const [paginatorStatus, setPaginatorStatus] = useState(false)
 
 
   const [searchData, setSearchData] = useState({ term: '', category: 'Selecione' })
@@ -130,27 +131,36 @@ function StaffAdmin() {
   );
 
   //Pesquisar Usuário
-  function handleSearchSimple() {
-    const resultadosFiltrados = users.filter(usuario => {
-      if (searchData.category === 'Selecione' || searchData.term === '') {
-        return true;
-      } else {
-        const normalizedSearchTerm = searchData.term.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 
-        switch (searchData.category) {
-          case 'Nome':
-            return usuario.nomeUser.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(normalizedSearchTerm);
-          case 'Matrícula':
-            const matriculaString = String(usuario.matricula);
-            return matriculaString.includes(searchData.term);
-          default:
-            return true;
-        }
-      }
-    });
-    setSearchData(({ term: '', category: 'Selecione' }))
-    setResultadosPesquisa(resultadosFiltrados);
+  const handleSearchSimple = () => {
+    let filtro = ''
+    switch (searchData.category) {
+      case 'Nome':
+        filtro = `&nomeUser=${searchData.term}`
+        getUsers(1, filtro);
+        return
+      case 'Matrícula':
+        filtro = `&matricula=${searchData.term}`
+        getUsers(1, filtro);
+        return
+      default:
+        filtro = ''
+        getUsers(1, filtro);
+        return
+    }
+  };
+
+  const handleSearchTermChange = (e) => {
+    setSearchData({ ...searchData, term: e.target.value })
   }
+
+  useEffect(() => {
+    if (searchData.term.length >= 1) {
+      setPaginatorStatus(true)
+    } else {
+      setPaginatorStatus(false)
+    }
+  }, [searchData.term]);
 
   //Reset campos
   const returnSearch = () => {
@@ -311,43 +321,29 @@ function StaffAdmin() {
           window.location.reload();
         }
       }
-      //  else {
-      //   console.log('desativar')
-      //   colaboradorDataDelete.status = false
-      //   console.log(colaboradorDataDelete)
-      //   var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-      //   var userCargo = infoUsers.cargo
-      //   try {
-      //     const response = await server.put(`/usuario/${colaboradorDataDelete.matricula}`, colaboradorDataDelete, {
-      //       headers: {
-      //         "Authorization": `${token}`,
-      //         "Content-Type": "application/json",
-      //         "access-level": `${userCargo}`
-      //       }
-      //     });
-      //     console.log(response);
-      //     openSnackBarMessage();
-      //     setSnackBarMessage(response.data.message);
-      //     setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
-      //     getUsers(1)
-      //   } catch (e) {
-      //     openSnackBarMessage();
-      //     setSnackBarMessage(e);
-      //     setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
-      //   }
-      // }
       returnSearch();
     }
   };
 
-  //Paginação;
+  //Paginação
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    console.log(page)
-    getUsers(page)
+    let filtro = ''
+    switch (searchData.category) {
+      case 'Nome':
+        filtro = `&nomeUser=${searchData.term}`
+        return
+      case 'Matrícula':
+        filtro = `&matricula=${searchData.term}`
+        return
+      case 'Cargo':
+        filtro = `&cargo=${searchData.term}`
+        return
+    }
+    getUsers(page, filtro);
   };
 
-  async function getUsers(pagina) {
+  async function getUsers(pagina, filtro = '') {
     var token = localStorage.getItem("loggedUserToken");
     var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
     var userCargo = infoUsers.cargo
@@ -355,7 +351,7 @@ function StaffAdmin() {
       pagina == 1
     }
     try {
-      const response = await server.get(`/usuario?page=${pagina}`, {
+      const response = await server.get(`/usuario?page=${pagina}${filtro}`, {
         headers: {
           "Authorization": `${token}`,
           "Content-Type": "application/json",
@@ -364,7 +360,13 @@ function StaffAdmin() {
         }
       });
       setUsers(response.data.users);
-      setTotalPages(response.data.pagination.totalPages)
+      let pagesTotal = response.data.pagination.totalPages
+      if (pagesTotal <= 0) {
+        setTotalPages(1);
+      } else {
+        setTotalPages(pagesTotal);
+      }
+      setSearchData({ ...searchData, term: '', category: '' })
       setResultadosPesquisa(response.data.users);
     } catch (e) {
       console.error(e);
@@ -401,9 +403,7 @@ function StaffAdmin() {
             <div className="staffContainer">
               <div className="searchBoxFamily">
                 <div className="searchBoxInputs">
-                  <input type='text' placeholder="Pesquisar por nome, matrícula ..." className='form-3' value={searchData.term}
-                    onChange={(e) => setSearchData({ ...searchData, term: e.target.value })}
-                  />
+                  <input type='text' placeholder="Pesquisar por nome..." className='form-3' value={searchData.term} onChange={handleSearchTermChange} />
                   <select value={searchData.category} onChange={(e) => setSearchData({ ...searchData, category: e.target.value })} className='searchBoxSelect'>
                     <option value='Selecione'>Selecione uma categoria</option>
                     <option>Nome</option>
@@ -419,7 +419,7 @@ function StaffAdmin() {
           </div>
         </div>
         <div className="paginator-component">
-          <Paginator currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+          <Paginator currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} disabledStatus={paginatorStatus} />
         </div>
         <Snackbar open={open} autoHideDuration={4000} onClose={closeSnackBarMessage} message={snackBarMessage} action={alertBox} ContentProps={snackBarStyle} />
       </Container>

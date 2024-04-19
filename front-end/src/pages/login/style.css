@@ -193,14 +193,15 @@
 
 /* Responsive Styles */
 
-@media (max-width: 1024px) {
+@media (max-width: 1152px) {
     .blocker {
         width: 100vw;
-        height: 100vh;
+        height: 100%;
         z-index: 99;
         background-color: #000000;
-        position: absolute;
+        position: fixed;
         top: 0;
+        left: 0;
     }
 }
 
