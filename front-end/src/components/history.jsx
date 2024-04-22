@@ -8,6 +8,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import './headers/style.css';
 import { server } from "../services/server";
 import Paginator from '../components/paginator/paginator';
+import ordenarIcon from '../assets/ordenarIcon.svg'
 
 //Import Components
 import PopUpSearch from '../components/popSearch';
@@ -15,11 +16,13 @@ import PopUpSearch from '../components/popSearch';
 function History() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1)
+  const [paginatorStatus, setPaginatorStatus] = useState(false)
+  const [orderModalidadeUsers, setOrderModalidadePedido] = useState(1)
+  const [orderStatusUsers, setOrderStatusUsers] = useState(3)
+  const [searchData, setSearchData] = useState({ term: '', category: 'Selecione' })
 
   const [showPopSearch, setShowPopSearch] = useState(false);
-  const [searchCategory, setSearchCategory] = useState('Cronológico');
   const [errorMessage, setErrorMessage] = useState('');
-  const [searchTerm, setSearchTerm] = useState('');
   const [resultadosPesquisa, setResultadosPesquisa] = useState([]);
   const [staff, setStaff] = useState([]);
 
@@ -27,10 +30,8 @@ function History() {
   const [alunoName_his, setAlunoName] = useState('');
   const [alunoMatricula_his, setAlunoMatricula] = useState('');
   const [alunoPeriodo_his, setAlunoPeriodo] = useState('');
-  const [periodo_his, setPeriodo] = useState('');
   const [alunoBox_his, setAlunoBox] = useState('');
   const [colabName_his, setColabName] = useState();
-  const [colaborador_his, setColaboradorName] = useState();
   const [tipo_his, setTipo] = useState('');
   const [date_his, setDate] = useState('');
   const [status_his, setStatus] = useState('');
@@ -48,7 +49,7 @@ function History() {
   const users = Array.from(usersSet);
 
 
-  const HistoryTable = ({ data }) => (
+  const HistoryTable = ({ data, onOrdenarModalidade, onOrdenarStatus }) => (
     <table className='table table-sm tableHistory' id="table-history">
       <thead>
         <tr>
@@ -58,8 +59,8 @@ function History() {
           <th scope="col">BOX</th>
           <th scope="col">DATA</th>
           <th scope="col">HORA</th>
-          <th scope="col">MODALIDADE</th>
-          <th scope="col">STATUS</th>
+          <th scope="col" onClick={() => onOrdenarModalidade()} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>MODALIDADE<img className='ordenarIcon' src={ordenarIcon} /></th>
+          <th scope="col" onClick={() => onOrdenarStatus()} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>STATUS<img className='ordenarIcon' src={ordenarIcon} /></th>
           <th scope="col">COLABORADOR</th>
         </tr>
       </thead>
@@ -96,6 +97,8 @@ function History() {
       setStaff(users);
     };
     addToStaff();
+    setOrderStatusUsers(2)
+    setOrderModalidadePedido(2)
   }, []);
 
   function formatarData(dataMov) {
@@ -117,7 +120,7 @@ function History() {
     handleCronologicalResult();
   }, [pedidos]);
 
-  async function getPedidos(pagina) {
+  async function getPedidos(pagina, filtro = '') {
     var token = localStorage.getItem("loggedUserToken")
     var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
     var userCargo = infoUsers.cargo
@@ -125,7 +128,7 @@ function History() {
       pagina == 1
     }
     try {
-      const response = await server.get(`/pedido?page=${pagina}`, {
+      const response = await server.get(`/pedido?page=${pagina}${filtro}`, {
         method: 'GET',
         headers: {
           "Authorization": `${token}`,
@@ -134,7 +137,17 @@ function History() {
         }
       })
       setPedidos(response.data.pedidos)
-      setTotalPages(response.data.pagination.totalPages)
+      let pagesTotal = response.data.pagination.totalPages
+      if (pagesTotal <= 0) {
+        setTotalPages(1);
+      } else {
+        setTotalPages(pagesTotal);
+      }
+      if (pagesTotal <= currentPage - 1) {
+        setCurrentPage(1)
+      }
+      // setSearchData({ ...searchData, term: '', category: '' })
+      setResultadosPesquisa(response.data.users);
     } catch (e) {
       console.error(e)
       if (e.response.status == 401) {
@@ -148,6 +161,7 @@ function History() {
     }
   }
 
+  //Snackbar settings
   const openSnackBarMessage = () => {
     setOpen(true);
   };
@@ -172,54 +186,78 @@ function History() {
     </React.Fragment>
   );
 
-  //Pesquisa Historico
+  //Pesquisa
 
   function handleSearchTermChange(e) {
-    setSearchTerm(e.target.value);
+    setSearchData({ ...searchData, term: e.target.value })
   };
 
   function handleSearchCategoryChange(e) {
-    setSearchCategory(e.target.value);
+    setSearchData({ ...searchData, category: e.target.value })
   };
 
-  function handleSearchSimple() {
-    const normalizedSearchTerm = searchTerm.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-
-    const resultadosFiltrados = pedidos.filter(movimentacao => {
-      if (searchCategory === 'Cronológico' || searchTerm === '') {
-        return true;
-      }
-      switch (searchCategory) {
-        case 'Nome':
-          console.log('nome')
-          return movimentacao.nomeAluno.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(normalizedSearchTerm);
-        case 'Matrícula':
-          return String(movimentacao.matricula).includes(searchTerm);
-        case 'Período':
-          return String(movimentacao.periodoAluno).includes(searchTerm);
-        case 'Box':
-          return String(movimentacao.box).includes(searchTerm);
-        case 'Status':
-          return movimentacao.status.toLowerCase().includes(searchTerm.toLowerCase());
-        case 'Colaborador':
-          return movimentacao.colaborador.toLowerCase().includes(searchTerm.toLowerCase());
-        case 'Modalidade':
-          const modalidadeLowerCase = movimentacao.tipo.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-          const searchTermLowerCase = searchTerm.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-          return modalidadeLowerCase.includes(searchTermLowerCase);
-        default:
-          return true;
-      }
-    });
-
-    handleSearchResult(resultadosFiltrados);
+  function handleSearchSimple(ordenar) {
+    let filtro = ''
+    switch (searchData.category) {
+      case 'Nome':
+        filtro = `&nomeAluno=${searchData.term}`
+        getPedidos(1, filtro)
+        return
+      case 'Matrícula':
+        filtro = `&matricula=${searchData.term}`
+        getPedidos(1, filtro)
+        return
+      case 'Período':
+        filtro = `&periodoAluno=${searchData.term}`
+        getPedidos(1, filtro)
+        return
+      case 'Box':
+        filtro = `&box=${searchData.term}`
+        getPedidos(1, filtro)
+        return
+      case 'Colaborador':
+        filtro = `&colaborador=${searchData.term}`
+        getPedidos(1, filtro)
+        return
+      default:
+        if (ordenar === 1 || ordenar === 2) {
+          if (ordenar === 1) {
+            switch (orderModalidadeUsers) {
+              case 2:
+                filtro = `&tipo=Entrada`
+                getPedidos(1, filtro)
+                return
+              case 3:
+                filtro = `&tipo=Saída`
+                getPedidos(1, filtro)
+                return
+            }
+          } else if (ordenar === 2) {
+            switch (orderStatusUsers) {
+              case 2:
+                filtro = `&status=Pendente`
+                getPedidos(1, filtro)
+                return
+              case 3:
+                filtro = `&status=Aprovado`
+                getPedidos(1, filtro)
+                return
+              case 4:
+                filtro = `&status=Reprovado`
+                getPedidos(1, filtro)
+                return
+            }
+          }
+        }
+        getPedidos(1, filtro)
+    }
   }
 
   function handleSearchAdvanced() {
     const base = { nomeAluno: '', matriculaAluno: '', periodoAluno: '', boxAluno: '', colaborador: '', createdAt: '' };
 
     const filterConditions = [
-      { key: 'nomeAluno', value: alunoName_his.toLowerCase(), condition: alunoName_his !== base.nomeAluno },
+      { key: 'nomeAluno', value: alunoName_his, condition: alunoName_his !== base.nomeAluno },
       { key: 'matricula', value: alunoMatricula_his, condition: alunoMatricula_his !== base.matriculaAluno },
       { key: 'periodoAluno', value: alunoPeriodo_his, condition: alunoPeriodo_his !== base.periodoAluno },
       { key: 'box', value: alunoBox_his, condition: alunoBox_his !== base.boxAluno },
@@ -230,15 +268,14 @@ function History() {
 
     const filteredConditions = filterConditions.filter(({ condition }) => condition);
     let keys = filteredConditions.map(({ key }) => key);
-    let values = filteredConditions.map(({ value }) => String(value).toLowerCase());
+    let values = filteredConditions.map(({ value }) => String(value));
 
     let result = [];
     let search = [];
 
     if (colabName_his && colabName_his.value !== undefined) {
       keys.push('colaborador');
-      values.push(colabName_his.value.toLowerCase());
-      setColaboradorName(colabName_his.value);
+      values.push(colabName_his.value);
     }
 
     if (filteredConditions.some(({ key }) => key === 'createdAt')) {
@@ -246,12 +283,12 @@ function History() {
       search = pedidos.filter(e => isDateInRange(e['createdAt'], start, end));
       keys.splice(keys.indexOf('createdAt'), 1);
       result = search.filter(e => keys.every(key => {
-        const value = String(e[key]).toLowerCase();
+        const value = String(e[key]);
         return values.some(val => value.includes(val));
       }));
     } else {
       result = pedidos.filter(e => keys.every(key => {
-        const value = String(e[key]).toLowerCase();
+        const value = String(e[key]);
         return values.some(val => value.includes(val));
       }));
     }
@@ -261,7 +298,6 @@ function History() {
     console.log(result);
     handleSearchResult(result);
   }
-
 
   function isDateInRange(date, start, end) {
     const data = new Date(date);
@@ -274,7 +310,6 @@ function History() {
     var endDateObj = moment(end, ['DD/MM/YYYY'], true);
     return dateObj.isSameOrAfter(startDateObj) && dateObj.isSameOrBefore(endDateObj);
   }
-
 
   const handleCronologicalResult = () => {
     const sortedPedidos = pedidos.slice().sort((a, b) => {
@@ -315,8 +350,6 @@ function History() {
     setTipo('');
     setStatus('');
     setDate('');
-    setSearchCategory('Cronológico');
-    setSearchTerm('');
   }
 
   // Components
@@ -342,18 +375,89 @@ function History() {
     });
   });
 
-
-  const optionsColaborador = staff.map(e => ({
-    label: e,
-    value: e,
+  const optionsColaborador = pedidos.map(e => ({
+    label: e.colaborador,
+    value: e.colaborador,
   }));
 
   //Paginação
+
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    console.log(page)
-    getPedidos(page)
+    let filtro = ''
+    switch (searchData.category) {
+      case 'Nome':
+        filtro = `&nomeAluno=${searchData.term}`
+        getPedidos(page, filtro)
+        break
+      case 'Matrícula':
+        filtro = `&matricula=${searchData.term}`
+        getPedidos(page, filtro)
+        break
+      case 'Período':
+        filtro = `&periodoAluno=${searchData.term}`
+        getPedidos(page, filtro)
+        break
+      case 'Box':
+        filtro = `&box=${searchData.term}`
+        getPedidos(page, filtro)
+        break
+      case 'Colaborador':
+        filtro = `&colaborador=${searchData.term}`
+        getPedidos(page, filtro)
+        break
+      default:
+        console.log('passou')
+        if (orderModalidadeUsers !== 2) {
+          switch (orderModalidadeUsers) {
+            case 3:
+              setOrderStatusUsers(2)
+              filtro = `&tipo=Entrada`
+              getPedidos(page, filtro)
+              console.log('modalidade entrada')
+              break
+            case 1:
+              filtro = `&tipo=Saída`
+              setOrderStatusUsers(2)
+              getPedidos(page, filtro)
+              console.log('modalidade saída')
+              break
+          }
+        } else if (orderStatusUsers !== 2) {
+          switch (orderStatusUsers) {
+            case 3:
+              filtro = `&status=Pendente`
+              setOrderModalidadePedido(2)
+              getPedidos(page, filtro)
+              break
+            case 4:
+              filtro = `&status=Aprovado`
+              setOrderModalidadePedido(2)
+              getPedidos(page, filtro)
+              break
+            case 1:
+              filtro = `&status=Reprovado`
+              setOrderModalidadePedido(2)
+              getPedidos(page, filtro)
+              break
+          }
+        } else {
+          setOrderModalidadePedido(2)
+          setOrderStatusUsers(2)
+          getPedidos(page, filtro)
+        }
+    }
   };
+
+  useEffect(() => {
+    if (searchData.term.length >= 1) {
+      setPaginatorStatus(true)
+    } else {
+      setPaginatorStatus(false)
+    }
+  }, [searchData.term]);
+
+  //Pesquisa
 
   function detectBoxEntry(e) {
     setAlunoBox(e.target.value.replace(/[^0-9]/g, ''));
@@ -367,6 +471,39 @@ function History() {
     console.log(date_his)
   }, [date_his]);
 
+  const handleOrderModalidadePedido = async () => {
+    if (orderModalidadeUsers === 1) {
+      setOrderModalidadePedido(2)
+      setOrderStatusUsers(2)
+    } else if (orderModalidadeUsers === 2) {
+      setOrderModalidadePedido(3)
+      setOrderStatusUsers(2)
+    } else if (orderModalidadeUsers === 3) {
+      setOrderModalidadePedido(1)
+      setOrderStatusUsers(2)
+    }
+    setSearchData({ ...searchData, category: 'Modalidade' })
+    handleSearchSimple(1)
+  }
+
+  const handleOrderStatusPedido = async () => {
+    if (orderStatusUsers === 1) {
+      setOrderStatusUsers(2)
+      setOrderModalidadePedido(2)
+    } else if (orderStatusUsers === 2) {
+      setOrderStatusUsers(3)
+      setOrderModalidadePedido(2)
+    } else if (orderStatusUsers === 3) {
+      setOrderStatusUsers(4)
+      setOrderModalidadePedido(2)
+    } else if (orderStatusUsers === 4) {
+      setOrderStatusUsers(1)
+      setOrderModalidadePedido(2)
+    }
+    setSearchData({ ...searchData, category: 'Status' })
+    handleSearchSimple(2)
+  }
+
   return (
     <>
       <Container className='containerDesktop'>
@@ -379,16 +516,14 @@ function History() {
             <div className="historyContainer">
               <div className="searchBoxHistory">
                 <div className="searchBoxInputs">
-                  <input type='text' placeholder="Pesquisar por nome, matrícula ..." className='form-3' value={searchTerm} onChange={handleSearchTermChange} />
-                  <select value={searchCategory} onChange={handleSearchCategoryChange} className='searchBoxSelect'>
+                  <input type='text' placeholder="Pesquisar por nome, matrícula ..." className='form-3' value={searchData.term} onChange={handleSearchTermChange} />
+                  <select value={searchData.category} onChange={handleSearchCategoryChange} className='searchBoxSelect'>
                     <option value='Cronológico'>Cronológico</option>
                     <option>Nome</option>
                     <option>Matrícula</option>
                     <option>Período</option>
                     <option>Box</option>
-                    <option>Status</option>
                     <option>Colaborador</option>
-                    <option>Modalidade</option>
                   </select>
                 </div>
                 <div className="searchBoxButtons">
@@ -396,7 +531,7 @@ function History() {
                   <button className='button-11' onClick={() => setShowPopSearch(true)}>Pesquisa avançada</button>
                 </div>
               </div>
-              <HistoryTable data={resultadosPesquisa} />
+              <HistoryTable data={resultadosPesquisa} onOrdenarModalidade={handleOrderModalidadePedido} onOrdenarStatus={handleOrderStatusPedido} />
             </div>
           </div>
         </div>

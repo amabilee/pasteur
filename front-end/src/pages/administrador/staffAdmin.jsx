@@ -73,6 +73,7 @@ function StaffAdmin() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1)
   const [paginatorStatus, setPaginatorStatus] = useState(false)
+  const [orderUsers, setOrderUsers] = useState(1)
 
 
   const [searchData, setSearchData] = useState({ term: '', category: 'Selecione' })
@@ -115,11 +116,13 @@ function StaffAdmin() {
   //Requisição GET usuarios
 
   useEffect(() => {
-    getUsers(1)
+    getUsers(1, '')
+    setCurrentPage(1);
   }, []);
 
   //Snackbar settings
   const openSnackBarMessage = () => setOpen(true);
+
   const closeSnackBarMessage = (event, reason) => {
     if (reason === 'clickaway') return;
     setOpen(false);
@@ -129,38 +132,6 @@ function StaffAdmin() {
       <CloseIcon fontSize="small" />
     </IconButton>
   );
-
-  //Pesquisar Usuário
-
-  const handleSearchSimple = () => {
-    let filtro = ''
-    switch (searchData.category) {
-      case 'Nome':
-        filtro = `&nomeUser=${searchData.term}`
-        getUsers(1, filtro);
-        return
-      case 'Matrícula':
-        filtro = `&matricula=${searchData.term}`
-        getUsers(1, filtro);
-        return
-      default:
-        filtro = ''
-        getUsers(1, filtro);
-        return
-    }
-  };
-
-  const handleSearchTermChange = (e) => {
-    setSearchData({ ...searchData, term: e.target.value })
-  }
-
-  useEffect(() => {
-    if (searchData.term.length >= 1) {
-      setPaginatorStatus(true)
-    } else {
-      setPaginatorStatus(false)
-    }
-  }, [searchData.term]);
 
   //Reset campos
   const returnSearch = () => {
@@ -191,14 +162,12 @@ function StaffAdmin() {
       setErrorMessage('Preencha todos os campos antes de adicionar.');
     } else if (existingColab) {
       setErrorMessage('Já existe um usuário com essa matrícula.');
-      console.log('Já existe um usuário com essa matrícula.');
     } else if (senha_colab !== senhaConfirm_colab) {
       setErrorMessage(`A senha deve ser igual nos campos 'Senha' e 'Confirmar senha'.`);
     } else if (parseInt(matricula_colab <= 0)) {
       setErrorMessage('A matrícula deve ser maior que zero.');
     } else {
       formatColabData()
-      console.log('Informações do usuário:', matrixColab); //Envio para a API do usuario criado
       openSnackBarMessage();
       setSnackBarMessage('Usuário criado com sucesso');
       setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
@@ -213,7 +182,6 @@ function StaffAdmin() {
             "access-level": `${userCargo}`
           }
         });
-        console.log(response);
         returnSearch();
         getUsers(1)
       } catch (e) {
@@ -231,6 +199,7 @@ function StaffAdmin() {
 
     }
   };
+
   function formatColabData() {
     const colabFields = ['nomeUser', 'matricula', 'cargo', 'senha']
     colabFields.forEach(field => matrixColab[field] = eval(`${field}_colab`))
@@ -244,6 +213,7 @@ function StaffAdmin() {
     setShowPopEdit(true);
     setShowPopCreate(false);
   };
+
   const handleEditColaborador = async () => {
     const requiredFields = ['nomeUser', 'cargo', 'senha']
     if (requiredFields.some(field => !colaboradorDataEdit[field])) {
@@ -255,7 +225,6 @@ function StaffAdmin() {
       setSnackBarMessage('Usuário editado com sucesso');
       setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
 
-      console.log('Novas informações do usuário editado:', colaboradorDataEdit);
       var token = localStorage.getItem("loggedUserToken");
       var matriculaID = Number(colaboradorDataEdit.matricula)
       var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
@@ -268,7 +237,6 @@ function StaffAdmin() {
             "access-level": `${userCargo}`
           }
         });
-        console.log(response);
         returnSearch();
         getUsers(1)
       } catch (e) {
@@ -303,7 +271,6 @@ function StaffAdmin() {
             "access-level": `${userCargo}`
           }
         });
-        console.log(response);
         openSnackBarMessage();
         setSnackBarMessage(response.data.message);
         setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
@@ -332,15 +299,31 @@ function StaffAdmin() {
     switch (searchData.category) {
       case 'Nome':
         filtro = `&nomeUser=${searchData.term}`
-        return
+        getUsers(page, filtro);
+        console.log('nome')
+        break
       case 'Matrícula':
         filtro = `&matricula=${searchData.term}`
-        return
-      case 'Cargo':
-        filtro = `&cargo=${searchData.term}`
-        return
+        getUsers(page, filtro);
+        break
+      default:
+        if (orderUsers === 1 || orderUsers === 2 || orderUsers === 3) {
+          switch (orderUsers) {
+            case 1:
+              filtro = ``
+              getUsers(page, filtro);
+              break
+            case 3:
+              filtro = `&status=0`
+              getUsers(page, filtro);
+              break
+            case 2:
+              filtro = `&status=1`
+              getUsers(page, filtro);
+              return
+          }
+        }
     }
-    getUsers(page, filtro);
   };
 
   async function getUsers(pagina, filtro = '') {
@@ -366,7 +349,10 @@ function StaffAdmin() {
       } else {
         setTotalPages(pagesTotal);
       }
-      setSearchData({ ...searchData, term: '', category: '' })
+      if (pagesTotal <= currentPage - 1) {
+        setCurrentPage(1)
+      }
+      // setSearchData({ ...searchData, term: '', category: '' })
       setResultadosPesquisa(response.data.users);
     } catch (e) {
       console.error(e);
@@ -382,10 +368,72 @@ function StaffAdmin() {
     }
   }
 
-  const ordenarUsers = async () => {
-
-    console.log('ordenar')
+  const ordenarUsers = () => {
+    if (orderUsers === 1) {
+      setOrderUsers(2)
+      setCurrentPage(1)
+      console.log(1)
+    } else if (orderUsers === 2) {
+      setOrderUsers(3)
+      setCurrentPage(1)
+      console.log(2)
+    } else if (orderUsers === 3) {
+      setOrderUsers(1)
+      setCurrentPage(1)
+      console.log(3)
+    }
+    console.log(orderUsers)
+    setSearchData({ ...searchData, category: 'Ordenar' })
+    handleSearchSimple(true)
   }
+
+  //Pesquisar Usuário
+
+  const handleSearchSimple = (ordenar) => {
+    let filtro = ''
+    if (ordenar) {
+      if (orderUsers === 1) {
+        filtro = `&status=1`
+      } else if (orderUsers === 2) {
+        filtro = `&status=0`
+      } else if (orderUsers === 3) {
+        filtro = ``
+      }
+      getUsers(1, filtro);
+      console.log(true)
+    } else {
+      console.log(false)
+      switch (searchData.category) {
+        case 'Nome':
+          filtro = `&nomeUser=${searchData.term}`
+          getUsers(1, filtro);
+          console.log(1)
+          break
+        case 'Matrícula':
+          filtro = `&matricula=${searchData.term}`
+          getUsers(1, filtro);
+          console.log(2)
+          break
+        default:
+          filtro = ''
+          getUsers(1, filtro);
+          console.log(3)
+          break
+      }
+    }
+  };
+
+  const handleSearchTermChange = (e) => {
+    setSearchData({ ...searchData, term: e.target.value })
+  }
+
+  // useEffect(() => {
+  //   if (searchData.term.length >= 1) {
+  //     setPaginatorStatus(true)
+  //   } else {
+  //     setPaginatorStatus(false)
+  //   }
+  // }, [searchData.term]);
 
   return (
     <>
@@ -411,7 +459,7 @@ function StaffAdmin() {
                   </select>
                 </div>
                 <div className="searchBoxButtonsFamily">
-                  <button className='button-10' onClick={handleSearchSimple}>Pesquisar</button>
+                  <button className='button-10' onClick={(e) => handleSearchSimple(false)}>Pesquisar</button>
                 </div>
               </div>
               <UsuarioTable data={resultadosPesquisa} onEdit={openEditPop} onDelete={openDeletePopup} onOrdenar={ordenarUsers} />

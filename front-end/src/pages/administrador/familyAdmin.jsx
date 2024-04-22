@@ -87,7 +87,6 @@ function FamilyAdmin() {
       } else {
         setTotalPages(pagesTotal);
       }
-      setSearchTerm('')
     } catch (e) {
       console.error(e);
       if (e.response.status == 401) {
@@ -140,13 +139,6 @@ function FamilyAdmin() {
     getFamilia(1)
   }, []);
 
-  useEffect(() => {
-    if (searchTerm.length >= 1) {
-      setPaginatorStatus(true)
-    } else {
-      setPaginatorStatus(false)
-    }
-  }, [searchTerm]);
 
   const returnSearch = () => {
     setShowPopCreate(false);
