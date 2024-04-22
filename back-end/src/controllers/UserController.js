@@ -4,7 +4,7 @@ import bcrypt from 'bcrypt';
 
 class UserController {
   static async getAllEntities(req, res) {
-    const { page = 1, limit = 7, cargo, matricula, nomeUser } = req.query;
+    const { page = 1, limit = 7, cargo, matricula, nomeUser, status } = req.query;
 
     try {
       const offset = (page - 1) * limit;
@@ -19,6 +19,9 @@ class UserController {
       }
       if (nomeUser) {
         whereClause.nomeUser = { [Sequelize.Op.like]: `%${nomeUser}%` };
+      }
+      if (status) {
+        whereClause.status = { [Sequelize.Op.like]: `%${status}%` };
       }
 
       const { count, rows: users } = await User.findAndCountAll({

@@ -306,7 +306,7 @@
 .tableHistory thead tr th:nth-child(6),
 .tableHistory thead tr th:nth-child(7),
 .tableHistory thead tr th:nth-child(8) {
-    width: 8.75%;
+    width: 10%;
 }
 
 .tableHistory tbody tr td:nth-child(1),
@@ -321,7 +321,7 @@
 .tableHistory tbody tr td:nth-child(6),
 .tableHistory tbody tr td:nth-child(7),
 .tableHistory tbody tr td:nth-child(8) {
-    width: 8.75%;
+    width: 10%;
 }
 
 .tableHistory thead tr th:nth-last-child(1) {
