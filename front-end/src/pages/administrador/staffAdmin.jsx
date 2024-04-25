@@ -383,7 +383,7 @@ function StaffAdmin() {
       console.log(3)
     }
     console.log(orderUsers)
-    setSearchData({ ...searchData, category: 'Ordenar' })
+    setSearchData(({ term: '', category: 'Selecione' }))
     handleSearchSimple(true)
   }
 
@@ -425,6 +425,10 @@ function StaffAdmin() {
 
   const handleSearchTermChange = (e) => {
     setSearchData({ ...searchData, term: e.target.value })
+  }
+
+  function detectMatriculaEntry(e) {
+    setColabMatricula(e.target.value.replace(/[^0-9]/g, ''));
   }
 
   // useEffect(() => {
@@ -485,7 +489,7 @@ function StaffAdmin() {
               </div>
               <div className='searchForms'>
                 <span className='body-normal margin-bottom-5'>Matrícula</span>
-                <input placeholder='Digite a matrícula...' className='form-1' value={matricula_colab} onChange={(e) => setColabMatricula(e.target.value)} type='number' />
+                <input placeholder='Digite a matrícula...' className='form-1' value={matricula_colab} onChange={(e) => detectMatriculaEntry(e)} type='text' />
               </div>
               <div className='searchForms'>
                 <span className='body-normal margin-bottom-5'>Cargo</span>

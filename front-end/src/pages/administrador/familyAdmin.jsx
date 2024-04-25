@@ -309,6 +309,14 @@ function FamilyAdmin() {
     getFamilia(page, filtro);
   };
 
+  function detectQuantMaxEntry(e) {
+    setFamilyquantidadeMAX(e.target.value.replace(/[^0-9]/g, ''));
+  }
+
+  function detectQuantMinEntry(e) {
+    setFamilyquantidadeMIN(e.target.value.replace(/[^0-9]/g, ''));
+  }
+
   return (
     <>
       <HeaderHomeAdmin />
@@ -354,11 +362,11 @@ function FamilyAdmin() {
               </div>
               <div className='searchForms'>
                 <span className='body-normal margin-bottom-5'>Quantidade máxima / esperada</span>
-                <input placeholder='Digite um valor...' className='form-1' value={quantidadeMAX_fam} onChange={(e) => setFamilyquantidadeMAX(e.target.value)} type='number' />
+                <input placeholder='Digite um valor...' className='form-1' value={quantidadeMAX_fam} onChange={(e) => detectQuantMaxEntry(e)} type='text' />
               </div>
               <div className='searchForms'>
                 <span className='body-normal margin-bottom-5'>Quantidade mínima</span>
-                <input placeholder='Digite um valor...' className='form-1' value={quantidadeMIN_fam} onChange={(e) => setFamilyquantidadeMIN(e.target.value)} type='number' />
+                <input placeholder='Digite um valor...' className='form-1' value={quantidadeMIN_fam} onChange={(e) => detectQuantMinEntry(e)} type='text' />
               </div>
             </div>
           </>
