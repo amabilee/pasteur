@@ -27,11 +27,11 @@ function History() {
   const [staff, setStaff] = useState([]);
 
 
-  const [alunoName_his, setAlunoName] = useState('');
-  const [alunoMatricula_his, setAlunoMatricula] = useState('');
-  const [alunoPeriodo_his, setAlunoPeriodo] = useState('');
-  const [alunoBox_his, setAlunoBox] = useState('');
-  const [colabName_his, setColabName] = useState();
+  const [nomeAluno_his, setAlunoName] = useState('');
+  const [matricula_his, setAlunoMatricula] = useState('');
+  const [pediodoAluno_his, setAlunoPeriodo] = useState('');
+  const [box_his, setAlunoBox] = useState('');
+  const [colaborador_his, setColabName] = useState();
   const [tipo_his, setTipo] = useState('');
   const [date_his, setDate] = useState('');
   const [status_his, setStatus] = useState('');
@@ -248,6 +248,9 @@ function History() {
                 return
             }
           }
+        } else {
+          searchData.category = 'Selecione'
+          console.log('categoria')
         }
         getPedidos(1, filtro)
     }
@@ -257,10 +260,10 @@ function History() {
     const base = { nomeAluno: '', matriculaAluno: '', periodoAluno: '', boxAluno: '', colaborador: '', createdAt: '' };
 
     const filterConditions = [
-      { key: 'nomeAluno', value: alunoName_his, condition: alunoName_his !== base.nomeAluno },
-      { key: 'matricula', value: alunoMatricula_his, condition: alunoMatricula_his !== base.matriculaAluno },
-      { key: 'periodoAluno', value: alunoPeriodo_his, condition: alunoPeriodo_his !== base.periodoAluno },
-      { key: 'box', value: alunoBox_his, condition: alunoBox_his !== base.boxAluno },
+      { key: 'nomeAluno', value: nomeAluno_his, condition: nomeAluno_his !== base.nomeAluno },
+      { key: 'matricula', value: matricula_his, condition: matricula_his !== base.matriculaAluno },
+      { key: 'periodoAluno', value: pediodoAluno_his, condition: pediodoAluno_his !== base.periodoAluno },
+      { key: 'box', value: box_his, condition: box_his !== base.boxAluno },
       { key: 'tipo', value: tipo_his, condition: tipo_his?.length >= 3 },
       { key: 'status', value: status_his, condition: status_his?.length >= 3 },
       { key: 'createdAt', value: date_his, condition: date_his !== base.date && date_his?.includes('-') },
@@ -273,9 +276,9 @@ function History() {
     let result = [];
     let search = [];
 
-    if (colabName_his && colabName_his.value !== undefined) {
+    if (colaborador_his && colaborador_his.value !== undefined) {
       keys.push('colaborador');
-      values.push(colabName_his.value);
+      values.push(colaborador_his.value);
     }
 
     if (filteredConditions.some(({ key }) => key === 'createdAt')) {
@@ -296,7 +299,27 @@ function History() {
     console.log(keys);
     console.log(values);
     console.log(result);
-    handleSearchResult(result);
+
+    let filtro = ''
+    if (keys.length >= 1) {
+      for (let i = 0; i <= keys.length - 1; i++) {
+        let currentKeyData = eval(`${keys[i]}_his`)
+        filtro += `&${keys[i]}=${currentKeyData}`
+        setSearchData({ ...searchData, category: filtro })
+        console.log(i)
+      }
+    }
+    getPedidos(1, filtro)
+    returnSearch()
+    openSnackBarMessage()
+    if (result.length === 0) {
+      setSnackBarMessage('Não foram encontrados resultados')
+      setSnackBarStyle({ sx: { background: "#BE5353", color: "white", borderRadius: '15px' } })
+    } else {
+      setSnackBarMessage('Pesquisa realizada com sucesso')
+      setSnackBarStyle({ sx: { background: "#79B874", color: "white", borderRadius: '15px' } })
+    }
+    console.log(filtro)
   }
 
   function isDateInRange(date, start, end) {
@@ -320,25 +343,25 @@ function History() {
     setResultadosPesquisa(sortedPedidos);
   };
 
-  function handleSearchResult(result) {
-    const pedidosCronologicos = result.sort((a, b) => {
-      const dateTimeA = `${a.data} ${a.hora}`;
-      const dateTimeB = `${b.data} ${b.hora}`;
-      const dateObjectA = new Date(dateTimeA.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1'));
-      const dateObjectB = new Date(dateTimeB.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1'));
-      return dateObjectB - dateObjectA;
-    });
-    setResultadosPesquisa(pedidosCronologicos);
-    openSnackBarMessage()
-    if (result.length === 0) {
-      setSnackBarMessage('Não foram encontrados resultados')
-      setSnackBarStyle({ sx: { background: "#BE5353", color: "white", borderRadius: '15px' } })
-    } else {
-      setSnackBarMessage('Pesquisa realizada com sucesso')
-      setSnackBarStyle({ sx: { background: "#79B874", color: "white", borderRadius: '15px' } })
-    }
-    returnSearch()
-  }
+  // function handleSearchResult(result) {
+  //   const pedidosCronologicos = result.sort((a, b) => {
+  //     const dateTimeA = `${a.data} ${a.hora}`;
+  //     const dateTimeB = `${b.data} ${b.hora}`;
+  //     const dateObjectA = new Date(dateTimeA.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1'));
+  //     const dateObjectB = new Date(dateTimeB.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1'));
+  //     return dateObjectB - dateObjectA;
+  //   });
+  //   setResultadosPesquisa(pedidosCronologicos);
+  //   openSnackBarMessage()
+  //   if (result.length === 0) {
+  //     setSnackBarMessage('Não foram encontrados resultados')
+  //     setSnackBarStyle({ sx: { background: "#BE5353", color: "white", borderRadius: '15px' } })
+  //   } else {
+  //     setSnackBarMessage('Pesquisa realizada com sucesso')
+  //     setSnackBarStyle({ sx: { background: "#79B874", color: "white", borderRadius: '15px' } })
+  //   }
+  //   returnSearch()
+  // }
 
   function returnSearch() {
     setShowPopSearch(false)
@@ -385,26 +408,31 @@ function History() {
   const handlePageChange = (page) => {
     setCurrentPage(page);
     let filtro = ''
-    switch (searchData.category) {
-      case 'Nome':
+    switch (searchData.category[0]) {
+      case 'N':
         filtro = `&nomeAluno=${searchData.term}`
         getPedidos(page, filtro)
         break
-      case 'Matrícula':
+      case 'M':
         filtro = `&matricula=${searchData.term}`
         getPedidos(page, filtro)
         break
-      case 'Período':
+      case 'P':
         filtro = `&periodoAluno=${searchData.term}`
         getPedidos(page, filtro)
         break
-      case 'Box':
+      case 'B':
         filtro = `&box=${searchData.term}`
         getPedidos(page, filtro)
         break
-      case 'Colaborador':
+      case 'C':
         filtro = `&colaborador=${searchData.term}`
         getPedidos(page, filtro)
+        break
+      case '&':
+        filtro = searchData.category
+        getPedidos(page, filtro)
+        console.log('search')
         break
       default:
         console.log('passou')
@@ -482,7 +510,7 @@ function History() {
       setOrderModalidadePedido(1)
       setOrderStatusUsers(2)
     }
-    setSearchData({ ...searchData, category: 'Modalidade' })
+    setSearchData(({ term: '', category: 'Selecione' }))
     handleSearchSimple(1)
   }
 
@@ -500,7 +528,7 @@ function History() {
       setOrderStatusUsers(1)
       setOrderModalidadePedido(2)
     }
-    setSearchData({ ...searchData, category: 'Status' })
+    setSearchData(({ term: '', category: 'Selecione' }))
     handleSearchSimple(2)
   }
 
@@ -556,7 +584,7 @@ function History() {
                 </div>
                 <div className='searchForms'>
                   <span className='body-normal margin-bottom-5'>Colaborador</span>
-                  <Select value={colabName_his} onChange={setColabName} options={optionsColaborador} placeholder='Selecione uma opção' className='select1' />
+                  <Select value={colaborador_his} onChange={setColabName} options={optionsColaborador} placeholder='Selecione uma opção' className='select1' />
                 </div>
                 <div className='searchForms'>
                   <span className='body-normal margin-bottom-5'>Modalidade</span>
@@ -582,15 +610,15 @@ function History() {
               <div className="searchCardBottomBox">
                 <div className='searchForms'>
                   <span className='body-normal margin-bottom-5'>Nome</span>
-                  <input placeholder='Nome do aluno...' className='form-1' value={alunoName_his} onChange={(e) => setAlunoName(e.target.value)} type='text' style={{ width: '220px', marginRight: '20px' }} />
+                  <input placeholder='Nome do aluno...' className='form-1' value={nomeAluno_his} onChange={(e) => setAlunoName(e.target.value)} type='text' style={{ width: '220px', marginRight: '20px' }} />
                 </div>
                 <div className='searchForms'>
                   <span className='body-normal margin-bottom-5'>Matrícula</span>
-                  <input placeholder='Matrícula do aluno...' className='form-1' value={alunoMatricula_his} onChange={(e) => detectMatriculaEntry(e)} type='text' style={{ width: '220px', marginRight: '20px' }} />
+                  <input placeholder='Matrícula do aluno...' className='form-1' value={matricula_his} onChange={(e) => detectMatriculaEntry(e)} type='text' style={{ width: '220px', marginRight: '20px' }} />
                 </div>
                 <div className='searchForms'>
                   <span className='body-normal margin-bottom-5'>Período</span>
-                  <select className='form-1' value={alunoPeriodo_his} onChange={(e) => setAlunoPeriodo(e.target.value)} style={{ width: '160px', marginRight: '20px' }}>
+                  <select className='form-1' value={pediodoAluno_his} onChange={(e) => setAlunoPeriodo(e.target.value)} style={{ width: '160px', marginRight: '20px' }}>
                     <option value='' disabled>Selecionar</option>
                     <option>1</option>
                     <option>2</option>
@@ -606,7 +634,7 @@ function History() {
                 </div>
                 <div className='searchForms'>
                   <span className='body-normal margin-bottom-5'>Box de armazenamento</span>
-                  <input placeholder='Box do aluno...' className='form-1' value={alunoBox_his} onChange={(e) => detectBoxEntry(e)} type='text' />
+                  <input placeholder='Box do aluno...' className='form-1' value={box_his} onChange={(e) => detectBoxEntry(e)} type='text' />
                 </div>
               </div>
             </div>
