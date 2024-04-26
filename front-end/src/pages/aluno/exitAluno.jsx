@@ -179,7 +179,7 @@ function ExitAluno() {
                 }
             })
             console.log(response.data.pedidos);
-            const pedidosDisponiveisSaida = searchPedidosBasedMatricula(formatedMatricula, response.data.pedidos);
+            const pedidosDisponiveisSaida = searchPedidosBasedMatricula(response.data.pedidos);
             console.log("Pedidos disponíveis para saída:", pedidosDisponiveisSaida);
             console.log("Pedidos no sistema:", pedidos);
         } catch (e) {
@@ -195,7 +195,7 @@ function ExitAluno() {
         }
     }
 
-    function searchPedidosBasedMatricula(matriculaDesejada, pedidos) {
+    function searchPedidosBasedMatricula(pedidos) {
         const pedidosDisponiveisSaida = [];
         const pedidosFiltrados = pedidos
         console.log("Pedidos geral filtrados:", pedidosFiltrados);
@@ -257,9 +257,17 @@ function ExitAluno() {
 
     function detectBoxEntry(e) {
         setBox(e.target.value.replace(/[^0-9]/g, ''));
-        if (box.length <= 2) {
+        let tempBox = e.target.value
+        if (tempBox.length <= 2) {
             setPedidoPossivelMovimentar([]);
             setSelectedItems([])
+            changeAddButtonStyle('button-6-disable');
+            changeAddButtonState(true);
+            console.log(box.length)
+        } else {
+            changeAddButtonStyle('button-6');
+            changeAddButtonState(false);
+            console.log('preencheu')
         }
     }
 

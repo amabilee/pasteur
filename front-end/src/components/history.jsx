@@ -31,14 +31,15 @@ function History() {
   const [matricula_his, setAlunoMatricula] = useState('');
   const [pediodoAluno_his, setAlunoPeriodo] = useState('');
   const [box_his, setAlunoBox] = useState('');
-  const [colaborador_his, setColabName] = useState();
+  const [colaborador_his, setColabName] = useState('');
   const [tipo_his, setTipo] = useState('');
-  const [date_his, setDate] = useState('');
+  const [createdAt_his, setDate] = useState('');
   const [status_his, setStatus] = useState('');
   const [open, setOpen] = React.useState(false);
   const [snackBarMessage, setSnackBarMessage] = useState('')
   const [snackBarStyle, setSnackBarStyle] = useState({ sx: { background: "white", color: "black", borderRadius: '10px' } })
   const [pedidos, setPedidos] = useState([])
+  let allDates = [];
 
   const usersSet = new Set();
 
@@ -147,6 +148,15 @@ function History() {
         setCurrentPage(1)
       }
       // setSearchData({ ...searchData, term: '', category: '' })
+      if (pagesTotal != 0 && currentPage == 1) {
+        openSnackBarMessage()
+        setSnackBarMessage('Correspondências encontradas')
+        setSnackBarStyle({ sx: { background: "#79B874", color: "white", borderRadius: '15px' } })
+      } else if (pagesTotal == 0){
+        openSnackBarMessage()
+        setSnackBarMessage('Não foram encontradas correspondências')
+        setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
+      }
       setResultadosPesquisa(response.data.users);
     } catch (e) {
       console.error(e)
@@ -258,7 +268,6 @@ function History() {
 
   function handleSearchAdvanced() {
     const base = { nomeAluno: '', matriculaAluno: '', periodoAluno: '', boxAluno: '', colaborador: '', createdAt: '' };
-
     const filterConditions = [
       { key: 'nomeAluno', value: nomeAluno_his, condition: nomeAluno_his !== base.nomeAluno },
       { key: 'matricula', value: matricula_his, condition: matricula_his !== base.matriculaAluno },
@@ -266,72 +275,31 @@ function History() {
       { key: 'box', value: box_his, condition: box_his !== base.boxAluno },
       { key: 'tipo', value: tipo_his, condition: tipo_his?.length >= 3 },
       { key: 'status', value: status_his, condition: status_his?.length >= 3 },
-      { key: 'createdAt', value: date_his, condition: date_his !== base.date && date_his?.includes('-') },
+      { key: 'createdAt', value: createdAt_his, condition: createdAt_his !== base.date && createdAt_his?.includes('-') },
     ];
 
     const filteredConditions = filterConditions.filter(({ condition }) => condition);
     let keys = filteredConditions.map(({ key }) => key);
-    let values = filteredConditions.map(({ value }) => String(value));
 
-    let result = [];
-    let search = [];
-
-    if (colaborador_his && colaborador_his.value !== undefined) {
+    if (colaborador_his && colaborador_his !== '') {
       keys.push('colaborador');
-      values.push(colaborador_his.value);
-    }
-
-    if (filteredConditions.some(({ key }) => key === 'createdAt')) {
-      const [start, end] = date_his.split('-').map(d => d.trim());
-      search = pedidos.filter(e => isDateInRange(e['createdAt'], start, end));
-      keys.splice(keys.indexOf('createdAt'), 1);
-      result = search.filter(e => keys.every(key => {
-        const value = String(e[key]);
-        return values.some(val => value.includes(val));
-      }));
-    } else {
-      result = pedidos.filter(e => keys.every(key => {
-        const value = String(e[key]);
-        return values.some(val => value.includes(val));
-      }));
     }
 
     console.log(keys);
-    console.log(values);
-    console.log(result);
 
     let filtro = ''
     if (keys.length >= 1) {
       for (let i = 0; i <= keys.length - 1; i++) {
-        let currentKeyData = eval(`${keys[i]}_his`)
+        var currentKeyData = eval(`${keys[i]}_his`)
         filtro += `&${keys[i]}=${currentKeyData}`
         setSearchData({ ...searchData, category: filtro })
+
         console.log(i)
       }
     }
     getPedidos(1, filtro)
     returnSearch()
-    openSnackBarMessage()
-    if (result.length === 0) {
-      setSnackBarMessage('Não foram encontrados resultados')
-      setSnackBarStyle({ sx: { background: "#BE5353", color: "white", borderRadius: '15px' } })
-    } else {
-      setSnackBarMessage('Pesquisa realizada com sucesso')
-      setSnackBarStyle({ sx: { background: "#79B874", color: "white", borderRadius: '15px' } })
-    }
     console.log(filtro)
-  }
-
-  function isDateInRange(date, start, end) {
-    const data = new Date(date);
-    const dia = String(data.getDate()).padStart(2, '0');
-    const mes = String(data.getMonth() + 1).padStart(2, '0');
-    const ano = data.getFullYear();
-    `${dia}/${mes}/${ano}`;
-    var dateObj = moment(`${dia}/${mes}/${ano}`, ['DD/MM/YYYY'], true);
-    var startDateObj = moment(start, ['DD/MM/YYYY'], true);
-    var endDateObj = moment(end, ['DD/MM/YYYY'], true);
-    return dateObj.isSameOrAfter(startDateObj) && dateObj.isSameOrBefore(endDateObj);
   }
 
   const handleCronologicalResult = () => {
@@ -343,25 +311,6 @@ function History() {
     setResultadosPesquisa(sortedPedidos);
   };
 
-  // function handleSearchResult(result) {
-  //   const pedidosCronologicos = result.sort((a, b) => {
-  //     const dateTimeA = `${a.data} ${a.hora}`;
-  //     const dateTimeB = `${b.data} ${b.hora}`;
-  //     const dateObjectA = new Date(dateTimeA.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1'));
-  //     const dateObjectB = new Date(dateTimeB.replace(/(\d{2})\/(\d{2})\/(\d{4})/, '$3-$2-$1'));
-  //     return dateObjectB - dateObjectA;
-  //   });
-  //   setResultadosPesquisa(pedidosCronologicos);
-  //   openSnackBarMessage()
-  //   if (result.length === 0) {
-  //     setSnackBarMessage('Não foram encontrados resultados')
-  //     setSnackBarStyle({ sx: { background: "#BE5353", color: "white", borderRadius: '15px' } })
-  //   } else {
-  //     setSnackBarMessage('Pesquisa realizada com sucesso')
-  //     setSnackBarStyle({ sx: { background: "#79B874", color: "white", borderRadius: '15px' } })
-  //   }
-  //   returnSearch()
-  // }
 
   function returnSearch() {
     setShowPopSearch(false)
@@ -369,7 +318,7 @@ function History() {
     setAlunoMatricula('');
     setAlunoPeriodo('');
     setAlunoBox('');
-    setColabName();
+    setColabName('');
     setTipo('');
     setStatus('');
     setDate('');
@@ -378,30 +327,35 @@ function History() {
   // Components
   $(function () {
     const dateFilterInput = $('input[name="datefilter"]');
+
     dateFilterInput.daterangepicker({
       autoUpdateInput: false,
       locale: {
-        cancelLabel: 'Clear'
-      }
+        cancelLabel: 'Clear',
+        format: 'DD/MM/YYYY',
+      },
     });
+
     const updateDateValue = (newValue) => {
       dateFilterInput.val(newValue);
       setDate(newValue);
-      console.log(date_his)
+      console.log(`Date filter updated: ${newValue}`);
     };
+
+    dateFilterInput.on('click', function () {
+      console.log("Date filter input clicked.");
+    });
+
     dateFilterInput.on('apply.daterangepicker', function (ev, picker) {
       const newDateValue = `${picker.startDate.format('DD/MM/YYYY')} - ${picker.endDate.format('DD/MM/YYYY')}`;
       updateDateValue(newDateValue);
     });
+
     dateFilterInput.on('cancel.daterangepicker', function () {
       updateDateValue('');
     });
   });
 
-  const optionsColaborador = pedidos.map(e => ({
-    label: e.colaborador,
-    value: e.colaborador,
-  }));
 
   //Paginação
 
@@ -496,8 +450,8 @@ function History() {
   }
 
   useEffect(() => {
-    console.log(date_his)
-  }, [date_his]);
+    console.log(createdAt_his)
+  }, [createdAt_his]);
 
   const handleOrderModalidadePedido = async () => {
     if (orderModalidadeUsers === 1) {
@@ -580,11 +534,11 @@ function History() {
               <div className="searchCardTopBox">
                 <div className='searchForms'>
                   <span className='body-normal margin-bottom-5'>Intervalo temporal</span>
-                  <input placeholder='Intervalo de tempo' type="text" className='form-1' name="datefilter" value={date_his} onChange={(e) => setDate(e.target.value)} style={{ width: '220px', marginRight: '20px' }} />
+                  <input placeholder='Intervalo de tempo' type="text" className='form-1' name="datefilter" value={createdAt_his} onChange={(e) => setDate(e.target.value)} style={{ width: '220px', marginRight: '20px' }} />
                 </div>
                 <div className='searchForms'>
                   <span className='body-normal margin-bottom-5'>Colaborador</span>
-                  <Select value={colaborador_his} onChange={setColabName} options={optionsColaborador} placeholder='Selecione uma opção' className='select1' />
+                  <input placeholder='Nome do colaborador...' className='form-1' value={colaborador_his} onChange={(e) => setColabName(e.target.value)} type='text' style={{ width: '220px', marginRight: '20px' }} />
                 </div>
                 <div className='searchForms'>
                   <span className='body-normal margin-bottom-5'>Modalidade</span>

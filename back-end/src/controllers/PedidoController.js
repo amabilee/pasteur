@@ -3,7 +3,7 @@ import Pedido from '../models/Pedido.js';
 
 class PedidoController {
   static async getAllEntities(req, res) {
-    const { page = 1, limit = 7, status, matricula, nomeAluno, periodoAluno, quantidadeItens, familias, box, tipo, colaborador, assinatura } = req.query;
+    const { page = 1, limit = 7, status, matricula, nomeAluno, periodoAluno, quantidadeItens, familias, box, tipo, colaborador, assinatura, createdAt } = req.query;
 
     try {
       const offset = (page - 1) * limit;
@@ -48,6 +48,33 @@ class PedidoController {
       if (assinatura) {
         whereClause.assinatura = { [Op.like]: `%${assinatura}%` };
       }
+
+      if (createdAt) {
+        let startOfDay, endOfDay;
+
+        if (createdAt.includes('-')) {
+          const [start, end] = createdAt.split('-').map(date => date.trim());
+          const [startDay, startMonth, startYear] = start.split('/');
+          const [endDay, endMonth, endYear] = end.split('/');
+          const formattedStartDate = `${startYear}-${startMonth}-${startDay}`;
+          const formattedEndDate = `${endYear}-${endMonth}-${endDay}`;
+          const startDate = new Date(`${formattedStartDate}T00:00:00Z`);
+          const endDate = new Date(`${formattedEndDate}T00:00:00Z`);
+          startOfDay = new Date(Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate(), 0, 0, 0));
+          endOfDay = new Date(Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate(), 23, 59, 59, 999));
+        } else {
+          const [day, month, year] = createdAt.split('/');
+          const formattedDate = `${year}-${month}-${day}`;
+          const date = new Date(`${formattedDate}T00:00:00Z`);
+          startOfDay = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 0, 0, 0));
+          endOfDay = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), 23, 59, 59, 999));
+        }
+
+        whereClause.createdAt = {
+          [Op.between]: [startOfDay, endOfDay],
+        };
+      }
+
 
       const { count, rows: pedidos } = await Pedido.findAndCountAll({
         offset,
