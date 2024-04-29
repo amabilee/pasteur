@@ -144,15 +144,29 @@ function History() {
       } else {
         setTotalPages(pagesTotal);
       }
-      if (pagesTotal <= currentPage - 1) {
-        setCurrentPage(1)
+      console.log(pagesTotal)
+      if (pagesTotal === 1) {
+        try {
+          const responseOnePage = await server.get(`/pedido?page=1${filtro}`, {
+            method: 'GET',
+            headers: {
+              "Authorization": `${token}`,
+              "Content-Type": "application/json",
+              "access-level": `${userCargo}`
+            }
+          })
+          setPedidos(responseOnePage.data.pedidos)
+          setCurrentPage(1)
+          console.log('pages 1')
+        } catch (e) {
+          console.error(e)
+        }
       }
-      // setSearchData({ ...searchData, term: '', category: '' })
       if (pagesTotal != 0 && currentPage == 1) {
         openSnackBarMessage()
         setSnackBarMessage('Correspondências encontradas')
         setSnackBarStyle({ sx: { background: "#79B874", color: "white", borderRadius: '15px' } })
-      } else if (pagesTotal == 0){
+      } else if (pagesTotal == 0) {
         openSnackBarMessage()
         setSnackBarMessage('Não foram encontradas correspondências')
         setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });

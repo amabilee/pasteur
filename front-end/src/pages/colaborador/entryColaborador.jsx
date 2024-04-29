@@ -29,7 +29,6 @@ function HomeColaborador() {
     getPedidos(1);
     infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
     setNome(infoUsers.NomeUser)
-    console.log(infoUsers)
   }, []);
 
   async function getPedidos(pagina) {
@@ -50,7 +49,6 @@ function HomeColaborador() {
       })
       setPedidos(response.data.pedidos)
       setTotalPages(response.data.pagination.totalPages)
-      console.log(response.data.pedidos)
     } catch (e) {
       console.error(e)
       if (e.response.status == 401) {
@@ -91,15 +89,12 @@ function HomeColaborador() {
   function buttonView(aluno) {
     setShowPopView(true);
     setSelectedAluno(aluno);
-    console.log(selectedAluno)
-    console.log(aluno)
     var familiasArray = aluno.familias.split(',');
     var quantidadesArray = aluno.quantidadeItens.split(',');
     for (let i = 0; i < quantidadesArray.length; i++) {
       const familia = familiasArray[i].trim();
       const quantidade = parseInt(quantidadesArray[i].trim());
       movimentacoesArray.push({ familia, quantidade });
-      console.log(movimentacoesArray)
     }
   }
 
@@ -107,7 +102,6 @@ function HomeColaborador() {
     let formatedPedido = selectedAluno
     formatedPedido.status = 'Reprovado'
     formatedPedido.colaborador = nome
-    console.log(formatedPedido)
     postPedidoAvaliado(formatedPedido.id, formatedPedido)
     openSnackBarMessage()
     setSnackBarMessage('Pedido invalidado com sucesso')
@@ -127,7 +121,6 @@ function HomeColaborador() {
           "access-level": `${userCargo}`
         }
       });
-      console.log(response);
     } catch (e) {
       console.error(e);
       if (e.response.status == 401) {
@@ -145,7 +138,6 @@ function HomeColaborador() {
     let formatedPedido = selectedAluno
     formatedPedido.status = 'Aprovado'
     formatedPedido.colaborador = nome
-    console.log(formatedPedido)
     postPedidoAvaliado(formatedPedido.id, formatedPedido)
     openSnackBarMessage()
     setSnackBarMessage('Pedido validado com sucesso')
@@ -182,7 +174,6 @@ function HomeColaborador() {
   //Paginação;
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    console.log(page)
     getPedidos(page)
   };
 

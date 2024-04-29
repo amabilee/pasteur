@@ -300,7 +300,6 @@ function StaffAdmin() {
       case 'Nome':
         filtro = `&nomeUser=${searchData.term}`
         getUsers(page, filtro);
-        console.log('nome')
         break
       case 'Matrícula':
         filtro = `&matricula=${searchData.term}`
@@ -349,11 +348,25 @@ function StaffAdmin() {
       } else {
         setTotalPages(pagesTotal);
       }
-      if (pagesTotal <= currentPage - 1) {
-        setCurrentPage(1)
+      if (pagesTotal === 1) {
+        try {
+          const responseOnePage = await server.get(`/usuario?page=1${filtro}`, {
+            method: 'GET',
+            headers: {
+              "Authorization": `${token}`,
+              "Content-Type": "application/json",
+              "access-level": `${userCargo}`
+            }
+          })
+          setUsers(responseOnePage.data.users)
+          setCurrentPage(1)
+          setResultadosPesquisa(responseOnePage.data.users);
+        } catch (e) {
+          console.error(e)
+        }
+      } else {
+        setResultadosPesquisa(response.data.users);
       }
-      // setSearchData({ ...searchData, term: '', category: '' })
-      setResultadosPesquisa(response.data.users);
     } catch (e) {
       console.error(e);
       if (e.response.status == 401) {
@@ -372,17 +385,13 @@ function StaffAdmin() {
     if (orderUsers === 1) {
       setOrderUsers(2)
       setCurrentPage(1)
-      console.log(1)
     } else if (orderUsers === 2) {
       setOrderUsers(3)
       setCurrentPage(1)
-      console.log(2)
     } else if (orderUsers === 3) {
       setOrderUsers(1)
       setCurrentPage(1)
-      console.log(3)
     }
-    console.log(orderUsers)
     setSearchData(({ term: '', category: 'Selecione' }))
     handleSearchSimple(true)
   }
@@ -400,24 +409,19 @@ function StaffAdmin() {
         filtro = ``
       }
       getUsers(1, filtro);
-      console.log(true)
     } else {
-      console.log(false)
       switch (searchData.category) {
         case 'Nome':
           filtro = `&nomeUser=${searchData.term}`
           getUsers(1, filtro);
-          console.log(1)
           break
         case 'Matrícula':
           filtro = `&matricula=${searchData.term}`
           getUsers(1, filtro);
-          console.log(2)
           break
         default:
           filtro = ''
           getUsers(1, filtro);
-          console.log(3)
           break
       }
     }

@@ -75,7 +75,6 @@ export default function Login() {
                 setUsernameChange('')
                 setDataSenhaChange({ senha: '', senhaConfirm: '' })
                 setErrorMessage('')
-                console.log(response);
             } catch (e) {
                 console.log(e)
             }

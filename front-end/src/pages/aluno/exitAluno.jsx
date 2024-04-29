@@ -25,7 +25,6 @@ function ExitAluno() {
 
     useEffect(() => {
         infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-        console.log(infoUsers)
         setNomeAluno(infoUsers.NomeUser.split(' ')[0])
         setMatriculaAluno(infoUsers.matricula)
         getPedidos();
@@ -51,7 +50,6 @@ function ExitAluno() {
             setErrorMessage('');
             setShowConfirmExit(true);
             formatMovimentData()
-            console.log(finalDataMoviment);
             sendPedidoRequest()
         }
     }
@@ -68,7 +66,6 @@ function ExitAluno() {
                     "access-level": `${userCargo}`
                 }
             });
-            console.log(response);
         } catch (e) {
             console.error(e);
             if (e.response.status == 401) {
@@ -89,7 +86,6 @@ function ExitAluno() {
         } else {
             setSelectedItems([...selectedItems, item]);
         }
-        console.log(selectedItems)
     };
 
     function tableReportContent() {
@@ -178,10 +174,7 @@ function ExitAluno() {
                     "access-level": `${userCargo}`
                 }
             })
-            console.log(response.data.pedidos);
             const pedidosDisponiveisSaida = searchPedidosBasedMatricula(response.data.pedidos);
-            console.log("Pedidos disponíveis para saída:", pedidosDisponiveisSaida);
-            console.log("Pedidos no sistema:", pedidos);
         } catch (e) {
             console.error(e)
             if (e.response.status == 401) {
@@ -198,7 +191,6 @@ function ExitAluno() {
     function searchPedidosBasedMatricula(pedidos) {
         const pedidosDisponiveisSaida = [];
         const pedidosFiltrados = pedidos
-        console.log("Pedidos geral filtrados:", pedidosFiltrados);
         const familiasQuantidadeEntrada = [];
         const familiasQuantidadeSaida = [];
         pedidosFiltrados.forEach(pedido => {
@@ -213,7 +205,6 @@ function ExitAluno() {
                     };
                     familiasQuantidadeEntrada.push(novoPedido);
                 }
-                console.log("Pedidos para de entrada 1:", familiasQuantidadeEntrada);
             } else if (pedido.tipo === "Saída") {
                 const familias = pedido.familias.split(',');
                 for (let i = 0; i < familias.length; i++) {
@@ -223,7 +214,6 @@ function ExitAluno() {
                     };
                     familiasQuantidadeSaida.push(novoPedido);
                 }
-                console.log("Pedidos para de saída 1:", familiasQuantidadeSaida);
             }
         });
 
@@ -239,10 +229,6 @@ function ExitAluno() {
                 });
             }
         });
-
-        console.log("Pedidos para de entrada:", familiasQuantidadeEntrada);
-        console.log("Pedidos para de saída:", familiasQuantidadeSaida);
-        console.log("Pedidos disponíveis para saída:", pedidosDisponiveisSaida);
         setPedidos(pedidosDisponiveisSaida)
         return pedidosDisponiveisSaida;
     }
@@ -263,11 +249,9 @@ function ExitAluno() {
             setSelectedItems([])
             changeAddButtonStyle('button-6-disable');
             changeAddButtonState(true);
-            console.log(box.length)
         } else {
             changeAddButtonStyle('button-6');
             changeAddButtonState(false);
-            console.log('preencheu')
         }
     }
 

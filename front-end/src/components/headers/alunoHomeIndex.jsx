@@ -12,7 +12,6 @@ export default function HeaderHomeAluno() {
     function returnLogin(){
         navigate('/entrar')
         signOut()
-        console.log('deslogar')
     }
 	return (
 		<Container>

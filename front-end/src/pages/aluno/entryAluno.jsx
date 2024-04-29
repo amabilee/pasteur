@@ -35,7 +35,6 @@ function EntryAluno() {
     useEffect(() => {
         getFamilias();
         infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-        console.log(infoUsers)
         setNomeAluno(infoUsers.NomeUser.split(' ')[0])
         setMatriculaAluno(infoUsers.matricula)
     }, []);
@@ -63,7 +62,6 @@ function EntryAluno() {
         } else {
             setErrorMessage(' ');
             formatMovimentData()
-            console.log(finalDataMoviment);
             setShowConfirmEntry(true);
             sendPedidoRequest()
         }
@@ -81,7 +79,6 @@ function EntryAluno() {
                     "access-level": `${userCargo}`
                 }
             });
-            console.log(response);
         } catch (e) {
             console.error(e);
             if (e.response.status == 401) {
@@ -195,7 +192,6 @@ function EntryAluno() {
         setFamily('0');
         setQuantity('0');
         stagesReturn()
-        console.log(tableData)
     };
 
     function stagesReturn() {
@@ -229,7 +225,6 @@ function EntryAluno() {
                 }
             })
             setFamilias(response.data.familias)
-            console.log(response.data)
         } catch (e) {
             console.error(e)
             if (e.response.status == 401) {

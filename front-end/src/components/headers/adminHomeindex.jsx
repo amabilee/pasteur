@@ -71,7 +71,6 @@ export default function HeaderHomeColab() {
                 setShowPopSenha(false)
                 setDataSenhaChange({ senha: '', senhaConfirm: '' })
                 setErrorMessage('')
-                console.log(response);
             }
             catch (e) {
                 console.log(e)
@@ -92,7 +91,6 @@ export default function HeaderHomeColab() {
     function returnLogin() {
         navigate('/entrar')
         signOut()
-        console.log('deslogar')
     }
 
     function handleMenu() {

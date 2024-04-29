@@ -61,7 +61,6 @@ function ExitAluno() {
                     "access-level": `${userCargo}`
                 }
             });
-            console.log(response);
         } catch (e) {
             console.error(e);
             if (e.response.status == 401) {
@@ -85,7 +84,6 @@ function ExitAluno() {
             pedidosAssinados.forEach(pedido => {
                 postPedidoAssinado(pedido.id, pedido);
             });
-            console.log(pedidosAssinados);
             requestConfirmed();
         }
     }

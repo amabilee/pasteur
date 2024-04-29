@@ -18,7 +18,6 @@ function HomeAluno() {
 
   useEffect(() => {
     infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-    console.log(infoUsers)
     setNomeAluno(infoUsers.NomeUser.split(' ')[0])
     getPedidos()
   }, []);

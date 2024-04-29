@@ -72,7 +72,7 @@ function FamilyAdmin() {
       pagina = 1;
     }
     try {
-      const response = await server.get(`/familia?page=${pagina}${filtro}`,{
+      const response = await server.get(`/familia?page=${pagina}${filtro}`, {
         method: 'GET',
         headers: {
           "Authorization": `${token}`,
@@ -82,10 +82,26 @@ function FamilyAdmin() {
       });
       setTableData(response.data.familias);
       let pagesTotal = response.data.pagination.totalPages
-      if (pagesTotal <= 0){
+      if (pagesTotal <= 0) {
         setTotalPages(1);
       } else {
         setTotalPages(pagesTotal);
+      }
+      if (pagesTotal === 1) {
+        try {
+          const responseOnePage = await server.get(`/familia?page=1${filtro}`, {
+            method: 'GET',
+            headers: {
+              "Authorization": `${token}`,
+              "Content-Type": "application/json",
+              "access-level": `${userCargo}`
+            }
+          })
+          setTableData(responseOnePage.data.familias)
+          setCurrentPage(1)
+        } catch (e) {
+          console.error(e)
+        }
       }
     } catch (e) {
       console.error(e);
@@ -131,8 +147,8 @@ function FamilyAdmin() {
   }
 
   const handleSearchSimple = () => {
-    const filtro = searchTerm ? `&nome=${searchTerm}` : '';
-    getFamilia(1, filtro);
+    let filtro = searchTerm ? `&nome=${searchTerm}` : '';
+    getFamilia(currentPage, filtro);
   };
 
   useEffect(() => {
@@ -179,7 +195,6 @@ function FamilyAdmin() {
       openSnackBarMessage();
       setSnackBarMessage('Família editada com sucesso');
       setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
-      console.log('Novas informações da família editada:', familyDataEdit);
       var token = localStorage.getItem("loggedUserToken");
       var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
       var userCargo = infoUsers.cargo
@@ -191,7 +206,6 @@ function FamilyAdmin() {
             "access-level": `${userCargo}`
           }
         });
-        console.log(response);
         returnSearch();
         getFamilia(1)
       } catch (e) {
@@ -222,7 +236,6 @@ function FamilyAdmin() {
     openSnackBarMessage();
     setSnackBarMessage('Família deletada com sucesso');
     setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
-    console.log('Informações da família deletada:', familyDataDelete);
     var token = localStorage.getItem("loggedUserToken");
 
     var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
@@ -235,7 +248,6 @@ function FamilyAdmin() {
           "access-level": `${userCargo}`
         }
       });
-      console.log(response);
       returnSearch();
       getFamilia(1)
     } catch (e) {
@@ -264,7 +276,6 @@ function FamilyAdmin() {
       setErrorMessage('Quantidade máxima/quantidade mínima devem ser maiores que zero.');
     } else {
       formatFamiliaData()
-      console.log('Informações da família:', matrixFamilia);
       openSnackBarMessage();
       setSnackBarMessage('Família criada com sucesso');
       setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
@@ -279,7 +290,6 @@ function FamilyAdmin() {
             "access-level": `${userCargo}`
           }
         });
-        console.log(response);
         returnSearch();
         getFamilia(1)
       } catch (e) {
