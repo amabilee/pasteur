@@ -87,6 +87,9 @@ function FamilyAdmin() {
       } else {
         setTotalPages(pagesTotal);
       }
+      if (pagesTotal <= currentPage - 1 ){
+        setCurrentPage(1)
+      }
       if (pagesTotal === 1) {
         try {
           const responseOnePage = await server.get(`/familia?page=1${filtro}`, {
