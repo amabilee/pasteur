@@ -87,10 +87,7 @@ export const AuthProvider = ({ children }) => {
         setTimeout(() => {
             var token = localStorage.getItem("loggedUserToken");
             if (!token || token.length <= 1) {
-                console.log('deslogar')
                 signOut()
-            } else {
-                console.log('continuar logado')
             }
         }, 100);
     }, [localStorage.getItem("loggedUserToken")]);

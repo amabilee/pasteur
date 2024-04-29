@@ -28,7 +28,6 @@ function ExitAdmin() {
     getPedidos(1);
     infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
     setNome(infoUsers.NomeUser)
-    console.log(infoUsers)
   }, []);
 
   const openSnackBarMessage = () => {
@@ -53,7 +52,6 @@ function ExitAdmin() {
       })
       setPedidos(response.data.pedidos)
       setTotalPages(response.data.pagination.totalPages)
-      console.log(response.data.pedidos)
     }
     catch (e) {
       console.error(e)
@@ -95,7 +93,6 @@ function ExitAdmin() {
     for (let i = 0; i < familiasArray.length; i++) {
       const familia = familiasArray[i].trim();
       movimentacoesArray.push({ familia });
-      console.log(movimentacoesArray)
     }
   }
 
@@ -103,7 +100,6 @@ function ExitAdmin() {
     let formatedPedido = selectedAluno
     formatedPedido.status = 'Reprovado'
     formatedPedido.colaborador = nome
-    console.log(formatedPedido)
     postPedidoAvaliado(formatedPedido.id, formatedPedido)
     openSnackBarMessage()
     setSnackBarMessage('Pedido invalidado com sucesso')
@@ -115,7 +111,6 @@ function ExitAdmin() {
     let formatedPedido = selectedAluno
     formatedPedido.status = 'Aprovado'
     formatedPedido.colaborador = nome
-    console.log(formatedPedido)
     postPedidoAvaliado(formatedPedido.id, formatedPedido)
     openSnackBarMessage()
     setSnackBarMessage('Pedido validado com sucesso')
@@ -135,7 +130,6 @@ function ExitAdmin() {
           "access-level": `${userCargo}`
         }
       });
-      console.log(response);
     }
     catch (e) {
       console.error(e);
@@ -178,7 +172,6 @@ function ExitAdmin() {
   //Paginação;
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    console.log(page)
     getPedidos(page)
   };
 

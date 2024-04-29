@@ -30,7 +30,6 @@ function EntryAdmin() {
     getPedidos(1);
     infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
     setNome(infoUsers.NomeUser)
-    console.log(infoUsers)
   }, []);
 
   async function getPedidos(pagina) {
@@ -98,7 +97,6 @@ function EntryAdmin() {
       const familia = familiasArray[i].trim();
       const quantidade = parseInt(quantidadesArray[i].trim());
       movimentacoesArray.push({ familia, quantidade });
-      console.log(movimentacoesArray)
     }
   }
 
@@ -106,7 +104,6 @@ function EntryAdmin() {
     let formatedPedido = selectedAluno
     formatedPedido.status = 'Reprovado'
     formatedPedido.colaborador = nome
-    console.log(formatedPedido)
     postPedidoAvaliado(formatedPedido.id, formatedPedido)
     openSnackBarMessage()
     setSnackBarMessage('Pedido invalidado com sucesso')
@@ -126,7 +123,6 @@ function EntryAdmin() {
           "access-level": `${userCargo}`
         }
       });
-      console.log(response);
     }
     catch (e) {
       console.error(e);
@@ -145,7 +141,6 @@ function EntryAdmin() {
     let formatedPedido = selectedAluno
     formatedPedido.status = 'Aprovado'
     formatedPedido.colaborador = nome
-    console.log(formatedPedido)
     postPedidoAvaliado(formatedPedido.id, formatedPedido)
     openSnackBarMessage()
     setSnackBarMessage('Pedido validado com sucesso')
@@ -182,7 +177,6 @@ function EntryAdmin() {
   //Paginação;
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    console.log(page)
     getPedidos(page)
   };
 

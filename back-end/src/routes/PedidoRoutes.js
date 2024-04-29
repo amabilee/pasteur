@@ -9,7 +9,7 @@ const router = express.Router();
 router.get('/pedido/:id', authorizationMiddleware, authenticationMiddleware({ cargo: [1, 2, 3] }), PedidoController.getEntity);
 router.get('/pedido', authorizationMiddleware, authenticationMiddleware({ cargo: [1, 2, 3] }), PedidoController.getAllEntities);
 router.post('/pedido', authorizationMiddleware, authenticationMiddleware({ cargo: [1, 2, 3] }), PedidoController.createEntity);
-router.put('/pedido/:id', authorizationMiddleware, authenticationMiddleware({ cargo: [1, 2] }), PedidoController.updateEntity);
+router.put('/pedido/:id', authorizationMiddleware, authenticationMiddleware({ cargo: [1, 2, 3] }), PedidoController.updateEntity);
 router.delete('/pedido/:id', authorizationMiddleware, authenticationMiddleware({ cargo: [1] }), PedidoController.deleteEntity);
 
 export default router;

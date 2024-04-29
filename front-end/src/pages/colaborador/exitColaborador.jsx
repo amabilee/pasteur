@@ -28,7 +28,6 @@ function HomeColaborador() {
     getPedidos(1);
     infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
     setNome(infoUsers.NomeUser)
-    console.log(infoUsers)
   }, []);
 
   const openSnackBarMessage = () => {
@@ -53,7 +52,6 @@ function HomeColaborador() {
       })
       setPedidos(response.data.pedidos)
       setTotalPages(response.data.pagination.totalPages)
-      console.log(response.data)
     } catch (e) {
       console.error(e)
       if (e.response.status == 401) {
@@ -94,7 +92,6 @@ function HomeColaborador() {
     for (let i = 0; i < familiasArray.length; i++) {
       const familia = familiasArray[i].trim();
       movimentacoesArray.push({ familia });
-      console.log(movimentacoesArray)
     }
   }
 
@@ -102,7 +99,6 @@ function HomeColaborador() {
     let formatedPedido = selectedAluno
     formatedPedido.status = 'Reprovado'
     formatedPedido.colaborador = nome
-    console.log(formatedPedido)
     postPedidoAvaliado(formatedPedido.id, formatedPedido)
     openSnackBarMessage()
     setSnackBarMessage('Pedido invalidado com sucesso')
@@ -114,7 +110,6 @@ function HomeColaborador() {
     let formatedPedido = selectedAluno
     formatedPedido.status = 'Aprovado'
     formatedPedido.colaborador = nome
-    console.log(formatedPedido)
     postPedidoAvaliado(formatedPedido.id, formatedPedido)
     openSnackBarMessage()
     setSnackBarMessage('Pedido validado com sucesso')
@@ -134,7 +129,6 @@ function HomeColaborador() {
           "access-level": `${userCargo}`
         }
       });
-      console.log(response);
     } catch (e) {
       console.error(e);
       if (e.response.status == 401) {
@@ -177,7 +171,6 @@ function HomeColaborador() {
   //Paginação;
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    console.log(page)
     getPedidos(page)
   };
 
