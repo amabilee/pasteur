@@ -29,7 +29,7 @@ function History() {
 
   const [nomeAluno_his, setAlunoName] = useState('');
   const [matricula_his, setAlunoMatricula] = useState('');
-  const [pediodoAluno_his, setAlunoPeriodo] = useState('');
+  const [periodoAluno_his, setAlunoPeriodo] = useState('');
   const [box_his, setAlunoBox] = useState('');
   const [colaborador_his, setColabName] = useState('');
   const [tipo_his, setTipo] = useState('');
@@ -144,7 +144,9 @@ function History() {
       } else {
         setTotalPages(pagesTotal);
       }
-      console.log(pagesTotal)
+      if (pagesTotal <= currentPage - 1 ){
+        setCurrentPage(1)
+      }
       if (pagesTotal === 1) {
         try {
           const responseOnePage = await server.get(`/pedido?page=1${filtro}`, {
@@ -157,7 +159,6 @@ function History() {
           })
           setPedidos(responseOnePage.data.pedidos)
           setCurrentPage(1)
-          console.log('pages 1')
         } catch (e) {
           console.error(e)
         }
@@ -274,7 +275,6 @@ function History() {
           }
         } else {
           searchData.category = 'Selecione'
-          console.log('categoria')
         }
         getPedidos(1, filtro)
     }
@@ -285,35 +285,46 @@ function History() {
     const filterConditions = [
       { key: 'nomeAluno', value: nomeAluno_his, condition: nomeAluno_his !== base.nomeAluno },
       { key: 'matricula', value: matricula_his, condition: matricula_his !== base.matriculaAluno },
-      { key: 'periodoAluno', value: pediodoAluno_his, condition: pediodoAluno_his !== base.periodoAluno },
+      { key: 'periodoAluno', value: periodoAluno_his, condition: periodoAluno_his !== base.periodoAluno },
       { key: 'box', value: box_his, condition: box_his !== base.boxAluno },
       { key: 'tipo', value: tipo_his, condition: tipo_his?.length >= 3 },
       { key: 'status', value: status_his, condition: status_his?.length >= 3 },
-      { key: 'createdAt', value: createdAt_his, condition: createdAt_his !== base.date && createdAt_his?.includes('-') },
+      { key: 'createdAt', value: createdAt_his, condition: createdAt_his?.length >= 1 },
     ];
 
     const filteredConditions = filterConditions.filter(({ condition }) => condition);
     let keys = filteredConditions.map(({ key }) => key);
-
     if (colaborador_his && colaborador_his !== '') {
       keys.push('colaborador');
     }
 
-    console.log(keys);
-
-    let filtro = ''
-    if (keys.length >= 1) {
-      for (let i = 0; i <= keys.length - 1; i++) {
-        var currentKeyData = eval(`${keys[i]}_his`)
-        filtro += `&${keys[i]}=${currentKeyData}`
-        setSearchData({ ...searchData, category: filtro })
-
-        console.log(i)
+    if (keys.find(chave => chave === 'createdAt')) {
+      if (createdAt_his.includes('-') && createdAt_his.length === 23) {
+        let filtro = ''
+        if (keys.length >= 1) {
+          for (let i = 0; i <= keys.length - 1; i++) {
+            var currentKeyData = eval(`${keys[i]}_his`)
+            filtro += `&${keys[i]}=${currentKeyData}`
+            setSearchData({ ...searchData, category: filtro })
+          }
+        }
+        getPedidos(1, filtro)
+        returnSearch()
+      } else {
+        setErrorMessage('Insira uma data válida')
       }
+    } else {
+      let filtro = ''
+      if (keys.length >= 1) {
+        for (let i = 0; i <= keys.length - 1; i++) {
+          var currentKeyData = eval(`${keys[i]}_his`)
+          filtro += `&${keys[i]}=${currentKeyData}`
+          setSearchData({ ...searchData, category: filtro })
+        }
+      }
+      getPedidos(1, filtro)
+      returnSearch()
     }
-    getPedidos(1, filtro)
-    returnSearch()
-    console.log(filtro)
   }
 
   const handleCronologicalResult = () => {
@@ -336,6 +347,7 @@ function History() {
     setTipo('');
     setStatus('');
     setDate('');
+    setErrorMessage('')
   }
 
   // Components
@@ -400,23 +412,19 @@ function History() {
       case '&':
         filtro = searchData.category
         getPedidos(page, filtro)
-        console.log('search')
         break
       default:
-        console.log('passou')
         if (orderModalidadeUsers !== 2) {
           switch (orderModalidadeUsers) {
             case 3:
               setOrderStatusUsers(2)
               filtro = `&tipo=Entrada`
               getPedidos(page, filtro)
-              console.log('modalidade entrada')
               break
             case 1:
               filtro = `&tipo=Saída`
               setOrderStatusUsers(2)
               getPedidos(page, filtro)
-              console.log('modalidade saída')
               break
           }
         } else if (orderStatusUsers !== 2) {
@@ -462,10 +470,6 @@ function History() {
   function detectMatriculaEntry(e) {
     setAlunoMatricula(e.target.value.replace(/[^0-9]/g, ''));
   }
-
-  useEffect(() => {
-    console.log(createdAt_his)
-  }, [createdAt_his]);
 
   const handleOrderModalidadePedido = async () => {
     if (orderModalidadeUsers === 1) {
@@ -586,7 +590,7 @@ function History() {
                 </div>
                 <div className='searchForms'>
                   <span className='body-normal margin-bottom-5'>Período</span>
-                  <select className='form-1' value={pediodoAluno_his} onChange={(e) => setAlunoPeriodo(e.target.value)} style={{ width: '160px', marginRight: '20px' }}>
+                  <select className='form-1' value={periodoAluno_his} onChange={(e) => setAlunoPeriodo(e.target.value)} style={{ width: '160px', marginRight: '20px' }}>
                     <option value='' disabled>Selecionar</option>
                     <option>1</option>
                     <option>2</option>

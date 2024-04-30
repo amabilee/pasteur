@@ -348,6 +348,9 @@ function StaffAdmin() {
       } else {
         setTotalPages(pagesTotal);
       }
+      if (pagesTotal <= currentPage - 1 ){
+        setCurrentPage(1)
+      }
       if (pagesTotal === 1) {
         try {
           const responseOnePage = await server.get(`/usuario?page=1${filtro}`, {
