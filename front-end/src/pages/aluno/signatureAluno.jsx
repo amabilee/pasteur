@@ -4,6 +4,9 @@ import HeaderPagesAluno from '../../components/headers/alunoPagesIndex';
 import { Container } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
 import { server } from "../../services/server";
+import Snackbar from '@mui/material/Snackbar';
+import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
 
 function ExitAluno() {
     const [request, setRequest] = useState('');
@@ -11,9 +14,12 @@ function ExitAluno() {
     const [addButtonStyle, setAddButtonStyle] = useState('button-6-disable');
     const [addButtonState, setAddButtonState] = useState(true);
     const [tableData, setTableData] = useState([]);
-    const [errorMessage, setErrorMessage] = useState('');
     const [organizedPedidos, setOrganizedPedidos] = useState([]);
+    const [showConfirm, setShowConfirm] = useState(false);
     const navigate = useNavigate();
+    const [open, setOpen] = React.useState(false);
+    const [snackBarMessage, setSnackBarMessage] = useState('')
+    const [snackBarStyle, setSnackBarStyle] = useState({ sx: { background: "white", color: "black", borderRadius: '10px' } })
 
     useEffect(() => {
         fetchData();
@@ -76,15 +82,21 @@ function ExitAluno() {
 
     function navigateToConfirmExit() {
         if (tableData.length === 0) {
-            setErrorMessage('Todos os campos devem ser preenchidos.');
+            openSnackBarMessage()
+            setSnackBarMessage('Todos os campos devem ser preenchidos.');
+            setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
         } else {
-            setErrorMessage('');
             setShowPop(false);
+            setShowConfirm(true)
             const pedidosAssinados = tableData.map(pedido => ({ ...pedido, assinatura: true }));
             pedidosAssinados.forEach(pedido => {
                 postPedidoAssinado(pedido.id, pedido);
             });
-            requestConfirmed();
+            setTimeout(() => {
+                navigate('/home-aluno')
+                setShowConfirm(false)
+                setTableData([]);
+            }, 3000);
         }
     }
 
@@ -113,22 +125,20 @@ function ExitAluno() {
             );
 
             if (existingIndex !== -1) {
-                setErrorMessage('Pedido já existe na tabela.');
+                openSnackBarMessage()
+                setSnackBarMessage('Pedido já existe na tabela.');
+                setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
             } else {
                 setTableData(prevData => [...prevData, selectedPedido]);
                 setRequest('');
                 setAddButtonStyle('button-6-disable');
                 setAddButtonState(true);
-                setErrorMessage('');
             }
         } else {
-            setErrorMessage('Pedido não encontrado.');
+            openSnackBarMessage()
+            setSnackBarMessage('Pedido não encontrado.');
+            setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
         }
-    }
-
-    function requestConfirmed() {
-        navigate('/home-aluno');
-        setTableData([]);
     }
 
     function formatarDataHora(dataHora) {
@@ -162,12 +172,38 @@ function ExitAluno() {
         }
     }
 
+    //Snackbar settings
+    const openSnackBarMessage = () => {
+        setOpen(true);
+    };
+
+    const closeSnackBarMessage = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpen(false);
+    };
+
+    const alertBox = (
+        <React.Fragment>
+            <IconButton
+                size="small"
+                aria-label="close"
+                color="inherit"
+                onClick={closeSnackBarMessage}
+            >
+                <CloseIcon fontSize="small" />
+            </IconButton>
+        </React.Fragment>
+    );
+
     return (
         <>
             <HeaderPagesAluno />
             <Container className='containerMobileSign'>
                 <div className="inputForms">
                     <h1 className='title-1 margin-bottom-30'>Assinar pedidos</h1>
+                    <p className='body-small text-color-5 margin-bottom-10'>Pedidos disponíveis para assinatura</p>
                     <select className='form-4' value={request} onChange={detectEntryRequest}>
                         <option value='0'>Selecione o pedido</option>
                         {organizedPedidos.map((option, index) => (
@@ -179,11 +215,11 @@ function ExitAluno() {
                     <button className={addButtonStyle} onClick={addMovement} disabled={addButtonState}>
                         Adicionar
                     </button>
+                    <p className='body-small text-color-5 margin-bottom-10'>Assinaturas</p>
                     <div className="tableReport">
                         <table>{tableReportContent()}</table>
                     </div>
                 </div>
-                {errorMessage && <p className="error-message-mobile">{errorMessage}</p>}
                 <div className='sendButtonsEntry'>
                     <button className='button-2' onClick={navigateToHome}>
                         Cancelar
@@ -209,6 +245,15 @@ function ExitAluno() {
                     </div>
                 </div>
             )}
+            {showConfirm && (
+                <div className='popUpConfirmOperation'>
+                    <div className="popUpConfirmCard">
+                        <h1 className='body-large text-align-center margin-bottom-10'>Seu pedido foi assinado com sucesso !</h1>
+                        <h2 className='body-light text-align-center margin-bottom-20'>Deixe sempre suas assinaturas em dia.</h2>
+                    </div>
+                </div>
+            )}
+            <Snackbar open={open} autoHideDuration={4000} onClose={closeSnackBarMessage} message={snackBarMessage} action={alertBox} ContentProps={snackBarStyle} />
             <div className="blockerMobile"></div>
         </>
     );
