@@ -1,11 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import './style.css';
+import Snackbar from '@mui/material/Snackbar';
 import HeaderPagesAluno from '../../components/headers/alunoPagesIndex'
 import { Container } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom';
 import { server } from "../../services/server";
+import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
 
 function EntryAluno() {
+    const [open, setOpen] = React.useState(false);
+    const [snackBarMessage, setSnackBarMessage] = useState('')
+    const [snackBarStyle, setSnackBarStyle] = useState({ sx: { background: "white", color: "black", borderRadius: '10px' } })
+
     const [box, setBox] = useState('');
     const [periodo, setPeriodo] = useState('')
     const [family, setFamily] = useState('0');
@@ -27,7 +34,6 @@ function EntryAluno() {
     const [addButtonStyle, changeAddButtonStyle] = useState('button-6-disable');
     const [buttonNegativeQuant, changeStatusQuantButtonNegative] = useState('button-5-disable');
     const [buttonPositiveQuant, changeStatusQuantButtonPositive] = useState('button-5-disable');
-    const [errorMessage, setErrorMessage] = useState(' ');
     const finalDataMoviment = {};
     var infoUsers = {}
     const [familias, setFamilias] = useState([])
@@ -54,16 +60,28 @@ function EntryAluno() {
 
     function navigateToConfirmEntry() {
         if (box.length <= 2 || (tableData.length === 0)) {
-            setErrorMessage('O box deve ter três números.');
+            openSnackBarMessage()
+            setSnackBarMessage('O box deve ter três números.')
+            setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
         } else if (tableData.length === 0) {
-            setErrorMessage('Pelo menos uma movimentação deve ser adicionada.');
+            openSnackBarMessage()
+            setSnackBarMessage('Pelo menos uma movimentação deve ser adicionada.')
+            setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
         } else if (periodo == '') {
-            setErrorMessage('Todos os campos devem ser preenchidos.');
+            openSnackBarMessage()
+            setSnackBarMessage('Todos os campos devem ser preenchidos.')
+            setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
         } else {
-            setErrorMessage(' ');
             formatMovimentData()
             setShowConfirmEntry(true);
             sendPedidoRequest()
+            window.scrollTo(0, 0);
+            setTimeout(() => {
+                navigate('/home-aluno')
+                setShowConfirmEntry(false)
+                stagesReturn();
+                setTableData([]);
+            }, 3000);
         }
     }
 
@@ -204,13 +222,6 @@ function EntryAluno() {
         changeAddButtonStyle('button-6-disable')
     }
 
-    async function requestConfirmed() {
-        navigate('/home-aluno')
-        setShowConfirmEntry(false)
-        stagesReturn();
-        setTableData([]);
-    }
-
     async function getFamilias() {
         var token = localStorage.getItem("loggedUserToken")
         var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
@@ -251,14 +262,41 @@ function EntryAluno() {
         setBox(e.target.value.replace(/[^0-9]/g, ""));
     }
 
+    //Snackbar settings
+    const openSnackBarMessage = () => {
+        setOpen(true);
+    };
+
+    const closeSnackBarMessage = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpen(false);
+    };
+
+    const alertBox = (
+        <React.Fragment>
+            <IconButton
+                size="small"
+                aria-label="close"
+                color="inherit"
+                onClick={closeSnackBarMessage}
+            >
+                <CloseIcon fontSize="small" />
+            </IconButton>
+        </React.Fragment>
+    );
+
     return (
         <>
             <HeaderPagesAluno />
             <Container className='containerMobileEntry'>
                 <h1 className='title-1 margin-bottom-30'>Registrar pedido de entrada</h1>
+                <p className='body-small text-color-5'>Box de armazenamento</p>
                 <input placeholder='Box de armazenamento' className='form-4' value={box} onChange={(e) => onChangeTagInput(e)} type='text' maxLength="3" />
+                <p className='body-small text-color-5'>Período</p>
                 <select className='form-4' value={periodo} onChange={(e) => setPeriodo(e.target.value)}>
-                    <option value='' disabled>Selecionar um periodo</option>
+                    <option value='' disabled>Selecionar um período</option>
                     <option>1</option>
                     <option>2</option>
                     <option>3</option>
@@ -270,6 +308,7 @@ function EntryAluno() {
                     <option>9</option>
                     <option>10</option>
                 </select>
+                <p className='body-small text-color-5'>Família de caixa</p>
                 <select className='form-4' value={family} onChange={detectEntryFamily} >
                     <option disabled={true} value='0'>Selecione a família</option>
                     {familias.map((option, index) => (
@@ -287,6 +326,7 @@ function EntryAluno() {
                         Não
                     </button>
                 </div>
+                <p className='body-small text-color-5'>Quantidade de itens</p>
                 <select className={enableQuantSelectStyle} value={quantity} disabled={enableQuantSelect} onChange={detectEntryQuant} >
                     <option disabled={true} value='0'>Selecione a quantidade</option>
                     {renderOptionsQuant()}
@@ -294,12 +334,12 @@ function EntryAluno() {
                 <button className={addButtonStyle} onClick={addMovement} disabled={addButtonState} >
                     Adicionar
                 </button>
+                <p className='body-small text-color-5'>Movimentações</p>
                 <div className="tableReport">
                     <table>
                         {tableReportContent()}
                     </table>
                 </div>
-                {errorMessage && <p className="error-message-mobile">{errorMessage}</p>}
                 <div className='sendRequestButtons'>
                     <button className='button-2' disabled={false} onClick={navigateToConfirmHome} >
                         Cancelar
@@ -330,11 +370,11 @@ function EntryAluno() {
                     <div className="popUpConfirmCard">
                         <h1 className='body-large text-align-center margin-bottom-10'>Seu pedido de <strong>entrada</strong> foi enviado com sucesso !</h1>
                         <h2 className='body-light text-align-center margin-bottom-20'>Assim que um colaborador avaliar o seu pedido, assine.</h2>
-                        <button className='button-4' onClick={requestConfirmed}>Voltar a tela inicial</button>
                     </div>
                 </div>
             )}
             <div className="blockerMobile"></div>
+            <Snackbar open={open} autoHideDuration={3000} onClose={closeSnackBarMessage} message={snackBarMessage} action={alertBox} ContentProps={snackBarStyle} />
         </>
     )
 }

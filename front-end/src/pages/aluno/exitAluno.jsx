@@ -4,6 +4,9 @@ import HeaderPagesAluno from '../../components/headers/alunoPagesIndex'
 import { Container } from 'react-bootstrap'
 import { useNavigate } from 'react-router-dom';
 import { server } from "../../services/server";
+import Snackbar from '@mui/material/Snackbar';
+import CloseIcon from '@mui/icons-material/Close';
+import IconButton from '@mui/material/IconButton';
 
 function ExitAluno() {
     const [box, setBox] = useState('');
@@ -15,13 +18,16 @@ function ExitAluno() {
     const [addButtonStyle, changeAddButtonStyle] = useState('button-6-disable');
     const [addButtonState, changeAddButtonState] = useState(true);
     const [tableData, setTableData] = useState([]);
-    const [errorMessage, setErrorMessage] = useState('');
 
     const [pedidoPossivelMovimentar, setPedidoPossivelMovimentar] = useState([])
     const finalDataMoviment = {};
     var infoUsers = {}
     const [pedidos, setPedidos] = useState([])
     const [selectedItems, setSelectedItems] = useState([]);
+
+    const [open, setOpen] = React.useState(false);
+    const [snackBarMessage, setSnackBarMessage] = useState('')
+    const [snackBarStyle, setSnackBarStyle] = useState({ sx: { background: "white", color: "black", borderRadius: '10px' } })
 
     useEffect(() => {
         infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
@@ -45,12 +51,18 @@ function ExitAluno() {
 
     function navigateToConfirmExit() {
         if ((selectedItems.length === 0)) {
-            setErrorMessage('Pelo menos uma caixa deve ser selecionada.');
+            openSnackBarMessage()
+            setSnackBarMessage('Pelo menos uma caixa deve ser selecionada.');
+            setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
         } else {
-            setErrorMessage('');
             setShowConfirmExit(true);
             formatMovimentData()
             sendPedidoRequest()
+            setTimeout(() => {
+                navigate('/home-aluno')
+                setShowConfirmExit(false)
+                stagesReturn();
+            }, 3000);
         }
     }
 
@@ -127,10 +139,11 @@ function ExitAluno() {
         changeAddButtonState(true);
         if (pedidosEncontrados.length > 0) {
             setPedidoPossivelMovimentar(pedidosEncontrados);
-            setErrorMessage('');
         } else {
             setPedidoPossivelMovimentar([]);
-            setErrorMessage('Não foram encontradas caixas neste box.');
+            openSnackBarMessage()
+            setSnackBarMessage('Não foram encontradas caixas neste box.')
+            setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
         }
         setBox('');
     }
@@ -139,12 +152,6 @@ function ExitAluno() {
     function stagesReturn() {
         changeAddButtonStyle('button-6-disable');
         changeAddButtonState(true);
-    }
-
-    function requestConfirmed() {
-        navigate('/home-aluno')
-        setShowConfirmExit(false)
-        stagesReturn();
     }
 
     function formatMovimentData() {
@@ -255,17 +262,43 @@ function ExitAluno() {
         }
     }
 
+    //Snackbar settings
+    const openSnackBarMessage = () => {
+        setOpen(true);
+    };
+
+    const closeSnackBarMessage = (event, reason) => {
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpen(false);
+    };
+
+    const alertBox = (
+        <React.Fragment>
+            <IconButton
+                size="small"
+                aria-label="close"
+                color="inherit"
+                onClick={closeSnackBarMessage}
+            >
+                <CloseIcon fontSize="small" />
+            </IconButton>
+        </React.Fragment>
+    );
+
     return (
         <>
             <HeaderPagesAluno />
             <Container className='containerMobileExit'>
                 <div className="inputFormsExit">
                     <h1 className='title-1 margin-bottom-30'>Registrar pedido de saída</h1>
+                    <p className='body-small text-color-5 margin-bottom-10'>Box de armazenamento</p>
                     <input placeholder='Box de armazenamento' className='form-4' value={box} onChange={(e) => detectBoxEntry(e)} type='text' maxLength="3" />
                     <button className={addButtonStyle} onClick={searchPedidosBasedBox} disabled={addButtonState} style={{ marginBottom: '25px' }}>
                         Pesquisar caixas
                     </button>
-                    {errorMessage && <p className="error-message-mobile">{errorMessage}</p>}
+                    <p className='body-small text-color-5 margin-bottom-10'>Movimentações</p>
                     <div className="tableReport">
                         {tableReportContent()}
                     </div>
@@ -299,11 +332,11 @@ function ExitAluno() {
                     <div className="popUpConfirmCard">
                         <h1 className='body-large text-align-center margin-bottom-10'>Seu pedido de <strong>saída</strong> foi enviado com sucesso !</h1>
                         <h2 className='body-light text-align-center margin-bottom-20'>Assim que um colaborador avaliar o seu pedido, assine.</h2>
-                        <button className='button-4' onClick={requestConfirmed}>Voltar a tela inicial</button>
                     </div>
                 </div>
             )}
             <div className="blockerMobile"></div>
+            <Snackbar open={open} autoHideDuration={4000} onClose={closeSnackBarMessage} message={snackBarMessage} action={alertBox} ContentProps={snackBarStyle} />
         </>
     )
 }

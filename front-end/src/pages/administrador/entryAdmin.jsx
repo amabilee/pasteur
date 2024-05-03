@@ -150,7 +150,7 @@ function EntryAdmin() {
 
   function handleReturn() {
     setShowPopView(false)
-    setErrorMessage(' ');
+    setErrorMessage('');
     setSelectedAluno(null);
     setMovimentacoesArray([])
   }
