@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import HeaderHomeAdmin from '../../components/headers/adminHomeindex';
 import { Container } from 'react-bootstrap'
 import './style.css';
@@ -22,13 +22,13 @@ function EntryAdmin() {
   var pedidosEntrada = []
   const [pedidos, setPedidos] = useState([])
   const [nome, setNome] = useState('')
-  var infoUsers = {}
+  const infoUsers = useRef({});
   const [movimentacoesArray, setMovimentacoesArray] = useState([]);
 
 
   useEffect(() => {
     getPedidos(1);
-    infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+    infoUsers.current = JSON.parse(localStorage.getItem("loggedUserData"));
     setNome(infoUsers.NomeUser)
   }, []);
 
@@ -116,7 +116,7 @@ function EntryAdmin() {
     var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
     var userCargo = infoUsers.cargo
     try {
-      const response = await server.put(`/pedido/${idPedido}`, pedido, {
+      await server.put(`/pedido/${idPedido}`, pedido, {
         headers: {
           "Authorization": `${token}`,
           "Content-Type": "application/json",
@@ -171,8 +171,7 @@ function EntryAdmin() {
         </tr>
       </tbody>
     ));
-
-  };
+  }
 
   //Paginação;
   const handlePageChange = (page) => {
@@ -252,10 +251,10 @@ function EntryAdmin() {
                 </p>
               )}
               <div className='popUpViewButtons'>
-                <button className='button-8' disabled={false} onClick={invalidateBox} variant="outlined" >
+                <button className='button-8' disabled={false} onClick={invalidateBox}>
                   Reprovar
                 </button>
-                <button className='button-9' disabled={false} onClick={validateBox} variant="outlined" >
+                <button className='button-9' disabled={false} onClick={validateBox}>
                   Aprovar
                 </button>
               </div>

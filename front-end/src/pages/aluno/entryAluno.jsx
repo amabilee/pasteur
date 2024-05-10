@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './style.css';
 import Snackbar from '@mui/material/Snackbar';
 import HeaderPagesAluno from '../../components/headers/alunoPagesIndex'
@@ -35,15 +35,26 @@ function EntryAluno() {
     const [buttonNegativeQuant, changeStatusQuantButtonNegative] = useState('button-5-disable');
     const [buttonPositiveQuant, changeStatusQuantButtonPositive] = useState('button-5-disable');
     const finalDataMoviment = {};
-    var infoUsers = {}
+    const infoUsers = useRef({});
     const [familias, setFamilias] = useState([])
 
     useEffect(() => {
+        const userData = localStorage.getItem("loggedUserData");
+        if (userData) {
+          const parsedData = JSON.parse(userData);
+          if (parsedData.NomeUser) {
+            infoUsers.current = parsedData;
+            const nomeAluno = parsedData.NomeUser.split(' ')[0];
+            setNomeAluno(nomeAluno);
+            setMatriculaAluno(infoUsers.matricula)
+          } else {
+            console.warn("NomeUser is undefined or empty");
+          }
+        } else {
+          console.warn("No loggedUserData found in localStorage");
+        }
         getFamilias();
-        infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-        setNomeAluno(infoUsers.NomeUser.split(' ')[0])
-        setMatriculaAluno(infoUsers.matricula)
-    }, []);
+      }, []);
 
     function navigateToHomeAluno() {
         if (showPop) {
@@ -59,7 +70,7 @@ function EntryAluno() {
     }
 
     function navigateToConfirmEntry() {
-        if (box.length <= 2 || (tableData.length === 0)) {
+        if (box.length <= 2) {
             openSnackBarMessage()
             setSnackBarMessage('O box deve ter três números.')
             setSnackBarStyle({ sx: { background: '#BE5353', color: 'white', borderRadius: '15px' } });
@@ -90,7 +101,7 @@ function EntryAluno() {
         var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
         var userCargo = infoUsers.cargo
         try {
-            const response = await server.post("/pedido", finalDataMoviment, {
+            await server.post("/pedido", finalDataMoviment, {
                 headers: {
                     "Authorization": `${token}`,
                     "Content-Type": "application/json",
@@ -138,7 +149,7 @@ function EntryAluno() {
         changeStatusQuantButtonPositive('button-5')
         changeAddButtonStyle('button-6-disable')
         changeAddButtonState(false)
-    };
+    }
 
     function changeSelectorStatePositive() {
         changeStatusQuantSelect(true);
@@ -150,14 +161,14 @@ function EntryAluno() {
         setQuantity(quantityBase.quantidadeMAX)
         changeStatusQuantButtonNegative('button-5')
         changeStatusQuantButtonPositive('button-5-enable')
-    };
+    }
 
     function detectEntryQuant(e) {
         const selectedQuant = e.target.value;
         setQuantity(selectedQuant);
         changeAddButtonStyle('button-6')
         changeAddButtonState(false)
-    };
+    }
 
     function renderOptionsQuant() {
         const selectedFamilyOption = familias.find(option => option.nome === family);
@@ -188,7 +199,7 @@ function EntryAluno() {
                 </tr>
             </tbody>
         ));
-    };
+    }
 
     function addMovement() {
         const existingIndex = tableData.findIndex((item) => item.family === family);
@@ -210,7 +221,7 @@ function EntryAluno() {
         setFamily('0');
         setQuantity('0');
         stagesReturn()
-    };
+    }
 
     function stagesReturn() {
         changeStatusQuantSelect(true)

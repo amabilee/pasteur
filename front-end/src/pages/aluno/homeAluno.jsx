@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import HeaderHomeAluno from '../../components/headers/alunoHomeIndex'
 import { Container } from 'react-bootstrap'
 import entryIcon from '../../assets/aluno/entryIcon.svg'
@@ -11,15 +11,24 @@ import { useNavigate } from 'react-router-dom';
 function HomeAluno() {
   const navigate = useNavigate();
   const [nomeAluno, setNomeAluno] = useState('');
-  const [matriculaAluno, setMatriculaAluno] = useState('');
   const [quantidadeAssinaturasPendentes, setQuantidadeAssinaturasPendentes] = useState(0);
-  var infoUsers = {}
-  var pedidos = []
+  const infoUsers = useRef({});
 
   useEffect(() => {
-    infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-    setNomeAluno(infoUsers.NomeUser.split(' ')[0])
-    getPedidos()
+    const userData = localStorage.getItem("loggedUserData");
+    if (userData) {
+      const parsedData = JSON.parse(userData);
+      if (parsedData.NomeUser) {
+        infoUsers.current = parsedData;
+        const nomeAluno = parsedData.NomeUser.split(' ')[0];
+        setNomeAluno(nomeAluno);
+      } else {
+        console.warn("NomeUser is undefined or empty");
+      }
+    } else {
+      console.warn("No loggedUserData found in localStorage");
+    }
+    getPedidos();
   }, []);
 
   async function getPedidos() {
@@ -36,9 +45,7 @@ function HomeAluno() {
           "access-level": `${userCargo}`
         }
       })
-      pedidos = response.data.pedidos
       let resposeData = response.data.pedidos
-      // let pedidoFiltrados = resposeData.filter(pedido => pedido.matricula === matricula && !pedido.assinatura && pedido.status === 'Aprovado')
       setQuantidadeAssinaturasPendentes(resposeData.length)
     } catch (e) {
       console.error(e)

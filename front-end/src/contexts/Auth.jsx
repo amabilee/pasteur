@@ -1,116 +1,88 @@
 import { AuthContext } from "./authContext";
-import React, { useState, useEffect } from 'react'
+import { useState } from 'react';
 import { server } from "../services/server";
+import PropTypes from 'prop-types';
 
-export const AuthProvider = ({ children }) => {
-    const [localLogged, setLocalLogged] = useState()
-    let storedUser;
-    const storedAuth1 = localStorage.getItem('auth1') === 'true';
-    const storedAuth2 = localStorage.getItem('auth2') === 'true';
-    const storedAuth3 = localStorage.getItem('auth3') === 'true';
-    const [user, setUser] = useState(storedUser);
+const AuthProvider = ({ children }) => {
+    const [localLogged, setLocalLogged] = useState(null);
+    const [user, setUser] = useState(null);
     const [error, setError] = useState('');
-    const [auth1, setAuth1] = useState(storedAuth1);
-    const [auth2, setAuth2] = useState(storedAuth2);
-    const [auth3, setAuth3] = useState(storedAuth3);
-    const [accessLevel, setAccessLevel] = useState(0);
+    const [auth1, setAuth1] = useState(false);
+    const [auth2, setAuth2] = useState(false);
+    const [auth3, setAuth3] = useState(false);
 
-    useEffect(() => {
-        localStorage.setItem('auth1', String(auth1));
-        localStorage.setItem('auth2', String(auth2));
-        localStorage.setItem('auth3', String(auth3));
-    }, [user, auth1, auth2, auth3, storedAuth1, storedAuth2, storedAuth3]);
+    const setAuth = (auth1, auth2, auth3) => {
+        setAuth1(auth1);
+        setAuth2(auth2);
+        setAuth3(auth3);
+    };
 
-    async function loginAdmin(matricula, senha) {
+    const storeAuthData = (token, userData) => {
+        localStorage.setItem("loggedUserToken", token);
+        localStorage.setItem("loggedUserData", JSON.stringify(userData));
+        setLocalLogged(userData);
+    };
+
+    const loginAdmin = async (matricula, senha) => {
         try {
-            const response = await server.post('/login', { matricula, senha })
-            console.log(response.data)
+            const response = await server.post('/login', { matricula, senha });
+
             if (window.innerWidth <= 767) {
                 switch (response.data.cargo) {
                     case 2:
-                        setAuth1(false)
-                        setAuth2(false)
-                        setAuth3(false)
-                        setError('Colaboradores devem acessar somente em dispositivos da clinica.')
-                        return
+                        setAuth(false, false, false);
+                        setError('Colaboradores devem acessar somente em dispositivos da clinica.');
+                        return;
                     case 3:
-                        setAuth1(true)
-                        setAuth2(false)
-                        setAuth3(false)
-                        setLocalLogged(response)
-                        localStorage.setItem("loggedUserToken", response.data.token);
-                        localStorage.setItem("loggedUserData", JSON.stringify(response.data));
-                        return
+                        setAuth(true, false, false);
+                        storeAuthData(response.data.token, response.data);
+                        return;
                     case 1:
-                        setAuth1(false)
-                        setAuth2(false)
-                        setAuth3(false)
-                        setError('Admins devem acessar somente em dispositivos da clinica.')
-                        return
-
+                        setAuth(false, false, false);
+                        setError('Admins devem acessar somente em dispositivos da clinica.');
+                        return;
                 }
             } else {
                 switch (response.data.cargo) {
                     case 2:
-                        setAuth1(false)
-                        setAuth2(true)
-                        setAuth3(false)
-                        localStorage.setItem("loggedUserToken", response.data.token);
-                        localStorage.setItem("loggedUserData", JSON.stringify(response.data));
-                        console.log(response.data.token)
-                        return
+                        setAuth(false, true, false);
+                        storeAuthData(response.data.token, response.data);
+                        return;
                     case 3:
-                        setAuth1(false)
-                        setAuth2(false)
-                        setAuth3(false)
-                        setError('Aluno devem acessar somente em dispositivos mobile.')
-                        return
+                        setAuth(false, false, false);
+                        setError('Alunos devem acessar somente em dispositivos mobile.');
+                        return;
                     case 1:
-                        setAuth1(false)
-                        setAuth2(false)
-                        setAuth3(true)
-                        localStorage.setItem("loggedUserToken", response.data.token);
-                        localStorage.setItem("loggedUserData", JSON.stringify(response.data));
-                        console.log(response.data.token)
-                        return
+                        setAuth(false, false, true);
+                        storeAuthData(response.data.token, response.data);
+                        return;
                 }
-            };
-        } catch (e) {
-            setAuth1(false)
-            setAuth2(false)
-            setAuth3(false)
-            setError(e.response.data.error)
-        }
-    }
-
-    useEffect(() => {
-        setTimeout(() => {
-            var token = localStorage.getItem("loggedUserToken");
-            if (!token || token.length <= 1) {
-                signOut()
             }
-        }, 100);
-    }, [localStorage.getItem("loggedUserToken")]);
+        } catch (e) {
+            setAuth(false, false, false);
+            setError(e.response ? e.response.data.error : 'An unexpected error occurred');
+        }
+    };
 
-
-    function signOut() {
-        setUser("");
+    const signOut = () => {
         setAuth1(false);
         setAuth2(false);
         setAuth3(false);
-        setError('')
-        setLocalLogged()
-        localStorage.removeItem('user');
-        localStorage.removeItem('loggedUserToken');
-        localStorage.removeItem('loggedUserData');
-        localStorage.removeItem('auth1');
-        localStorage.removeItem('auth2');
-        localStorage.removeItem('auth3');
-    }
+        setError('');
+        setUser(null);
+        setLocalLogged(null);
+        localStorage.clear(); // Clears all localStorage data
+    };
 
     return (
         <AuthContext.Provider value={{ user, loginAdmin, auth1, auth2, auth3, error, signOut, localLogged }}>
             {children}
         </AuthContext.Provider>
-    )
-}
+    );
+};
+
+AuthProvider.propTypes = {
+    children: PropTypes.node.isRequired, // 'children' must be a React node and is required
+};
+
+export default AuthProvider;

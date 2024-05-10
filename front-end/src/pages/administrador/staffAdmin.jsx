@@ -13,7 +13,7 @@ import { server } from "../../services/server";
 import './style.css';
 import PopupCreate from '../../components/popCreate'
 import PopUpEdit from '../../components/popEdit'
-
+import PropTypes from 'prop-types';
 import Paginator from '../../components/paginator/paginator';
 
 const UsuarioTable = ({ data, onEdit, onDelete, onOrdenar }) => (
@@ -23,7 +23,7 @@ const UsuarioTable = ({ data, onEdit, onDelete, onOrdenar }) => (
         <th scope="col">NOME</th>
         <th scope="col">MATRÍCULA</th>
         <th scope="col">CARGO</th>
-        <th scope="col" onClick={() => onOrdenar()}>STATUS<img className='ordenarIcon' src={ordenarIcon} /></th>
+        <th scope="col" onClick={onOrdenar}>STATUS<img className='ordenarIcon' src={ordenarIcon} /></th>
         <th scope="col">AÇÕES</th>
       </tr>
     </thead>
@@ -33,9 +33,9 @@ const UsuarioTable = ({ data, onEdit, onDelete, onOrdenar }) => (
           <td>{usuario.nomeUser}</td>
           <td>{usuario.matricula}</td>
           <td>
-            {usuario.cargo == '3' ? 'Aluno' :
-              usuario.cargo == '2' ? 'Colaborador' :
-                usuario.cargo == '1' ? 'Administrador' :
+            {usuario.cargo === '3' ? 'Aluno' :
+              usuario.cargo === '2' ? 'Colaborador' :
+                usuario.cargo === '1' ? 'Administrador' :
                   ''}
           </td>
           <td>
@@ -50,7 +50,7 @@ const UsuarioTable = ({ data, onEdit, onDelete, onOrdenar }) => (
           </td>
           <td>
             {
-              usuario.cargo == '3'
+              usuario.cargo === '3'
                 ?
                 <button className='button-14' onClick={() => onEdit(usuario)} style={{ marginRight: '50px' }}><img src={viewIcon} /></button>
                 :
@@ -65,6 +65,20 @@ const UsuarioTable = ({ data, onEdit, onDelete, onOrdenar }) => (
     </tbody>
   </table>
 );
+
+UsuarioTable.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      nomeUser: PropTypes.string,
+      matricula: PropTypes.number,
+      cargo: PropTypes.number,
+      status: PropTypes.bool,
+    })
+  ).isRequired,
+  onEdit: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onOrdenar: PropTypes.func.isRequired,
+};
 
 
 
@@ -175,7 +189,7 @@ function StaffAdmin() {
       var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
       var userCargo = infoUsers.cargo
       try {
-        const response = await server.post("/usuario", matrixColab, {
+        await server.post("/usuario", matrixColab, {
           headers: {
             "Authorization": `${token}`,
             "Content-Type": "application/json",
@@ -207,7 +221,7 @@ function StaffAdmin() {
 
   // Editar Usuário
   const openEditPop = (originalData) => {
-    setColaboradorDataEdit((prevData) => {
+    setColaboradorDataEdit(() => {
       return { ...originalData };
     });
     setShowPopEdit(true);
@@ -230,7 +244,7 @@ function StaffAdmin() {
       var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
       var userCargo = infoUsers.cargo
       try {
-        const response = await server.put(`/usuario/${matriculaID}`, colaboradorDataEdit, {
+        await server.put(`/usuario/${matriculaID}`, colaboradorDataEdit, {
           headers: {
             "Authorization": `${token}`,
             "Content-Type": "application/json",
@@ -348,7 +362,7 @@ function StaffAdmin() {
       } else {
         setTotalPages(pagesTotal);
       }
-      if (pagesTotal <= currentPage - 1 ){
+      if (pagesTotal <= currentPage - 1) {
         setCurrentPage(1)
       }
       if (pagesTotal === 1) {
@@ -402,33 +416,40 @@ function StaffAdmin() {
   //Pesquisar Usuário
 
   const handleSearchSimple = (ordenar) => {
-    let filtro = ''
+    let filtro = '';
+
     if (ordenar) {
-      if (orderUsers === 1) {
-        filtro = `&status=1`
-      } else if (orderUsers === 2) {
-        filtro = `&status=0`
-      } else if (orderUsers === 3) {
-        filtro = ``
+      switch (orderUsers) {
+        case 1:
+          filtro = `&status=1`;
+          break;
+        case 2:
+          filtro = `&status=0`;
+          break;
+        case 3:
+        default:
+          filtro = '';
+          break;
       }
       getUsers(1, filtro);
-    } else {
-      switch (searchData.category) {
-        case 'Nome':
-          filtro = `&nomeUser=${searchData.term}`
-          getUsers(1, filtro);
-          break
-        case 'Matrícula':
-          filtro = `&matricula=${searchData.term}`
-          getUsers(1, filtro);
-          break
-        default:
-          filtro = ''
-          getUsers(1, filtro);
-          break
-      }
+      return;
     }
+
+    switch (searchData.category) {
+      case 'Nome':
+        filtro = `&nomeUser=${searchData.term}`;
+        break;
+      case 'Matrícula':
+        filtro = `&matricula=${searchData.term}`;
+        break;
+      default:
+        filtro = '';
+        break;
+    }
+
+    getUsers(1, filtro);
   };
+
 
   const handleSearchTermChange = (e) => {
     setSearchData({ ...searchData, term: e.target.value })
@@ -438,13 +459,13 @@ function StaffAdmin() {
     setColabMatricula(e.target.value.replace(/[^0-9]/g, ''));
   }
 
-  // useEffect(() => {
-  //   if (searchData.term.length >= 1) {
-  //     setPaginatorStatus(true)
-  //   } else {
-  //     setPaginatorStatus(false)
-  //   }
-  // }, [searchData.term]);
+  useEffect(() => {
+    if (searchData.term.length >= 1) {
+      setPaginatorStatus(true)
+    } else {
+      setPaginatorStatus(false)
+    }
+  }, [searchData.term]);
 
   return (
     <>
@@ -470,7 +491,7 @@ function StaffAdmin() {
                   </select>
                 </div>
                 <div className="searchBoxButtonsFamily">
-                  <button className='button-10' onClick={(e) => handleSearchSimple(false)}>Pesquisar</button>
+                  <button className='button-10' onClick={() => handleSearchSimple(false)}>Pesquisar</button>
                 </div>
               </div>
               <UsuarioTable data={resultadosPesquisa} onEdit={openEditPop} onDelete={openDeletePopup} onOrdenar={ordenarUsers} />
@@ -604,7 +625,7 @@ function StaffAdmin() {
               <button className='button-8' disabled={false} onClick={returnSearch}>
                 Cancelar
               </button>
-              <button className='button-9' disabled={false} variant='outlined' onClick={handleDeleteStaff} >
+              <button className='button-9' disabled={false} onClick={handleDeleteStaff} >
                 Continuar
               </button>
             </div>

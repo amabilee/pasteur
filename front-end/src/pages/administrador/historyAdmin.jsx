@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react';
 import HeaderHomeAdmin from '../../components/headers/adminHomeindex'
 import './style.css';
 import History from '../../components/history'

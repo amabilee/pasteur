@@ -382,6 +382,11 @@
             "name": "assinatura",
             "in": "query",
             "type": "string"
+          },
+          {
+            "name": "createdAt",
+            "in": "query",
+            "type": "string"
           }
         ],
         "responses": {
@@ -472,6 +477,11 @@
           },
           {
             "name": "nomeUser",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "status",
             "in": "query",
             "type": "string"
           }
