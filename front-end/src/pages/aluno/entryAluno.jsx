@@ -46,7 +46,7 @@ function EntryAluno() {
             infoUsers.current = parsedData;
             const nomeAluno = parsedData.NomeUser.split(' ')[0];
             setNomeAluno(nomeAluno);
-            setMatriculaAluno(infoUsers.matricula)
+            setMatriculaAluno(parsedData.matricula)
           } else {
             console.warn("NomeUser is undefined or empty");
           }

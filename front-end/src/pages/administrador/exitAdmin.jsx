@@ -130,6 +130,7 @@ function ExitAdmin() {
           "access-level": `${userCargo}`
         }
       });
+      getPedidos(1);
     }
     catch (e) {
       console.error(e);

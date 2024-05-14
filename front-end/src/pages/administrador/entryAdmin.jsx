@@ -103,7 +103,8 @@ function EntryAdmin() {
   function invalidateBox() {
     let formatedPedido = selectedAluno
     formatedPedido.status = 'Reprovado'
-    formatedPedido.colaborador = nome
+    let nome = JSON.parse(localStorage.getItem("loggedUserData"));
+    formatedPedido.colaborador = nome.NomeUser
     postPedidoAvaliado(formatedPedido.id, formatedPedido)
     openSnackBarMessage()
     setSnackBarMessage('Pedido invalidado com sucesso')
@@ -123,6 +124,7 @@ function EntryAdmin() {
           "access-level": `${userCargo}`
         }
       });
+      getPedidos(1);
     }
     catch (e) {
       console.error(e);
@@ -140,7 +142,8 @@ function EntryAdmin() {
   function validateBox() {
     let formatedPedido = selectedAluno
     formatedPedido.status = 'Aprovado'
-    formatedPedido.colaborador = nome
+    let nome = JSON.parse(localStorage.getItem("loggedUserData"));
+    formatedPedido.colaborador = nome.NomeUser
     postPedidoAvaliado(formatedPedido.id, formatedPedido)
     openSnackBarMessage()
     setSnackBarMessage('Pedido validado com sucesso')
