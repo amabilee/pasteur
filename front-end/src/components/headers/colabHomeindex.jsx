@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Container } from 'react-bootstrap';
 import './style.css'
-import leaveIcon from '../../assets/leaveIconColab.svg'
 import menuIcon from '../../assets/menuIconColab.svg'
 import entryIcon from '../../assets/addBlackIcon.svg'
 import exitIcon from '../../assets/minusBlack.svg'
@@ -39,10 +38,6 @@ export default function HeaderHomeColab() {
         setShowPopSenha(true);
     };
 
-    function spaceOutClicked() {
-        setShowMenuUser(false)
-    }
-
     //Alterar senha
     const [dataSenhaChange, setDataSenhaChange] = useState({ senha: '', senhaConfirm: '' })
     const handlePutSenha = async () => {
@@ -57,7 +52,7 @@ export default function HeaderHomeColab() {
             var token = localStorage.getItem("loggedUserToken");
             try {
                 var userCargo = infoUsers.cargo
-                const response = await server.put(`/usuario/${novaSenhaDados.matricula}`, novaSenhaDados, {
+                await server.put(`/usuario/${novaSenhaDados.matricula}`, novaSenhaDados, {
                     headers: {
                         "Authorization": `${token}`,
                         "Content-Type": "application/json",
@@ -118,7 +113,7 @@ export default function HeaderHomeColab() {
         } else {
             setButtonStyles('button-16-disable', 'button-16-disable', 'button-16-enable');
         }
-    }, [location.pathname]);
+    }, []);
 
     function setButtonStyles(entry, exit, history) {
         setbuttonEntryStyle(entry);
@@ -240,7 +235,7 @@ export default function HeaderHomeColab() {
                                 <button className='button-8' disabled={false} onClick={closeModalChangeSenha}>
                                     Cancelar
                                 </button>
-                                <button className='button-9' style={{ margin: '0 20px 0 30px' }} disabled={false} variant='outlined' onClick={handlePutSenha}>
+                                <button className='button-9' style={{ margin: '0 20px 0 30px' }} disabled={false} onClick={handlePutSenha}>
                                     Continuar
                                 </button>
                             </div>

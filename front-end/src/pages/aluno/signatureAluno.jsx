@@ -39,7 +39,6 @@ function ExitAluno() {
                 }
             });
             const pedidos = response.data.pedidos;
-            // const pedidoFiltrados = pedidos.filter(pedido => pedido.matricula === matricula && !pedido.assinatura && pedido.status === 'Aprovado');
             const pedidosCronologicos = pedidos.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
             setOrganizedPedidos(pedidosCronologicos);
         } catch (e) {
@@ -60,7 +59,7 @@ function ExitAluno() {
         var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
         var userCargo = infoUsers.cargo
         try {
-            const response = await server.put(`/pedido/${idPedido}`, pedido, {
+            await server.put(`/pedido/${idPedido}`, pedido, {
                 headers: {
                     "Authorization": `${token}`,
                     "Content-Type": "application/json",

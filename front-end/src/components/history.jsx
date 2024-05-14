@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Container } from 'react-bootstrap'
-import moment from 'moment';
-import Select from 'react-select';
 import Snackbar from '@mui/material/Snackbar';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
@@ -9,6 +7,7 @@ import './headers/style.css';
 import { server } from "../services/server";
 import Paginator from '../components/paginator/paginator';
 import ordenarIcon from '../assets/ordenarIcon.svg'
+import PropTypes from 'prop-types';
 
 //Import Components
 import PopUpSearch from '../components/popSearch';
@@ -24,8 +23,6 @@ function History() {
   const [showPopSearch, setShowPopSearch] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [resultadosPesquisa, setResultadosPesquisa] = useState([]);
-  const [staff, setStaff] = useState([]);
-
 
   const [nomeAluno_his, setAlunoName] = useState('');
   const [matricula_his, setAlunoMatricula] = useState('');
@@ -39,7 +36,6 @@ function History() {
   const [snackBarMessage, setSnackBarMessage] = useState('')
   const [snackBarStyle, setSnackBarStyle] = useState({ sx: { background: "white", color: "black", borderRadius: '10px' } })
   const [pedidos, setPedidos] = useState([])
-  let allDates = [];
 
   const usersSet = new Set();
 
@@ -75,29 +71,49 @@ function History() {
             <td>{formatarData(movimentacao.createdAt)}</td>
             <td>{formatarHora(movimentacao.createdAt)}</td>
             <td>{movimentacao.tipo}</td>
-            <td className={
-              movimentacao.status === 'Aprovado' ? 'validado-class' :
-                movimentacao.status === 'Reprovado' ? 'invalidado-class' :
-                  movimentacao.status === 'Pendente' ? 'pendente-class' :
-                    ''
-            }>
+            <td className={getStatusClass(movimentacao.status)}>
               {movimentacao.status}
             </td>
             <td>{movimentacao.colaborador}</td>
           </tr>
         ))}
-
       </tbody>
     </table>
   );
 
+  const getStatusClass = (status) => {
+    switch (status) {
+      case 'Aprovado':
+        return 'validado-class';
+      case 'Reprovado':
+        return 'invalidado-class';
+      case 'Pendente':
+        return 'pendente-class';
+      default:
+        return '';
+    }
+  };
+
+  HistoryTable.propTypes = {
+    data: PropTypes.arrayOf(
+      PropTypes.shape({
+        nomeAluno: PropTypes.string,
+        matricula: PropTypes.string,
+        periodoAluno: PropTypes.string,
+        box: PropTypes.string,
+        createdAt: PropTypes.string,
+        tipo: PropTypes.string,
+        status: PropTypes.string,
+        colaborador: PropTypes.string,
+      })
+    ).isRequired,
+    onOrdenarModalidade: PropTypes.func.isRequired,
+    onOrdenarStatus: PropTypes.func.isRequired,
+  };
+
   useEffect(() => {
     getPedidos(1);
     handleCronologicalResult()
-    const addToStaff = () => {
-      setStaff(users);
-    };
-    addToStaff();
     setOrderStatusUsers(2)
     setOrderModalidadePedido(2)
   }, []);
@@ -144,7 +160,7 @@ function History() {
       } else {
         setTotalPages(pagesTotal);
       }
-      if (pagesTotal <= currentPage - 1 ){
+      if (pagesTotal <= currentPage - 1) {
         setCurrentPage(1)
       }
       if (pagesTotal === 1) {
@@ -215,11 +231,11 @@ function History() {
 
   function handleSearchTermChange(e) {
     setSearchData({ ...searchData, term: e.target.value })
-  };
+  }
 
   function handleSearchCategoryChange(e) {
     setSearchData({ ...searchData, category: e.target.value })
-  };
+  }
 
   function handleSearchSimple(ordenar) {
     let filtro = ''
@@ -303,8 +319,8 @@ function History() {
         let filtro = ''
         if (keys.length >= 1) {
           for (let i = 0; i <= keys.length - 1; i++) {
-            var currentKeyData = eval(`${keys[i]}_his`)
-            filtro += `&${keys[i]}=${currentKeyData}`
+            var currentKeyDatas = eval(`${keys[i]}_his`)
+            filtro += `&${keys[i]}=${currentKeyDatas}`
             setSearchData({ ...searchData, category: filtro })
           }
         }
@@ -536,7 +552,7 @@ function History() {
           </div>
         </div>
         <div className="paginator-component">
-          <Paginator currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+          <Paginator currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} disabledStatus={paginatorStatus} />
         </div>
         <Snackbar open={open} autoHideDuration={4000} onClose={closeSnackBarMessage} message={snackBarMessage} action={alertBox} ContentProps={snackBarStyle}
         />

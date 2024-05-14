@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import HeaderHomeAdmin from '../../components/headers/adminHomeindex';
 import { Container } from 'react-bootstrap'
 import './style.css';
@@ -21,12 +21,12 @@ function ExitAdmin() {
   var pedidosSaida = []
   const [pedidos, setPedidos] = useState([])
   const [nome, setNome] = useState('')
-  var infoUsers = {}
+  const infoUsers = useRef({});
   const [movimentacoesArray, setMovimentacoesArray] = useState([]);
 
   useEffect(() => {
     getPedidos(1);
-    infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+    infoUsers.current = JSON.parse(localStorage.getItem("loggedUserData"));
     setNome(infoUsers.NomeUser)
   }, []);
 
@@ -123,7 +123,7 @@ function ExitAdmin() {
     var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
     var userCargo = infoUsers.cargo
     try {
-      const response = await server.put(`/pedido/${idPedido}`, pedido, {
+      await server.put(`/pedido/${idPedido}`, pedido, {
         headers: {
           "Authorization": `${token}`,
           "Content-Type": "application/json",
@@ -167,7 +167,7 @@ function ExitAdmin() {
         </tr>
       </tbody>
     ));
-  };
+  }
 
   //Paginação;
   const handlePageChange = (page) => {
@@ -247,10 +247,10 @@ function ExitAdmin() {
                 </p>
               )}
               <div className='popUpViewButtons'>
-                <button className='button-8' disabled={false} onClick={invalidateBox} variant="outlined" >
+                <button className='button-8' disabled={false} onClick={invalidateBox} >
                   Reprovado
                 </button>
-                <button className='button-9' disabled={false} onClick={validateBox} variant="outlined" >
+                <button className='button-9' disabled={false} onClick={validateBox} >
                   Aprovado
                 </button>
               </div>

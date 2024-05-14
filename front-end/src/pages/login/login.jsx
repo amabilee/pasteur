@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import './style.css';
 import { Card } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
@@ -20,7 +20,7 @@ export default function Login() {
     const [username_change, setUsernameChange] = useState('');
     const [dataSenhaChange, setDataSenhaChange] = useState({ senha: '', senhaConfirm: '' })
 
-    const { loginAdmin, error, loading, auth1, auth2, auth3 } = UseAuth()
+    const { loginAdmin, error, auth1, auth2, auth3 } = UseAuth()
 
     const togglePasswordVisibility = () => {
         setIsPasswordVisible((prev) => !prev);
@@ -42,21 +42,20 @@ export default function Login() {
 
     useEffect(() => {
         if (auth1) {
-            navigate('/home-aluno')
-            setErrorMessage('')
+          navigate('/home-aluno');
+          setErrorMessage('');
         } else if (auth2) {
-            navigate('/entry-colaborador')
-            setErrorMessage('')
+          navigate('/entry-colaborador');
+          setErrorMessage('');
         } else if (auth3) {
-            navigate('/staff-admin')
-            setErrorMessage('')
+          navigate('/staff-admin');
+          setErrorMessage('');
         } else {
-            setErrorMessage('')
+          setErrorMessage('');
         }
-    }, [auth1, auth2, auth3, error])
+      }, [auth1, auth2, auth3, navigate, setErrorMessage]);
 
     const handlePutSenha = async () => {
-        const requiredFields = ['username', 'senha', 'senhaConfirm']
         if (dataSenhaChange.senha == '' || dataSenhaChange.senhaConfirm == '') {
             setErrorMessage('Preencha todos os campos antes de adicionar.');
         } else if (dataSenhaChange.senha !== dataSenhaChange.senhaConfirm) {
@@ -65,7 +64,7 @@ export default function Login() {
             let novaSenhaDados = { matricula: Number(username_change), senha: dataSenhaChange.senha }
             var token = localStorage.getItem("loggedUserToken");
             try {
-                const response = await server.put(`/usuario/modificar/${novaSenhaDados.matricula}`, novaSenhaDados, {
+                await server.put(`/usuario/modificar/${novaSenhaDados.matricula}`, novaSenhaDados, {
                     headers: {
                         "Authorization": `${token}`,
                         "Content-Type": "application/json",
@@ -121,7 +120,7 @@ export default function Login() {
                                     )}
                                     <button className='button-1' onClick={handleLogin}>Acessar</button>
                                 </div>
-                                <button className='buttonEsqueceuSenha' onClick={(e) => setShowPopSenha(true)}>Esqueceu a senha</button>
+                                <button className='buttonEsqueceuSenha' onClick={() => setShowPopSenha(true)}>Esqueceu a senha</button>
                             </div>
                         </Card.Body>
                     </Card>
@@ -166,7 +165,7 @@ export default function Login() {
                                 <button className='button-8' disabled={false} onClick={closeModalChangeSenha}>
                                     Cancelar
                                 </button>
-                                <button className='button-9' style={{ margin: '0 20px 0 30px' }} disabled={false} variant='outlined' onClick={handlePutSenha}>
+                                <button className='button-9' style={{ margin: '0 20px 0 30px' }} disabled={false} onClick={handlePutSenha}>
                                     Continuar
                                 </button>
                             </div>

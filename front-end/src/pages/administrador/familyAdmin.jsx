@@ -8,6 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 import { server } from "../../services/server";
 import './style.css';
+import PropTypes from 'prop-types';
 
 //Component
 import PopupCreate from '../../components/popCreate'
@@ -39,10 +40,21 @@ const FamilyTable = ({ data, onEdit, onDelete }) => (
   </table>
 )
 
+FamilyTable.propTypes = {
+  data: PropTypes.arrayOf(
+    PropTypes.shape({
+      nome: PropTypes.string.isRequired,
+      quantidadeMAX: PropTypes.number.isRequired,
+      quantidadeMIN: PropTypes.number.isRequired,
+    })
+  ).isRequired,
+  onEdit: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+};
+
 function FamilyAdmin() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1)
-  const [paginatorStatus, setPaginatorStatus] = useState(false)
 
   const [showPopCreate, setShowPopCreate] = useState(false);
   const [showPopEdit, setShowPopEdit] = useState(false);
@@ -54,7 +66,6 @@ function FamilyAdmin() {
   const [quantidadeMAX_fam, setFamilyquantidadeMAX] = useState('');
   const [quantidadeMIN_fam, setFamilyquantidadeMIN] = useState('');
   const [familyDataEdit, setFamilyDataEdit] = useState({ id: 0, nome: '', quantidadeMAX: '', quantidadeMIN: '' });
-  const [familyDataEditBefore, setFamilyDataEditBefore] = useState({ id: 0, nome: '', quantidadeMAX: '', quantidadeMIN: '' });
   const [familyDataDelete, setFamilyDataDelete] = useState({ id: 0, nome: '', quantidadeMAX: '', quantidadeMIN: '' });
   var matrixFamilia = { nome: '', quantidadeMIN: '', quantidadeMAX: '' }
   const [open, setOpen] = React.useState(false);
@@ -62,7 +73,6 @@ function FamilyAdmin() {
   const [snackBarStyle, setSnackBarStyle] = useState({
     sx: { background: 'white', color: 'black', borderRadius: '10px' }
   });
-  const [familias, setFamilias] = useState([])
 
   async function getFamilia(pagina, filtro = '') {
     var token = localStorage.getItem("loggedUserToken");
@@ -121,7 +131,6 @@ function FamilyAdmin() {
 
 
   const setTableData = (data) => {
-    setFamilias(data)
     setResultadosPesquisa(data)
   }
 
@@ -166,7 +175,6 @@ function FamilyAdmin() {
     setSearchTerm('');
     setFamilyDataEdit({ nome: '', quantidadeMAX: '', quantidadeMIN: '' });
     setFamilyDataDelete({ nome: '', quantidadeMAX: '', quantidadeMIN: '' });
-    setFamilyDataEditBefore({ nome: '', quantidadeMAX: '', quantidadeMIN: '' });
     setErrorMessage('');
     setFamilyName('');
     setFamilyquantidadeMAX('')
@@ -176,14 +184,12 @@ function FamilyAdmin() {
   //Editar Familia
 
   const openEditPop = (originalData) => {
-    setFamilyDataEdit((prevData) => {
-      setFamilyDataEditBefore(prevData);
+    setFamilyDataEdit(() => {
       return { ...originalData };
     });
     setShowPopEdit(true);
     setShowPopCreate(false);
     setShowPopDelete(false);
-    setFamilyDataEditBefore(familyDataEdit);
   };
 
   const handleEditFamily = async () => {
@@ -202,7 +208,7 @@ function FamilyAdmin() {
       var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
       var userCargo = infoUsers.cargo
       try {
-        const response = await server.put(`/familia/${familyDataEdit.id}`, familyDataEdit, {
+        await server.put(`/familia/${familyDataEdit.id}`, familyDataEdit, {
           headers: {
             "Authorization": `${token}`,
             "Content-Type": "application/json",
@@ -244,7 +250,7 @@ function FamilyAdmin() {
     var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
     var userCargo = infoUsers.cargo
     try {
-      const response = await server.delete(`/familia/${familyDataDelete.id}`, {
+      await server.delete(`/familia/${familyDataDelete.id}`, {
         headers: {
           "Authorization": `${token}`,
           "Content-Type": "application/json",
@@ -286,7 +292,7 @@ function FamilyAdmin() {
       var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
       var userCargo = infoUsers.cargo
       try {
-        const response = await server.post("/familia", matrixFamilia, {
+        await server.post("/familia", matrixFamilia, {
           headers: {
             "Authorization": `${token}`,
             "Content-Type": "application/json",
@@ -357,7 +363,7 @@ function FamilyAdmin() {
           </div>
         </div>
         <div className="paginator-component">
-          <Paginator currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} disabledStatus={paginatorStatus} />
+          <Paginator currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
         </div>
         <Snackbar open={open} autoHideDuration={4000} onClose={closeSnackBarMessage} message={snackBarMessage} action={alertBox} ContentProps={snackBarStyle} />
       </Container>
@@ -426,7 +432,7 @@ function FamilyAdmin() {
               <button className='button-8' disabled={false} onClick={returnSearch} >
                 Cancelar
               </button>
-              <button className='button-9' disabled={false} variant="outlined" onClick={handleDeleteFamily} >
+              <button className='button-9' disabled={false} onClick={handleDeleteFamily} >
                 Continuar
               </button>
             </div>

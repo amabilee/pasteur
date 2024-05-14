@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react';
 import HeaderHomeColab from '../../components/headers/colabHomeindex'
 import './style.css';
 import History from '../../components/history'

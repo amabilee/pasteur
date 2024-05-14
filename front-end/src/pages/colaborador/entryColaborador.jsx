@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import HeaderHomeColab from '../../components/headers/colabHomeindex'
 import { Container } from 'react-bootstrap'
 import './style.css';
@@ -21,15 +21,15 @@ function HomeColaborador() {
   var pedidosEntrada = []
   const [pedidos, setPedidos] = useState([])
   const [nome, setNome] = useState('')
-  var infoUsers = {}
+  const infoUsers = useRef({});
   const [movimentacoesArray, setMovimentacoesArray] = useState([]);
-
 
   useEffect(() => {
     getPedidos(1);
-    infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-    setNome(infoUsers.NomeUser)
+    infoUsers.current = JSON.parse(localStorage.getItem("loggedUserData"));
+    setNome(infoUsers.current.NomeUser);
   }, []);
+  
 
   async function getPedidos(pagina) {
     var token = localStorage.getItem("loggedUserToken")
@@ -114,7 +114,7 @@ function HomeColaborador() {
     var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
     var userCargo = infoUsers.cargo
     try {
-      const response = await server.put(`/pedido/${idPedido}`, pedido, {
+      await server.put(`/pedido/${idPedido}`, pedido, {
         headers: {
           "Authorization": `${token}`,
           "Content-Type": "application/json",
@@ -169,7 +169,7 @@ function HomeColaborador() {
       </tbody>
     ));
 
-  };
+  }
 
   //Paginação;
   const handlePageChange = (page) => {
@@ -249,10 +249,10 @@ function HomeColaborador() {
                 </p>
               )}
               <div className='popUpViewButtons'>
-                <button className='button-8' disabled={false} onClick={invalidateBox} variant="outlined" >
+                <button className='button-8' disabled={false} onClick={invalidateBox}>
                   Reprovar
                 </button>
-                <button className='button-9' disabled={false} onClick={validateBox} variant="outlined" >
+                <button className='button-9' disabled={false} onClick={validateBox}>
                   Aprovar
                 </button>
               </div>

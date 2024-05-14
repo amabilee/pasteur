@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './style.css';
 import HeaderPagesAluno from '../../components/headers/alunoPagesIndex'
 import { Container } from 'react-bootstrap'
@@ -21,20 +21,13 @@ function ExitAluno() {
 
     const [pedidoPossivelMovimentar, setPedidoPossivelMovimentar] = useState([])
     const finalDataMoviment = {};
-    var infoUsers = {}
+    const infoUsers = useRef({});
     const [pedidos, setPedidos] = useState([])
     const [selectedItems, setSelectedItems] = useState([]);
 
     const [open, setOpen] = React.useState(false);
     const [snackBarMessage, setSnackBarMessage] = useState('')
     const [snackBarStyle, setSnackBarStyle] = useState({ sx: { background: "white", color: "black", borderRadius: '10px' } })
-
-    useEffect(() => {
-        infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-        setNomeAluno(infoUsers.NomeUser.split(' ')[0])
-        setMatriculaAluno(infoUsers.matricula)
-        getPedidos();
-    }, []);
 
     function navigateToHomeAluno() {
         if (showPop) {
@@ -71,7 +64,7 @@ function ExitAluno() {
         var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
         var userCargo = infoUsers.cargo
         try {
-            const response = await server.post("/pedido", finalDataMoviment, {
+            await server.post("/pedido", finalDataMoviment, {
                 headers: {
                     "Authorization": `${token}`,
                     "Content-Type": "application/json",
@@ -124,7 +117,7 @@ function ExitAluno() {
         } else {
             return null;
         }
-    };
+    }
 
 
 
@@ -167,33 +160,36 @@ function ExitAluno() {
         finalDataMoviment.quantidadeItens = ''
     }
 
-    async function getPedidos() {
-        var token = localStorage.getItem("loggedUserToken")
+    const getPedidos = async () => {
+        var token = localStorage.getItem("loggedUserToken");
         var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-        var userCargo = infoUsers.cargo
-        let formatedMatricula = Number(infoUsers.matricula)
+        var userCargo = infoUsers.cargo;
+        let formatedMatricula = Number(infoUsers.matricula);
+
         try {
             const response = await server.get(`/pedido?matricula=${formatedMatricula}&status=Aprovado`, {
-                method: 'GET',
                 headers: {
                     "Authorization": `${token}`,
                     "Content-Type": "application/json",
-                    "access-level": `${userCargo}`
-                }
-            })
-            const pedidosDisponiveisSaida = searchPedidosBasedMatricula(response.data.pedidos);
+                    "access-level": `${userCargo}`,
+                },
+            });
+            searchPedidosBasedMatricula(response.data.pedidos);
         } catch (e) {
-            console.error(e)
-            if (e.response.status == 401) {
-                localStorage.removeItem('loggedUserToken');
-                localStorage.removeItem('loggedUserData');
-                localStorage.removeItem('auth1');
-                localStorage.removeItem('auth2');
-                localStorage.removeItem('auth3');
+            console.error(e);
+            if (e.response && e.response.status === 401) {
+                localStorage.clear(); // Clear all user-related data
                 window.location.reload();
             }
         }
-    }
+    };
+
+    useEffect(() => {
+        infoUsers.current = JSON.parse(localStorage.getItem("loggedUserData"));
+        setNomeAluno(infoUsers.current.NomeUser.split(' ')[0]);
+        setMatriculaAluno(infoUsers.current.matricula);
+        getPedidos();
+    }, []);
 
     function searchPedidosBasedMatricula(pedidos) {
         const pedidosDisponiveisSaida = [];
