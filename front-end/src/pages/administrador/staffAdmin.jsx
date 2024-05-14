@@ -33,9 +33,9 @@ const UsuarioTable = ({ data, onEdit, onDelete, onOrdenar }) => (
           <td>{usuario.nomeUser}</td>
           <td>{usuario.matricula}</td>
           <td>
-            {usuario.cargo === '3' ? 'Aluno' :
-              usuario.cargo === '2' ? 'Colaborador' :
-                usuario.cargo === '1' ? 'Administrador' :
+            {usuario.cargo === 3 ? 'Aluno' :
+              usuario.cargo === 2 ? 'Colaborador' :
+                usuario.cargo === 1 ? 'Administrador' :
                   ''}
           </td>
           <td>

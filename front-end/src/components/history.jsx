@@ -98,7 +98,7 @@ function History() {
     data: PropTypes.arrayOf(
       PropTypes.shape({
         nomeAluno: PropTypes.string,
-        matricula: PropTypes.string,
+        matricula: PropTypes.number,
         periodoAluno: PropTypes.string,
         box: PropTypes.string,
         createdAt: PropTypes.string,
@@ -468,14 +468,6 @@ function History() {
         }
     }
   };
-
-  useEffect(() => {
-    if (searchData.term.length >= 1) {
-      setPaginatorStatus(true)
-    } else {
-      setPaginatorStatus(false)
-    }
-  }, [searchData.term]);
 
   //Pesquisa
 

@@ -100,8 +100,9 @@ function HomeColaborador() {
 
   function invalidateBox() {
     let formatedPedido = selectedAluno
+    let nome = JSON.parse(localStorage.getItem("loggedUserData"));
+    formatedPedido.colaborador = nome.NomeUser
     formatedPedido.status = 'Reprovado'
-    formatedPedido.colaborador = nome
     postPedidoAvaliado(formatedPedido.id, formatedPedido)
     openSnackBarMessage()
     setSnackBarMessage('Pedido invalidado com sucesso')
@@ -121,6 +122,7 @@ function HomeColaborador() {
           "access-level": `${userCargo}`
         }
       });
+      getPedidos(1);
     } catch (e) {
       console.error(e);
       if (e.response.status == 401) {
@@ -137,7 +139,8 @@ function HomeColaborador() {
   function validateBox() {
     let formatedPedido = selectedAluno
     formatedPedido.status = 'Aprovado'
-    formatedPedido.colaborador = nome
+    let nome = JSON.parse(localStorage.getItem("loggedUserData"));
+    formatedPedido.colaborador = nome.NomeUser
     postPedidoAvaliado(formatedPedido.id, formatedPedido)
     openSnackBarMessage()
     setSnackBarMessage('Pedido validado com sucesso')
