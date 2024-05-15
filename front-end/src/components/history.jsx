@@ -99,7 +99,7 @@ function History() {
       PropTypes.shape({
         nomeAluno: PropTypes.string,
         matricula: PropTypes.number,
-        periodoAluno: PropTypes.string,
+        periodoAluno: PropTypes.number,
         box: PropTypes.string,
         createdAt: PropTypes.string,
         tipo: PropTypes.string,

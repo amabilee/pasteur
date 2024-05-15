@@ -16,14 +16,22 @@ import EntryAdmin from '../pages/administrador/entryAdmin';
 import ExitAdmin from '../pages/administrador/exitAdmin';
 
 const PrivateRoute = ({ component: Component, authKey, ...rest }) => {
-  const { [authKey]: isAuthenticated } = UseAuth();
-  return isAuthenticated ? <Component {...rest} /> : <Navigate to="/entrar" />;
+  let authStatus = JSON.parse(localStorage.getItem("loggedUserData"));
+  let isAuthenticated = authStatus !== 0 ? true : false
+  if (Component == "empty") {
+    return <Navigate to="/entrar" />;
+  } else {
+    return isAuthenticated ? <Component {...rest} /> : <Navigate to="/entrar" />;
+  }
 };
 
 PrivateRoute.propTypes = {
   component: PropTypes.elementType.isRequired,
   authKey: PropTypes.string.isRequired,
 };
+
+//Empty Route
+const PrivateRouteEmpty = (props) => <PrivateRoute component="empty" authKey="" {...props} />;
 
 // Aluno Routes
 const PrivateRouteAlunoHome = (props) => <PrivateRoute component={HomeAluno} authKey="auth1" {...props} />;
@@ -44,6 +52,7 @@ const PrivateRouteAdminEntry = (props) => <PrivateRoute component={EntryAdmin} a
 const PrivateRouteAdminExit = (props) => <PrivateRoute component={ExitAdmin} authKey="auth3" {...props} />;
 
 export {
+  PrivateRouteEmpty,
   PrivateRouteAlunoHome,
   PrivateRouteAlunoEntry,
   PrivateRouteAlunoExit,

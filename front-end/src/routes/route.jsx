@@ -2,13 +2,14 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from '../pages/login/login';
 
 
-import { PrivateRouteAlunoHome, PrivateRouteAlunoEntry, PrivateRouteAlunoExit, PrivateRouteAlunoSignature, PrivateRouteColaboradorHome, PrivateRouteColaboradorHistory, PrivateRouteColaboradorExit, PrivateRouteAdminHome, PrivateRouteAdminStaff, PrivateRouteAdminFamily, PrivateRouteAdminEntry, PrivateRouteAdminExit } from '../components/PrivateRoute.jsx';
+import { PrivateRouteEmpty, PrivateRouteAlunoHome, PrivateRouteAlunoEntry, PrivateRouteAlunoExit, PrivateRouteAlunoSignature, PrivateRouteColaboradorHome, PrivateRouteColaboradorHistory, PrivateRouteColaboradorExit, PrivateRouteAdminHome, PrivateRouteAdminStaff, PrivateRouteAdminFamily, PrivateRouteAdminEntry, PrivateRouteAdminExit } from '../components/PrivateRoute.jsx';
 
 function Router() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/entrar" element={<Login/>} />
+        <Route path="/" element={<PrivateRouteEmpty />} />
+        <Route path="/entrar" element={<Login />} />
         <Route path="/home-aluno" element={<PrivateRouteAlunoHome />} />
         <Route path="/entry-aluno" element={<PrivateRouteAlunoEntry />} />
         <Route path="/exit-aluno" element={<PrivateRouteAlunoExit />} />
@@ -26,4 +27,3 @@ function Router() {
   )
 }
 export default Router
-
