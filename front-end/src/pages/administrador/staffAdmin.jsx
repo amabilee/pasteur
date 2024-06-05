@@ -50,7 +50,7 @@ const UsuarioTable = ({ data, onEdit, onDelete, onOrdenar }) => (
           </td>
           <td>
             {
-              usuario.cargo === '3'
+              usuario.cargo === 3
                 ?
                 <button className='button-14' onClick={() => onEdit(usuario)} style={{ marginRight: '50px' }}><img src={viewIcon} /></button>
                 :
@@ -165,52 +165,94 @@ function StaffAdmin() {
 
   // Criar Usuário
   const handleCreateStaff = async () => {
-    const requiredFields = ['nomeUser', 'matricula', 'cargo', 'senha', 'senhaConfirm']
     const existingColab = users.find(usuario => {
       const userExist = usuario.matricula
       if (Number(userExist) === Number(matricula_colab)) {
         return true;
       }
     })
-    if (requiredFields.some(field => !eval(`${field}_colab`))) {
-      setErrorMessage('Preencha todos os campos antes de adicionar.');
-    } else if (existingColab) {
-      setErrorMessage('Já existe um usuário com essa matrícula.');
-    } else if (senha_colab !== senhaConfirm_colab) {
-      setErrorMessage(`A senha deve ser igual nos campos 'Senha' e 'Confirmar senha'.`);
-    } else if (parseInt(matricula_colab <= 0)) {
-      setErrorMessage('A matrícula deve ser maior que zero.');
-    } else {
-      formatColabData()
-      openSnackBarMessage();
-      setSnackBarMessage('Usuário criado com sucesso');
-      setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
-      var token = localStorage.getItem("loggedUserToken");
-      var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
-      var userCargo = infoUsers.cargo
-      try {
-        await server.post("/usuario", matrixColab, {
-          headers: {
-            "Authorization": `${token}`,
-            "Content-Type": "application/json",
-            "access-level": `${userCargo}`
+    if (cargo_colab === '3') {
+      const requiredFieldsAluno = ['nomeUser', 'matricula', 'cargo']
+      if (requiredFieldsAluno.some(field => !eval(`${field}_colab`))) {
+        setErrorMessage('Preencha todos os campos antes de adicionar.');
+      } else if (existingColab) {
+        setErrorMessage('Já existe um usuário com essa matrícula.');
+      } else if (parseInt(matricula_colab <= 0)) {
+        setErrorMessage('A matrícula deve ser maior que zero.');
+      } else {
+        formatColabData()
+        openSnackBarMessage();
+        setSnackBarMessage('Usuário criado com sucesso');
+        setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
+        var token = localStorage.getItem("loggedUserToken");
+        var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+        var userCargo = infoUsers.cargo
+        try {
+          await server.post("/usuario", matrixColab, {
+            headers: {
+              "Authorization": `${token}`,
+              "Content-Type": "application/json",
+              "access-level": `${userCargo}`
+            }
+          });
+          returnSearch();
+          getUsers(1)
+        } catch (e) {
+          console.error(e);
+          if (e.response.status == 401) {
+            localStorage.removeItem('loggedUserToken');
+            localStorage.removeItem('loggedUserData');
+            localStorage.removeItem('auth1');
+            localStorage.removeItem('auth2');
+            localStorage.removeItem('auth3');
+            window.location.reload();
           }
-        });
-        returnSearch();
-        getUsers(1)
-      } catch (e) {
-        console.error(e);
-        if (e.response.status == 401) {
-          localStorage.removeItem('loggedUserToken');
-          localStorage.removeItem('loggedUserData');
-          localStorage.removeItem('auth1');
-          localStorage.removeItem('auth2');
-          localStorage.removeItem('auth3');
-          window.location.reload();
         }
-      }
-      returnSearch();
+        returnSearch();
 
+      }
+    } else {
+      const requiredFields = ['nomeUser', 'matricula', 'cargo', 'senha', 'senhaConfirm']
+      if (requiredFields.some(field => !eval(`${field}_colab`))) {
+        setErrorMessage('Preencha todos os campos antes de adicionar.');
+      } else if (existingColab) {
+        setErrorMessage('Já existe um usuário com essa matrícula.');
+      } else if (senha_colab !== senhaConfirm_colab) {
+        setErrorMessage(`A senha deve ser igual nos campos 'Senha' e 'Confirmar senha'.`);
+      } else if (parseInt(matricula_colab <= 0)) {
+        setErrorMessage('A matrícula deve ser maior que zero.');
+      } else {
+        formatColabData()
+        openSnackBarMessage();
+        setSnackBarMessage('Usuário criado com sucesso');
+        setSnackBarStyle({ sx: { background: '#79B874', color: 'white', borderRadius: '15px' } });
+        var token = localStorage.getItem("loggedUserToken");
+        var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
+        var userCargo = infoUsers.cargo
+        try {
+          await server.post("/usuario", matrixColab, {
+            headers: {
+              "Authorization": `${token}`,
+              "Content-Type": "application/json",
+              "access-level": `${userCargo}`
+            }
+          });
+          returnSearch();
+          getUsers(1)
+        } catch (e) {
+          console.error(e);
+          if (e.response.status == 401) {
+            localStorage.removeItem('loggedUserToken');
+            localStorage.removeItem('loggedUserData');
+            localStorage.removeItem('auth1');
+            localStorage.removeItem('auth2');
+            localStorage.removeItem('auth3');
+            window.location.reload();
+          }
+        }
+        returnSearch();
+
+      }
     }
   };
 
@@ -529,22 +571,42 @@ function StaffAdmin() {
                 </select>
               </div>
             </div>
-            <div className="createCardBottom" style={{ display: 'flex', marginTop: '20px' }}>
-              <div className='searchForms' style={{ marginRight: '20px' }}>
-                <span className='body-normal margin-bottom-5'>Senha</span>
-                <div className='iconPasswordContainer'>
-                  <input style={{ width: "200px" }} maxLength="10" placeholder='Senha' className='form-1' value={senha_colab} onChange={(e) => setColabSenha(e.target.value)} type={isPasswordVisible ? 'text' : 'password'} />
-                  <img src={isPasswordVisible ? eyeOn : eyeOff} className="eyePassword" onClick={togglePasswordVisibility} />
+            {cargo_colab === '3' && (
+              <div className="createCardBottom" style={{ display: 'flex', marginTop: '20px' }}>
+                <div className='searchForms' style={{ marginRight: '20px' }}>
+                  <span className='body-normal margin-bottom-5'>Senha</span>
+                  <div className='iconPasswordContainer'>
+                    <input style={{ width: "200px" }} disabled={true} maxLength="10" placeholder='Senha' className='form-1' value={senha_colab} onChange={(e) => setColabSenha(e.target.value)} type={isPasswordVisible ? 'text' : 'password'} />
+                    <img src={isPasswordVisible ? eyeOn : eyeOff} className="eyePassword" onClick={togglePasswordVisibility} />
+                  </div>
+                </div>
+                <div className='searchForms'>
+                  <span className='body-normal margin-bottom-5'>Confirmar senha</span>
+                  <div className='iconPasswordContainer'>
+                    <input style={{ width: "200px" }} disabled={true} maxLength="10" placeholder='Senha' className='form-1' value={senhaConfirm_colab} onChange={(e) => setColabSenhaConfirm(e.target.value)} type={isPasswordVisible2 ? 'text' : 'password'} />
+                    <img src={isPasswordVisible2 ? eyeOn : eyeOff} className="eyePassword" onClick={togglePasswordVisibility2} />
+                  </div>
                 </div>
               </div>
-              <div className='searchForms'>
-                <span className='body-normal margin-bottom-5'>Confirmar senha</span>
-                <div className='iconPasswordContainer'>
-                  <input style={{ width: "200px" }} maxLength="10" placeholder='Senha' className='form-1' value={senhaConfirm_colab} onChange={(e) => setColabSenhaConfirm(e.target.value)} type={isPasswordVisible2 ? 'text' : 'password'} />
-                  <img src={isPasswordVisible2 ? eyeOn : eyeOff} className="eyePassword" onClick={togglePasswordVisibility2} />
+            )}
+            {cargo_colab !== '3' && (
+              <div className="createCardBottom" style={{ display: 'flex', marginTop: '20px' }}>
+                <div className='searchForms' style={{ marginRight: '20px' }}>
+                  <span className='body-normal margin-bottom-5'>Senha</span>
+                  <div className='iconPasswordContainer'>
+                    <input style={{ width: "200px" }} maxLength="10" placeholder='Senha' className='form-1' value={senha_colab} onChange={(e) => setColabSenha(e.target.value)} type={isPasswordVisible ? 'text' : 'password'} />
+                    <img src={isPasswordVisible ? eyeOn : eyeOff} className="eyePassword" onClick={togglePasswordVisibility} />
+                  </div>
+                </div>
+                <div className='searchForms'>
+                  <span className='body-normal margin-bottom-5'>Confirmar senha</span>
+                  <div className='iconPasswordContainer'>
+                    <input style={{ width: "200px" }} maxLength="10" placeholder='Senha' className='form-1' value={senhaConfirm_colab} onChange={(e) => setColabSenhaConfirm(e.target.value)} type={isPasswordVisible2 ? 'text' : 'password'} />
+                    <img src={isPasswordVisible2 ? eyeOn : eyeOff} className="eyePassword" onClick={togglePasswordVisibility2} />
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </>
         }
         onSubmit={handleCreateStaff}
