@@ -11,7 +11,6 @@ const User = db.define(
         },
         senha:{
             type: DataTypes.STRING,
-            allowNull: false,
         },
         nomeUser:{
             type: DataTypes.STRING,
