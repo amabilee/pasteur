@@ -59,9 +59,6 @@ class UserController {
   static async createEntity(req, res) {
     try {
       const { matricula, senha, nomeUser, cargo, status } = req.body;
-      if (!senha) {
-        return res.status(400).json({ error: 'A senha não pode estar vazia.' });
-      }
       const hashedPassword = await bcrypt.hash(senha, 10);
       const createdUser = await User.create({ matricula, senha: hashedPassword, nomeUser, cargo, status });
       res.status(201).json({ user: createdUser });
@@ -75,9 +72,6 @@ class UserController {
     try {
       const { matricula } = req.params;
       const { senha, nomeUser, cargo, status } = req.body;
-      if (!senha) {
-        return res.status(400).json({ error: 'A senha não pode estar vazia.' });
-      }
       const hashedPassword = await bcrypt.hash(senha, 10);
       await User.update({ senha: hashedPassword, nomeUser, cargo, status }, { where: { matricula } });
       res.json({ message: 'Usuário atualizado com sucesso.' });
