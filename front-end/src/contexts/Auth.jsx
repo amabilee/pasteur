@@ -24,6 +24,12 @@ const AuthProvider = ({ children }) => {
     };
 
     const loginAdmin = async (matricula, senha) => {
+        if (!matricula || !senha) {
+            setAuth(false, false, false);
+            setError('Preencha todos os campos.');
+            return;
+        }
+
         try {
             const response = await server.post('/login', { matricula, senha });
 
@@ -72,6 +78,7 @@ const AuthProvider = ({ children }) => {
         setUser(null);
         setLocalLogged(null);
         localStorage.clear(); // Clears all localStorage data
+        window.location.href = "/entrar";
     };
 
     return (
