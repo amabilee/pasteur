@@ -88,7 +88,6 @@ export default function HeaderHomeColab() {
     };
 
     function returnLogin() {
-        navigate('/entrar')
         signOut()
     }
 

@@ -1,6 +1,5 @@
 import { Navigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { UseAuth } from '../hooks/index';
 
 import HomeAluno from '../pages/aluno/homeAluno';
 import EntryAluno from '../pages/aluno/entryAluno';
@@ -16,18 +15,21 @@ import EntryAdmin from '../pages/administrador/entryAdmin';
 import ExitAdmin from '../pages/administrador/exitAdmin';
 
 const PrivateRoute = ({ component: Component, authKey, ...rest }) => {
-  let authStatus = JSON.parse(localStorage.getItem("loggedUserData"));
-  let isAuthenticated = authStatus !== 0 ? true : false
-  if (Component == "empty") {
-    return <Navigate to="/entrar" />;
-  } else {
-    return isAuthenticated ? <Component {...rest} /> : <Navigate to="/entrar" />;
-  }
+
+    let authStatus = JSON.parse(localStorage.getItem("loggedUserData"));
+
+    let isAuthenticated = authStatus !== null ? true : false
+
+    if (Component == "empty") {
+        return <Navigate to="/entrar" />;
+    } else {
+        return isAuthenticated ? <Component {...rest} /> : <Navigate to="/entrar" />;
+    }
 };
 
 PrivateRoute.propTypes = {
-  component: PropTypes.elementType.isRequired,
-  authKey: PropTypes.string.isRequired,
+    component: PropTypes.elementType.isRequired,
+    authKey: PropTypes.string.isRequired,
 };
 
 //Empty Route
@@ -52,17 +54,17 @@ const PrivateRouteAdminEntry = (props) => <PrivateRoute component={EntryAdmin} a
 const PrivateRouteAdminExit = (props) => <PrivateRoute component={ExitAdmin} authKey="auth3" {...props} />;
 
 export {
-  PrivateRouteEmpty,
-  PrivateRouteAlunoHome,
-  PrivateRouteAlunoEntry,
-  PrivateRouteAlunoExit,
-  PrivateRouteAlunoSignature,
-  PrivateRouteColaboradorHome,
-  PrivateRouteColaboradorHistory,
-  PrivateRouteColaboradorExit,
-  PrivateRouteAdminHome,
-  PrivateRouteAdminStaff,
-  PrivateRouteAdminFamily,
-  PrivateRouteAdminEntry,
-  PrivateRouteAdminExit,
+    PrivateRouteEmpty,
+    PrivateRouteAlunoHome,
+    PrivateRouteAlunoEntry,
+    PrivateRouteAlunoExit,
+    PrivateRouteAlunoSignature,
+    PrivateRouteColaboradorHome,
+    PrivateRouteColaboradorHistory,
+    PrivateRouteColaboradorExit,
+    PrivateRouteAdminHome,
+    PrivateRouteAdminStaff,
+    PrivateRouteAdminFamily,
+    PrivateRouteAdminEntry,
+    PrivateRouteAdminExit,
 };

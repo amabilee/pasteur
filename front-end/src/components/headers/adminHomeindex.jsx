@@ -1,4 +1,4 @@
-import {useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Container } from 'react-bootstrap';
 import './style.css'
 import menuIcon from '../../assets/menuIconColab.svg'
@@ -88,7 +88,6 @@ export default function HeaderHomeColab() {
     const { signOut } = UseAuth()
 
     function returnLogin() {
-        navigate('/entrar')
         signOut()
     }
 

@@ -7,18 +7,17 @@ import eyeOn from '../../assets/eyeOn.svg'
 import eyeOff from '../../assets/eyeOff.svg'
 import { server } from "../../services/server";
 
-
 export default function Login() {
     const [isPasswordVisible, setIsPasswordVisible] = useState(false);
     const [isPasswordVisible2, setIsPasswordVisible2] = useState(false);
     const [username, setUsername] = useState('');
     const [pwd, setPwd] = useState('');
     const navigate = useNavigate();
-    const [showLogin, setShowLogin] = useState(false);
+    const [showLogin, setShowLogin] = useState(true);
     const [errorMessage, setErrorMessage] = useState('');
     const [showPopSenha, setShowPopSenha] = useState(false);
     const [username_change, setUsernameChange] = useState('');
-    const [dataSenhaChange, setDataSenhaChange] = useState({ senha: '', senhaConfirm: '' })
+    const [dataSenhaChange, setDataSenhaChange] = useState({ senha: '', senhaConfirm: '' });
 
     const { loginAdmin, error, auth1, auth2, auth3 } = UseAuth()
 
@@ -30,30 +29,37 @@ export default function Login() {
         setIsPasswordVisible2((prev) => !prev);
     };
 
-    function handleLogin() {
-        loginAdmin(username, pwd)
+    const handleLogin = async () => {
+        setShowLogin(false);
+
+        await loginAdmin(username, pwd)
+            .then(() => {
+                setShowLogin(true);
+            });
+    }
+
+    const handleHitEnter = (e) => {
+        if (e.key === "Enter") {
+            if (username && pwd) {
+                handleLogin();
+            }
+        }
     }
 
     useEffect(() => {
-        setTimeout(() => {
-            setShowLogin(true);
-        }, 3000);
-    }, []);
-
-    useEffect(() => {
         if (auth1) {
-          navigate('/home-aluno');
-          setErrorMessage('');
+            navigate('/home-aluno');
+            setErrorMessage('');
         } else if (auth2) {
-          navigate('/entry-colaborador');
-          setErrorMessage('');
+            navigate('/entry-colaborador');
+            setErrorMessage('');
         } else if (auth3) {
-          navigate('/staff-admin');
-          setErrorMessage('');
+            navigate('/staff-admin');
+            setErrorMessage('');
         } else {
-          setErrorMessage('');
+            setErrorMessage('');
         }
-      }, [auth1, auth2, auth3, navigate, setErrorMessage]);
+    }, [auth1, auth2, auth3, navigate, setErrorMessage]);
 
     const handlePutSenha = async () => {
         if (dataSenhaChange.senha == '' || dataSenhaChange.senhaConfirm == '') {
@@ -90,6 +96,13 @@ export default function Login() {
         setUsername('')
         setPwd('')
     }
+
+    // window.addEventListener("keydown", (event) => {
+    //     if (event.key === "Enter" && (username !== "" && pwd !== "")) {
+    //         handleLogin()
+    //     }
+    // });
+
     return (
         <div className="body">
             <div className={`loadingPage ${showLogin ? 'loadingSectionSmall' : ''}`}>
@@ -106,10 +119,10 @@ export default function Login() {
                             <div className="cardLogin">
                                 <h1 className='heading-3 text-color-1 text-align-center margin-bottom-10'>Login</h1>
                                 <span className='body-normal text-color-5 margin-bottom-10'>Usuário</span>
-                                <input placeholder='Matrícula' className='form-1' value={username} onChange={(e) => setUsername(e.target.value)} />
+                                <input placeholder='Matrícula' className='form-1' value={username} onChange={(e) => setUsername(e.target.value)} onKeyDown={handleHitEnter} />
                                 <span className='body-normal text-color-5 margin-bottom-10 margin-top-20'>Senha</span>
                                 <div className='iconPasswordContainer'>
-                                    <input style={{ width: "100%" }} placeholder='Senha' className='form-1' value={pwd} onChange={(e) => setPwd(e.target.value)} type={isPasswordVisible ? 'text' : 'password'} />
+                                    <input style={{ width: "100%" }} placeholder='Senha' className='form-1' value={pwd} onChange={(e) => setPwd(e.target.value)} type={isPasswordVisible ? 'text' : 'password'} onKeyDown={handleHitEnter} />
                                     <img src={isPasswordVisible ? eyeOn : eyeOff} className="eyePassword" onClick={togglePasswordVisibility} />
                                 </div>
                                 <div className='errorContainer' style={{ position: 'relative', zIndex: 1 }}>
