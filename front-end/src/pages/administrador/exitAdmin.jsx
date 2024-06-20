@@ -23,9 +23,10 @@ function ExitAdmin() {
   const [nome, setNome] = useState('')
   const infoUsers = useRef({});
   const [movimentacoesArray, setMovimentacoesArray] = useState([]);
+  const [searchWord, setSearchWord] = useState("")
 
   useEffect(() => {
-    getPedidos(1);
+    getPedidos(1, "");
     infoUsers.current = JSON.parse(localStorage.getItem("loggedUserData"));
     setNome(infoUsers.NomeUser)
   }, []);
@@ -34,7 +35,7 @@ function ExitAdmin() {
     setOpen(true);
   };
 
-  async function getPedidos(pagina) {
+  async function getPedidos(pagina, searchTerm) {
     var token = localStorage.getItem("loggedUserToken")
     var infoUsers = JSON.parse(localStorage.getItem("loggedUserData"));
     var userCargo = infoUsers.cargo
@@ -42,7 +43,7 @@ function ExitAdmin() {
       pagina == 1
     }
     try {
-      const response = await server.get(`/pedido?page=${pagina}&tipo=Saída&status=Pendente`, {
+      const response = await server.get(`/pedido?page=${pagina}&tipo=Saída&status=Pendente&nomeAluno=${searchTerm}`, {
         method: 'GET',
         headers: {
           "Authorization": `${token}`,
@@ -51,7 +52,32 @@ function ExitAdmin() {
         }
       })
       setPedidos(response.data.pedidos)
-      setTotalPages(response.data.pagination.totalPages)
+      let pagesTotal = response.data.pagination.totalPages
+      if (pagesTotal <= 0) {
+        setTotalPages(1);
+      } else {
+        setTotalPages(pagesTotal);
+      }
+      if (pagesTotal <= currentPage - 1) {
+        setCurrentPage(1)
+      }
+      if (pagesTotal === 1) {
+        try {
+          const responseOnePage = await server.get(`/pedido?page=1&tipo=Saída&status=Pendente&nomeAluno=${searchTerm}`, {
+            method: 'GET',
+            headers: {
+              "Authorization": `${token}`,
+              "Content-Type": "application/json",
+              "access-level": `${userCargo}`
+            }
+          })
+          setPedidos(responseOnePage.data.pedidos)
+          setCurrentPage(1)
+          setTotalPages(1);
+        } catch (e) {
+          console.error(e)
+        }
+      }
     }
     catch (e) {
       console.error(e)
@@ -130,7 +156,7 @@ function ExitAdmin() {
           "access-level": `${userCargo}`
         }
       });
-      getPedidos(1);
+      getPedidos(1, "");
     }
     catch (e) {
       console.error(e);
@@ -173,18 +199,25 @@ function ExitAdmin() {
   //Paginação;
   const handlePageChange = (page) => {
     setCurrentPage(page);
-    getPedidos(page)
+    getPedidos(page, searchWord)
   };
 
+  const handleSearch = (data) => {
+    setSearchWord(data)
+    getPedidos(currentPage, data)
+  }
 
   return (
     <>
       <HeaderHomeAdmin />
       <Container className='containerDesktop'>
         <div className='boxContainerDesktop'>
-          <div className="headContainerDesktop">
-            <h2 className='body-normal text-color-5'>Validação saída de caixas</h2>
-            <h1 className='heading-4'>Pedidos de saída pendentes</h1>
+          <div className="headContainerAdminDesktop">
+            <div className="headContainerAdminText">
+              <h2 className='body-normal text-color-5'>Validação saída de caixas</h2>
+              <h1 className='heading-4'>Pedidos de saída pendentes</h1>
+            </div>
+            <input type='text' placeholder="Pesquisar por nome..." className='form-3' value={searchWord} onChange={(e) => handleSearch(e.target.value)} />
           </div>
           <div className="bodyContainerDesktop">
             <div className="tableRequests">
