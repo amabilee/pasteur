@@ -1,6 +1,6 @@
 > # Sistema Pasteur :clipboard:
 > 
-> **Agosto/2024**
+> **Junho/2024**
 > 
 > > Bem-vindo ao repositório do backend do Sistema de Controle de Estoque para uma aplicação de gerenciamento de inventário.
 > 
@@ -19,7 +19,7 @@
 > Para começar a trabalhar com este projeto, clone o repositório usando o seguinte comando:
 > 
 > ```bash
-> git clone 
+> git clone https://github.com/amabilee/pasteur.git
 > ```
 > 
 > ## Configuração do Ambiente de Desenvolvimento
